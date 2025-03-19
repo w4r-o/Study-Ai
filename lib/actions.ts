@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase/server"
 import { auth } from "@/lib/auth"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
 
-// Maximum file size in bytes (10MB)
-const MAX_FILE_SIZE = 10 * 1024 * 1024
+// Maximum file size in bytes (20MB)
+const MAX_FILE_SIZE = 20 * 1024 * 1024
 
 /**
  * Creates a new quiz based on uploaded notes
@@ -31,15 +31,20 @@ export async function createQuiz(formData: FormData): Promise<string> {
       const grade = formData.get("grade") as string
       const questionDistribution = JSON.parse(formData.get("questionDistribution") as string)
 
+      // Validate grade level
+      if (!["9", "10", "11", "12"].includes(grade)) {
+        throw new Error("Invalid grade level. Please select a grade between 9 and 12.")
+      }
+
       // Validate file sizes
       for (const file of notesFiles) {
         if (file.size > MAX_FILE_SIZE) {
-          throw new Error(`File "${file.name}" is too large. Maximum file size is 10MB.`)
+          throw new Error(`File "${file.name}" is too large. Maximum file size is 20MB.`)
         }
       }
 
       if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
-        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 10MB.`)
+        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 20MB.`)
       }
 
       // Check if OpenAI API key is available
@@ -167,15 +172,20 @@ export async function createQuiz(formData: FormData): Promise<string> {
       const grade = formData.get("grade") as string
       const questionDistribution = JSON.parse(formData.get("questionDistribution") as string)
 
+      // Validate grade level
+      if (!["9", "10", "11", "12"].includes(grade)) {
+        throw new Error("Invalid grade level. Please select a grade between 9 and 12.")
+      }
+
       // Validate file sizes
       for (const file of notesFiles) {
         if (file.size > MAX_FILE_SIZE) {
-          throw new Error(`File "${file.name}" is too large. Maximum file size is 10MB.`)
+          throw new Error(`File "${file.name}" is too large. Maximum file size is 20MB.`)
         }
       }
 
       if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
-        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 10MB.`)
+        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 20MB.`)
       }
 
       // Check if OpenAI API key is available

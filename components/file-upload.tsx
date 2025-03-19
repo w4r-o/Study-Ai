@@ -14,8 +14,8 @@ import { createQuiz } from "@/lib/actions"
 import { ApiKeyWarning } from "@/components/api-key-warning"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-// Maximum file size in bytes (10MB)
-const MAX_FILE_SIZE = 10 * 1024 * 1024
+// Maximum file size in bytes (20MB)
+const MAX_FILE_SIZE = 20 * 1024 * 1024
 
 export function FileUpload() {
   const router = useRouter()
@@ -36,7 +36,7 @@ export function FileUpload() {
   // Validate file size
   const validateFileSize = (file: File) => {
     if (file.size > MAX_FILE_SIZE) {
-      throw new Error(`File "${file.name}" is too large. Maximum file size is 10MB.`)
+      throw new Error(`File "${file.name}" is too large. Maximum file size is 20MB.`)
     }
   }
 
@@ -196,7 +196,7 @@ export function FileUpload() {
           <p className="mt-2 text-sm text-muted-foreground">
             Drag and drop your PDF files here, or click to select files
           </p>
-          <p className="text-xs text-muted-foreground mt-1">Maximum file size: 10MB</p>
+          <p className="text-xs text-muted-foreground mt-1">Maximum file size: 20MB</p>
         </label>
       </div>
 
@@ -267,7 +267,7 @@ export function FileUpload() {
             <SelectValue placeholder="Select your grade" />
           </SelectTrigger>
           <SelectContent>
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((grade) => (
+            {[9, 10, 11, 12].map((grade) => (
               <SelectItem key={grade} value={grade.toString()}>
                 Grade {grade}
               </SelectItem>
