@@ -127,7 +127,6 @@ export function FileUpload() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    console.log("clicked generate practice test")
 
     if (files.length === 0) {
       setError("Please upload at least one PDF file")
@@ -139,6 +138,7 @@ export function FileUpload() {
       return
     }
 
+    console.log("clicked generate practice test")
     setIsUploading(true)
 
     try {
@@ -146,10 +146,12 @@ export function FileUpload() {
       const formData = new FormData()
       files.forEach((file) => {
         formData.append("notes", file)
+        console.log(`Processing file: ${file.name}`)
       })
 
       if (pastTestUploaded) {
         formData.append("pastTest", pastTestUploaded)
+        console.log(`Processing past test: ${pastTestUploaded.name}`)
       }
 
       formData.append("grade", grade)
@@ -204,8 +206,8 @@ export function FileUpload() {
       {/* File List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          <Label>Uploaded Files</Label>
-          <div className="space-y-2">
+          <Label className="block mb-2">Uploaded Files</Label>
+          <div className="space-y-2 bg-background/50 p-4 rounded-lg border">
             {files.map((file, index) => (
               <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
                 <div className="flex items-center space-x-2">
@@ -229,35 +231,35 @@ export function FileUpload() {
 
       {/* Past Test Upload */}
       <div className="space-y-2">
-        <Label>Past Test (Optional)</Label>
-        <div className="flex items-center space-x-2">
-          <Input
-            type="file"
-            accept=".pdf"
-            onChange={handlePastTestChange}
-            className="flex-1"
-          />
-          <Button type="button" variant="outline" onClick={() => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()}>
-            Upload
-          </Button>
-        </div>
-        {pastTestUploaded && (
-          <div className="flex items-center justify-between p-2 bg-muted rounded-md">
-            <div className="flex items-center space-x-2">
-              <FileType className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{pastTestUploaded.name}</span>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={removePastTest}
-              className="h-8 w-8"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+        <Label className="block mb-2">Past Test (Optional)</Label>
+        <div className="bg-background/50 p-4 rounded-lg border">
+          <div className="flex items-center space-x-2 mb-2">
+            <Input
+              type="file"
+              accept=".pdf"
+              onChange={handlePastTestChange}
+              className="flex-1"
+              id="pastTest"
+            />
           </div>
-        )}
+          {pastTestUploaded && (
+            <div className="flex items-center justify-between p-2 bg-muted rounded-md mt-2">
+              <div className="flex items-center space-x-2">
+                <FileType className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">{pastTestUploaded.name}</span>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={removePastTest}
+                className="h-8 w-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Grade Selection */}

@@ -56,7 +56,6 @@ export async function createQuiz(formData: FormData): Promise<string> {
       const notesText = await Promise.all(
         notesFiles.map(async (file) => {
           const text = await extractTextFromPDF(file)
-          console.log("chatgpt has read the pdf")
           return text
         })
       )
@@ -65,12 +64,10 @@ export async function createQuiz(formData: FormData): Promise<string> {
       let pastTestText = ""
       if (pastTestFile) {
         pastTestText = await extractTextFromPDF(pastTestFile)
-        console.log("chatgpt has read the past test pdf")
       }
 
       // Determine subject using AI
       const subject = await determineSubject(notesText.join("\n"))
-      console.log("sending quiz")
 
       // Generate quiz questions
       const totalQuestions =
@@ -79,6 +76,8 @@ export async function createQuiz(formData: FormData): Promise<string> {
         questionDistribution.thinking +
         questionDistribution.application +
         questionDistribution.communication
+
+      console.log("sending quiz")
 
       const quizPrompt = `
         Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
@@ -193,7 +192,6 @@ export async function createQuiz(formData: FormData): Promise<string> {
       const notesText = await Promise.all(
         notesFiles.map(async (file) => {
           const text = await extractTextFromPDF(file)
-          console.log("chatgpt has read the pdf")
           return text
         })
       )
@@ -202,12 +200,10 @@ export async function createQuiz(formData: FormData): Promise<string> {
       let pastTestText = ""
       if (pastTestFile) {
         pastTestText = await extractTextFromPDF(pastTestFile)
-        console.log("chatgpt has read the past test pdf")
       }
 
       // Determine subject using AI
       const subject = await determineSubject(notesText.join("\n"))
-      console.log("sending quiz")
 
       // Generate quiz questions
       const totalQuestions =
@@ -216,6 +212,8 @@ export async function createQuiz(formData: FormData): Promise<string> {
         questionDistribution.thinking +
         questionDistribution.application +
         questionDistribution.communication
+
+      console.log("sending quiz")
 
       const quizPrompt = `
         Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
