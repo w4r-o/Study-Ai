@@ -58,4 +58,8 @@ const AlertDescription = React.forwardRef<
 ))
 AlertDescription.displayName = "AlertDescription"
 
+console.log("clicked generate practice test")
+
+console.log("chatgpt has read the past test pdf")
+
 export { Alert, AlertTitle, AlertDescription } 

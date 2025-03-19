@@ -53,28 +53,24 @@ export async function createQuiz(formData: FormData): Promise<string> {
       }
 
       // Extract text from PDFs
-      const notesTextPromises = notesFiles.map((file) => extractTextFromPDF(file))
-      const notesTexts = await Promise.all(notesTextPromises)
-      const notesText = notesTexts.join("\n\n")
+      const notesText = await Promise.all(
+        notesFiles.map(async (file) => {
+          const text = await extractTextFromPDF(file)
+          console.log("chatgpt has read the pdf")
+          return text
+        })
+      )
 
+      // Extract text from past test if provided
       let pastTestText = ""
       if (pastTestFile) {
         pastTestText = await extractTextFromPDF(pastTestFile)
+        console.log("chatgpt has read the past test pdf")
       }
 
       // Determine subject using AI
-      const subjectPrompt = `
-        Based on the following notes, determine the academic subject. 
-        Respond with only the subject name (e.g., "Mathematics", "Biology", "History", etc.).
-        
-        Notes:
-        ${notesText.substring(0, 2000)}
-      `
-
-      const { text: subject } = await generateText({
-        model: openai("gpt-3.5-turbo-instruct"),
-        prompt: subjectPrompt,
-      })
+      const subject = await determineSubject(notesText.join("\n"))
+      console.log("sending quiz")
 
       // Generate quiz questions
       const totalQuestions =
@@ -88,7 +84,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
         Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
         
         Notes:
-        ${notesText}
+        ${notesText.join("\n")}
         
         ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
         
@@ -194,28 +190,24 @@ export async function createQuiz(formData: FormData): Promise<string> {
       }
 
       // Extract text from PDFs
-      const notesTextPromises = notesFiles.map((file) => extractTextFromPDF(file))
-      const notesTexts = await Promise.all(notesTextPromises)
-      const notesText = notesTexts.join("\n\n")
+      const notesText = await Promise.all(
+        notesFiles.map(async (file) => {
+          const text = await extractTextFromPDF(file)
+          console.log("chatgpt has read the pdf")
+          return text
+        })
+      )
 
+      // Extract text from past test if provided
       let pastTestText = ""
       if (pastTestFile) {
         pastTestText = await extractTextFromPDF(pastTestFile)
+        console.log("chatgpt has read the past test pdf")
       }
 
       // Determine subject using AI
-      const subjectPrompt = `
-        Based on the following notes, determine the academic subject. 
-        Respond with only the subject name (e.g., "Mathematics", "Biology", "History", etc.).
-        
-        Notes:
-        ${notesText.substring(0, 2000)}
-      `
-
-      const { text: subject } = await generateText({
-        model: openai("gpt-3.5-turbo-instruct"),
-        prompt: subjectPrompt,
-      })
+      const subject = await determineSubject(notesText.join("\n"))
+      console.log("sending quiz")
 
       // Generate quiz questions
       const totalQuestions =
@@ -229,7 +221,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
         Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
         
         Notes:
-        ${notesText}
+        ${notesText.join("\n")}
         
         ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
         
@@ -621,5 +613,25 @@ export async function getPastQuizzes() {
     console.error("Error getting past quizzes:", error)
     throw new Error(`Failed to get past quizzes: ${error.message}`)
   }
+}
+
+/**
+ * Determines the subject of the notes using AI
+ */
+async function determineSubject(notesText: string): Promise<string> {
+  const subjectPrompt = `
+    Based on the following notes, determine the academic subject. 
+    Respond with only the subject name (e.g., "Mathematics", "Biology", "History", etc.).
+    
+    Notes:
+    ${notesText.substring(0, 2000)}
+  `
+
+  const { text: subject } = await generateText({
+    model: openai("gpt-3.5-turbo-instruct"),
+    prompt: subjectPrompt,
+  })
+
+  return subject
 }
 

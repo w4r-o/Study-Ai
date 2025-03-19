@@ -127,6 +127,7 @@ export function FileUpload() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    console.log("clicked generate practice test")
 
     if (files.length === 0) {
       setError("Please upload at least one PDF file")
