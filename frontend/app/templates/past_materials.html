@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Past Materials{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold mb-2">Your Study Materials</h1>
+        <p class="text-muted-foreground">View and manage your uploaded materials and generated quizzes</p>
+    </div>
+
+    {% if quizzes %}
+        <div class="grid gap-6">
+            {% for quiz in quizzes %}
+                <div class="bg-card rounded-lg shadow-lg p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-xl font-semibold mb-1">{{ quiz.title }}</h2>
+                            <p class="text-sm text-muted-foreground">Created on {{ quiz.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="{{ url_for('quiz.take_quiz', quiz_id=quiz.id) }}"
+                               class="bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 transition-colors">
+                                Take Quiz
+                            </a>
+                            {% if quiz.result %}
+                                <a href="{{ url_for('quiz.view_result', result_id=quiz.result.id) }}"
+                                   class="bg-secondary text-secondary-foreground py-2 px-4 rounded-md hover:bg-secondary/90 transition-colors">
+                                    View Result
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-medium">Grade Level</p>
+                            <p class="text-muted-foreground">{{ quiz.grade }}</p>
+                        </div>
+                        <div>
+                            <p class="font-medium">Questions</p>
+                            <p class="text-muted-foreground">{{ quiz.mcq_count }} MCQ, {{ quiz.short_answer_count }} Short Answer</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <p class="text-lg text-muted-foreground mb-4">You haven't uploaded any materials yet</p>
+            <a href="{{ url_for('main.index') }}"
+               class="inline-block bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 transition-colors">
+                Upload Materials
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

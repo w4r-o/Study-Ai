@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold mb-2">Quiz Results</h1>
+        <p class="text-muted-foreground">Here's how you did on the quiz</p>
+    </div>
+
+    <div class="bg-card rounded-lg shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+                <p class="text-sm text-muted-foreground">Score</p>
+                <p class="text-3xl font-bold">{{ result.score }}%</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Correct Answers</p>
+                <p class="text-3xl font-bold">{{ result.correct_count }}/{{ result.total_questions }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Time Taken</p>
+                <p class="text-3xl font-bold">{{ result.time_taken }} min</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-8">
+        {% for question in result.questions %}
+            <div class="bg-card rounded-lg shadow-lg p-6">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2">Question {{ loop.index }}</h3>
+                    <p class="text-muted-foreground">{{ question.text }}</p>
+                </div>
+
+                <div class="space-y-4">
+                    {% if question.type == 'mcq' %}
+                        <div class="space-y-3">
+                            {% for option in question.options %}
+                                <div class="flex items-center space-x-3 p-3 border rounded-md
+                                    {% if option == question.correct_answer %}
+                                        bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800
+                                    {% elif option == question.user_answer %}
+                                        bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800
+                                    {% endif %}">
+                                    <input type="radio" disabled
+                                           {% if option == question.user_answer %}checked{% endif %}
+                                           class="h-4 w-4 text-primary border-input">
+                                    <span>{{ option }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div>
+                            <p class="text-sm font-medium mb-2">Your Answer:</p>
+                            <div class="p-3 border rounded-md bg-background mb-2">
+                                {{ question.user_answer }}
+                            </div>
+                            <p class="text-sm font-medium mb-2">Correct Answer:</p>
+                            <div class="p-3 border rounded-md bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                                {{ question.correct_answer }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if question.explanation %}
+                        <div class="mt-4">
+                            <p class="text-sm font-medium mb-2">Explanation:</p>
+                            <p class="text-sm text-muted-foreground">{{ question.explanation }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="{{ url_for('main.past_materials') }}"
+           class="inline-block bg-primary text-primary-foreground py-2 px-6 rounded-md hover:bg-primary/90 transition-colors">
+            Back to Materials
+        </a>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4">Welcome to StudyAI</h1>
+        <p class="text-lg text-muted-foreground">Upload your study materials and get personalized practice questions</p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+        <div class="bg-card rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4">Upload Study Materials</h2>
+            <form action="{{ url_for('main.upload') }}" method="post" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label for="notes" class="block text-sm font-medium mb-2">Class Notes (PDF)</label>
+                    <input type="file" id="notes" name="notes" accept=".pdf" required
+                           class="w-full px-3 py-2 border rounded-md bg-background">
+                </div>
+                <div>
+                    <label for="past_test" class="block text-sm font-medium mb-2">Past Test (PDF)</label>
+                    <input type="file" id="past_test" name="past_test" accept=".pdf" required
+                           class="w-full px-3 py-2 border rounded-md bg-background">
+                </div>
+                <div>
+                    <label for="grade" class="block text-sm font-medium mb-2">Grade Level</label>
+                    <select id="grade" name="grade" required
+                            class="w-full px-3 py-2 border rounded-md bg-background">
+                        <option value="">Select grade level</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                        <option value="college">College</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="question_distribution" class="block text-sm font-medium mb-2">Question Distribution</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="mcq_count" class="block text-sm mb-1">Multiple Choice</label>
+                            <input type="number" id="mcq_count" name="mcq_count" min="0" max="20" value="10"
+                                   class="w-full px-3 py-2 border rounded-md bg-background">
+                        </div>
+                        <div>
+                            <label for="short_answer_count" class="block text-sm mb-1">Short Answer</label>
+                            <input type="number" id="short_answer_count" name="short_answer_count" min="0" max="10" value="5"
+                                   class="w-full px-3 py-2 border rounded-md bg-background">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit"
+                        class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 transition-colors">
+                    Generate Quiz
+                </button>
+            </form>
+        </div>
+    {% else %}
+        <div class="text-center space-y-4">
+            <p class="text-lg">Please log in or register to start using StudyAI</p>
+            <div class="space-x-4">
+                <a href="{{ url_for('auth.login') }}"
+                   class="inline-block bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 transition-colors">
+                    Login
+                </a>
+                <a href="{{ url_for('auth.register') }}"
+                   class="inline-block bg-secondary text-secondary-foreground py-2 px-4 rounded-md hover:bg-secondary/90 transition-colors">
+                    Register
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
