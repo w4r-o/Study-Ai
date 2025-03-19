@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server"
 import { auth } from "@/lib/auth"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
 
+// Maximum file size in bytes (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
 /**
  * Creates a new quiz based on uploaded notes
  * @param formData Form data containing notes, grade, and question distribution
@@ -27,6 +30,17 @@ export async function createQuiz(formData: FormData): Promise<string> {
       const pastTestFile = formData.get("pastTest") as File | null
       const grade = formData.get("grade") as string
       const questionDistribution = JSON.parse(formData.get("questionDistribution") as string)
+
+      // Validate file sizes
+      for (const file of notesFiles) {
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error(`File "${file.name}" is too large. Maximum file size is 10MB.`)
+        }
+      }
+
+      if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
+        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 10MB.`)
+      }
 
       // Check if OpenAI API key is available
       if (!process.env.OPENAI_API_KEY) {
@@ -53,7 +67,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
       `
 
       const { text: subject } = await generateText({
-        model: openai("gpt-4o", { apiKey: process.env.OPENAI_API_KEY }),
+        model: openai("gpt-3.5-turbo-instruct"),
         prompt: subjectPrompt,
       })
 
@@ -101,7 +115,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
       `
 
       const { text: quizJson } = await generateText({
-        model: openai("gpt-4o", { apiKey: process.env.OPENAI_API_KEY }),
+        model: openai("gpt-3.5-turbo-instruct"),
         prompt: quizPrompt,
       })
 
@@ -153,6 +167,17 @@ export async function createQuiz(formData: FormData): Promise<string> {
       const grade = formData.get("grade") as string
       const questionDistribution = JSON.parse(formData.get("questionDistribution") as string)
 
+      // Validate file sizes
+      for (const file of notesFiles) {
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error(`File "${file.name}" is too large. Maximum file size is 10MB.`)
+        }
+      }
+
+      if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
+        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 10MB.`)
+      }
+
       // Check if OpenAI API key is available
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("OpenAI API key is not configured. Please add it to your environment variables.")
@@ -178,7 +203,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
       `
 
       const { text: subject } = await generateText({
-        model: openai("gpt-4o", { apiKey: process.env.OPENAI_API_KEY }),
+        model: openai("gpt-3.5-turbo-instruct"),
         prompt: subjectPrompt,
       })
 
@@ -226,7 +251,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
       `
 
       const { text: quizJson } = await generateText({
-        model: openai("gpt-4o", { apiKey: process.env.OPENAI_API_KEY }),
+        model: openai("gpt-3.5-turbo-instruct"),
         prompt: quizPrompt,
       })
 
@@ -400,7 +425,7 @@ export async function submitQuizAnswers(quizId: string, answers: Record<string, 
     `
 
     const { text: explanationsJson } = await generateText({
-      model: openai("gpt-4o", { apiKey: process.env.OPENAI_API_KEY }),
+      model: openai("gpt-3.5-turbo-instruct"),
       prompt: explanationPrompt,
     })
 

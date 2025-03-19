@@ -14,6 +14,9 @@ import { createQuiz } from "@/lib/actions"
 import { ApiKeyWarning } from "@/components/api-key-warning"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
+// Maximum file size in bytes (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
 export function FileUpload() {
   const router = useRouter()
   const [files, setFiles] = useState<File[]>([])
@@ -30,6 +33,13 @@ export function FileUpload() {
   })
   const [pastTestUploaded, setPastTestUploaded] = useState<File | null>(null)
 
+  // Validate file size
+  const validateFileSize = (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`File "${file.name}" is too large. Maximum file size is 10MB.`)
+    }
+  }
+
   // Handle file drop
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -38,14 +48,22 @@ export function FileUpload() {
     setError(null)
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newFiles = Array.from(e.dataTransfer.files).filter(
-        (file) => file.type === "application/pdf" || file.name.endsWith(".pdf"),
-      )
+      try {
+        const newFiles = Array.from(e.dataTransfer.files).filter(
+          (file) => file.type === "application/pdf" || file.name.endsWith(".pdf"),
+        )
 
-      if (newFiles.length > 0) {
+        if (newFiles.length === 0) {
+          setError("Please upload PDF files only")
+          return
+        }
+
+        // Validate file sizes
+        newFiles.forEach(validateFileSize)
+
         setFiles((prevFiles) => [...prevFiles, ...newFiles])
-      } else {
-        setError("Please upload PDF files only")
+      } catch (error: any) {
+        setError(error.message)
       }
     }
   }
@@ -54,14 +72,22 @@ export function FileUpload() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null)
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).filter(
-        (file) => file.type === "application/pdf" || file.name.endsWith(".pdf"),
-      )
+      try {
+        const newFiles = Array.from(e.target.files).filter(
+          (file) => file.type === "application/pdf" || file.name.endsWith(".pdf"),
+        )
 
-      if (newFiles.length > 0) {
+        if (newFiles.length === 0) {
+          setError("Please upload PDF files only")
+          return
+        }
+
+        // Validate file sizes
+        newFiles.forEach(validateFileSize)
+
         setFiles((prevFiles) => [...prevFiles, ...newFiles])
-      } else {
-        setError("Please upload PDF files only")
+      } catch (error: any) {
+        setError(error.message)
       }
     }
   }
@@ -70,16 +96,24 @@ export function FileUpload() {
   const handlePastTestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null)
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+      try {
+        const file = e.target.files[0]
+        if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+          setError("Please upload a PDF file for the past test")
+          return
+        }
+
+        // Validate file size
+        validateFileSize(file)
+
         setPastTestUploaded(file)
-      } else {
-        setError("Please upload PDF files only")
+      } catch (error: any) {
+        setError(error.message)
       }
     }
   }
 
-  // Remove file from list
+  // Remove file from the list
   const removeFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index))
   }
@@ -137,52 +171,53 @@ export function FileUpload() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <ApiKeyWarning />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* PDF Upload Area */}
+      {/* File Upload Area */}
       <div
-        className={`border-2 border-dashed rounded-lg p-6 text-center ${
-          dragActive ? "border-primary bg-primary/10" : "border-border"
+        className={`border-2 border-dashed rounded-lg p-8 text-center ${
+          dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
         }`}
         onDragOver={(e) => {
           e.preventDefault()
-          e.stopPropagation()
           setDragActive(true)
         }}
-        onDragLeave={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          setDragActive(false)
-        }}
+        onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
       >
-        <Upload className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-        <h3 className="text-lg font-medium">Drag & drop your PDF notes here</h3>
-        <p className="text-sm text-muted-foreground mb-4">Or click to browse files (PDF only)</p>
-        <Input type="file" accept=".pdf" multiple onChange={handleFileChange} className="hidden" id="notes-upload" />
-        <Button type="button" variant="outline" onClick={() => document.getElementById("notes-upload")?.click()}>
-          Select Files
-        </Button>
+        <input
+          type="file"
+          id="files"
+          multiple
+          accept=".pdf"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        <label htmlFor="files" className="cursor-pointer">
+          <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+          <p className="mt-2 text-sm text-muted-foreground">
+            Drag and drop your PDF files here, or click to select files
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Maximum file size: 10MB</p>
+        </label>
       </div>
 
-      {/* Display uploaded files */}
+      {/* File List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          <Label>Uploaded Notes:</Label>
+          <Label>Uploaded Files</Label>
           <div className="space-y-2">
             {files.map((file, index) => (
-              <div key={`${file.name}-${index}`} className="flex items-center justify-between bg-muted p-2 rounded">
-                <div className="flex items-center">
-                  <FileType className="h-4 w-4 mr-2" />
-                  <span className="text-sm truncate max-w-[250px]">{file.name}</span>
+              <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                <div className="flex items-center space-x-2">
+                  <FileType className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">{file.name}</span>
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(index)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeFile(index)}
+                  className="h-8 w-8"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -191,19 +226,33 @@ export function FileUpload() {
         </div>
       )}
 
-      {/* Past Test Upload (Optional) */}
+      {/* Past Test Upload */}
       <div className="space-y-2">
-        <Label htmlFor="past-test-upload">Upload Past Test (Optional)</Label>
-        <p className="text-sm text-muted-foreground mb-2">Upload a past test to help generate similar questions</p>
-        <Input type="file" accept=".pdf" onChange={handlePastTestChange} id="past-test-upload" />
-
+        <Label>Past Test (Optional)</Label>
+        <div className="flex items-center space-x-2">
+          <Input
+            type="file"
+            accept=".pdf"
+            onChange={handlePastTestChange}
+            className="flex-1"
+          />
+          <Button type="button" variant="outline" onClick={() => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()}>
+            Upload
+          </Button>
+        </div>
         {pastTestUploaded && (
-          <div className="flex items-center justify-between bg-muted p-2 rounded mt-2">
-            <div className="flex items-center">
-              <FileType className="h-4 w-4 mr-2" />
-              <span className="text-sm truncate max-w-[250px]">{pastTestUploaded.name}</span>
+          <div className="flex items-center justify-between p-2 bg-muted rounded-md">
+            <div className="flex items-center space-x-2">
+              <FileType className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">{pastTestUploaded.name}</span>
             </div>
-            <Button type="button" variant="ghost" size="sm" onClick={removePastTest}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={removePastTest}
+              className="h-8 w-8"
+            >
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -212,99 +261,110 @@ export function FileUpload() {
 
       {/* Grade Selection */}
       <div className="space-y-2">
-        <Label htmlFor="grade">Select Your Grade</Label>
+        <Label htmlFor="grade">Grade</Label>
         <Select value={grade} onValueChange={setGrade}>
-          <SelectTrigger id="grade">
-            <SelectValue placeholder="Select grade" />
+          <SelectTrigger>
+            <SelectValue placeholder="Select your grade" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="9">Grade 9</SelectItem>
-            <SelectItem value="10">Grade 10</SelectItem>
-            <SelectItem value="11">Grade 11</SelectItem>
-            <SelectItem value="12">Grade 12</SelectItem>
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((grade) => (
+              <SelectItem key={grade} value={grade.toString()}>
+                Grade {grade}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
 
       {/* Question Distribution */}
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">Question Distribution</h3>
-
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="multiple-choice">Multiple Choice</Label>
-            <span>{questionDistribution.multipleChoice}</span>
+        <Label>Question Distribution</Label>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label htmlFor="multipleChoice">Multiple Choice</Label>
+              <span>{questionDistribution.multipleChoice}</span>
+            </div>
+            <Slider
+              id="multipleChoice"
+              min={0}
+              max={10}
+              step={1}
+              value={[questionDistribution.multipleChoice]}
+              onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, multipleChoice: value[0] })}
+            />
           </div>
-          <Slider
-            id="multiple-choice"
-            min={0}
-            max={10}
-            step={1}
-            value={[questionDistribution.multipleChoice]}
-            onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, multipleChoice: value[0] })}
-          />
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="knowledge">Knowledge</Label>
-            <span>{questionDistribution.knowledge}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label htmlFor="knowledge">Knowledge</Label>
+              <span>{questionDistribution.knowledge}</span>
+            </div>
+            <Slider
+              id="knowledge"
+              min={0}
+              max={10}
+              step={1}
+              value={[questionDistribution.knowledge]}
+              onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, knowledge: value[0] })}
+            />
           </div>
-          <Slider
-            id="knowledge"
-            min={0}
-            max={10}
-            step={1}
-            value={[questionDistribution.knowledge]}
-            onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, knowledge: value[0] })}
-          />
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="thinking">Thinking</Label>
-            <span>{questionDistribution.thinking}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label htmlFor="thinking">Thinking</Label>
+              <span>{questionDistribution.thinking}</span>
+            </div>
+            <Slider
+              id="thinking"
+              min={0}
+              max={10}
+              step={1}
+              value={[questionDistribution.thinking]}
+              onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, thinking: value[0] })}
+            />
           </div>
-          <Slider
-            id="thinking"
-            min={0}
-            max={10}
-            step={1}
-            value={[questionDistribution.thinking]}
-            onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, thinking: value[0] })}
-          />
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="application">Application</Label>
-            <span>{questionDistribution.application}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label htmlFor="application">Application</Label>
+              <span>{questionDistribution.application}</span>
+            </div>
+            <Slider
+              id="application"
+              min={0}
+              max={10}
+              step={1}
+              value={[questionDistribution.application]}
+              onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, application: value[0] })}
+            />
           </div>
-          <Slider
-            id="application"
-            min={0}
-            max={10}
-            step={1}
-            value={[questionDistribution.application]}
-            onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, application: value[0] })}
-          />
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="communication">Communication</Label>
-            <span>{questionDistribution.communication}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label htmlFor="communication">Communication</Label>
+              <span>{questionDistribution.communication}</span>
+            </div>
+            <Slider
+              id="communication"
+              min={0}
+              max={10}
+              step={1}
+              value={[questionDistribution.communication]}
+              onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, communication: value[0] })}
+            />
           </div>
-          <Slider
-            id="communication"
-            min={0}
-            max={10}
-            step={1}
-            value={[questionDistribution.communication]}
-            onValueChange={(value) => setQuestionDistribution({ ...questionDistribution, communication: value[0] })}
-          />
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Submit Button */}
       <Button type="submit" className="w-full" disabled={isUploading || files.length === 0 || !grade}>
