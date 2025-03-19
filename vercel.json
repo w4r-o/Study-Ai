@@ -9,7 +9,12 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "frontend/run.py"
+            "dest": "frontend/run.py",
+            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
         }
-    ]
+    ],
+    "env": {
+        "FLASK_APP": "frontend/run.py",
+        "FLASK_ENV": "production"
+    }
 } 
