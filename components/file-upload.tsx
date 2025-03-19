@@ -159,6 +159,7 @@ export function FileUpload() {
 
       // Call server action to process files and create quiz
       const quizId = await createQuiz(formData)
+      console.log("Quiz generation completed")
 
       // Redirect to the quiz page
       router.push(`/quiz/${quizId}`)

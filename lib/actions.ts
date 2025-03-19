@@ -77,8 +77,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
         questionDistribution.application +
         questionDistribution.communication
 
-      console.log("sending quiz")
-
+      // Create quiz prompt
       const quizPrompt = `
         Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
         
@@ -213,8 +212,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
         questionDistribution.application +
         questionDistribution.communication
 
-      console.log("sending quiz")
-
+      // Create quiz prompt
       const quizPrompt = `
         Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
         
