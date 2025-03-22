@@ -116,7 +116,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
           questionDistribution.communication
 
         const quizPrompt = `
-          Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
+          Create a practice test based on the following notes for a Grade ${grade} student studying ${subject} and the YRDSB cirriculum for the grade.
           
           Notes:
           ${notesText.join("\n")}
@@ -154,7 +154,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
           })
 
           if (!response || !response.text) {
-            throw new Error("Failed to generate quiz. Please try again.")
+            throw new Error("Failed to generate quiz. No response from AI.")
           }
 
           // Parse and validate the response
@@ -163,7 +163,13 @@ export async function createQuiz(formData: FormData): Promise<string> {
             if (!quiz.title || !quiz.questions || !Array.isArray(quiz.questions)) {
               throw new Error("Invalid quiz format generated. Please try again.")
             }
-            return quiz.id // or however you want to handle the response
+
+            // Validate question count
+            if (quiz.questions.length !== totalQuestions) {
+              throw new Error(`Expected ${totalQuestions} questions but got ${quiz.questions.length}. Please try again.`)
+            }
+
+            return quiz.id
           } catch (error) {
             if (error instanceof Error) {
               throw new Error(`Failed to parse quiz response: ${error.message}`)

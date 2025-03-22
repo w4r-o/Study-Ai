@@ -151,6 +151,7 @@ export function FileUpload() {
     setError(null)
 
     try {
+      // Validate inputs first
       if (files.length === 0) {
         setError("Please upload at least one PDF file")
         return
@@ -161,8 +162,8 @@ export function FileUpload() {
         return
       }
 
-      console.log("clicked generate practice test")
       setIsUploading(true)
+      console.log("clicked generate practice test")
 
       // Create FormData to send files
       const formData = new FormData()
@@ -176,8 +177,8 @@ export function FileUpload() {
           }
           validateFileSize(file)
           
-          console.log(`Processing file: ${file.name}`)
           formData.append("notes", file)
+          console.log(`Processing file: ${file.name}`)
         } catch (error) {
           if (error instanceof Error) {
             setError(error.message)
@@ -193,8 +194,8 @@ export function FileUpload() {
       if (pastTestUploaded) {
         try {
           validateFileSize(pastTestUploaded)
-          console.log(`Processing past test: ${pastTestUploaded.name}`)
           formData.append("pastTest", pastTestUploaded)
+          console.log(`Processing past test: ${pastTestUploaded.name}`)
         } catch (error) {
           if (error instanceof Error) {
             setError(error.message)
@@ -212,9 +213,12 @@ export function FileUpload() {
       // Call server action to process files and create quiz
       console.log("Starting quiz generation...")
       const quizId = await createQuiz(formData)
-      console.log("Quiz generation completed")
 
-      // Redirect to the quiz page
+      if (!quizId) {
+        throw new Error("Failed to generate quiz. No quiz ID returned.")
+      }
+
+      console.log("Quiz generation completed")
       router.push(`/quiz/${quizId}`)
     } catch (error: any) {
       console.error("Error creating quiz:", error)
