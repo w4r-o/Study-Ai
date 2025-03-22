@@ -71,117 +71,114 @@ export async function createQuiz(formData: FormData): Promise<string> {
         throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 20MB.`)
       }
 
-      // Check if OpenAI API key is available
-      if (!process.env.OPENAI_API_KEY) {
-        throw new Error("OpenAI API key is not configured. Please add it to your environment variables.")
+      // Check if OpenAI API key is available and properly formatted
+      if (!process.env.OPENAI_API_KEY?.startsWith('sk-')) {
+        throw new Error("Invalid OpenAI API key format. Please check your environment variables.")
       }
 
-      // Extract text from PDFs
-      const notesText = await Promise.all(
-        notesFiles.map(async (file) => {
-          const text = await extractTextFromPDF(file)
-          return text
-        })
-      )
-
-      // Extract text from past test if provided
-      let pastTestText = ""
-      if (pastTestFile) {
-        pastTestText = await extractTextFromPDF(pastTestFile)
-      }
-
-      // Determine subject using AI
-      const subject = await determineSubject(notesText.join("\n"))
-
-      // Generate quiz questions
-      const totalQuestions =
-        questionDistribution.multipleChoice +
-        questionDistribution.knowledge +
-        questionDistribution.thinking +
-        questionDistribution.application +
-        questionDistribution.communication
-
-      // Create quiz prompt
-      const quizPrompt = `
-        Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
-        
-        Notes:
-        ${notesText.join("\n")}
-        
-        ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
-        
-        Generate a quiz with exactly ${totalQuestions} questions with the following distribution:
-        - Multiple Choice: ${questionDistribution.multipleChoice}
-        - Knowledge: ${questionDistribution.knowledge}
-        - Thinking: ${questionDistribution.thinking}
-        - Application: ${questionDistribution.application}
-        - Communication: ${questionDistribution.communication}
-        
-        Format the response as a JSON object with the following structure:
-        {
-          "title": "Quiz title based on the content",
-          "questions": [
-            {
-              "id": "1",
-              "text": "Question text",
-              "type": "multipleChoice", // or "knowledge", "thinking", "application", "communication"
-              "options": ["Option A", "Option B", "Option C", "Option D"], // only for multipleChoice
-              "answer": "Correct answer"
+      try {
+        // Extract text from PDFs
+        const notesText = await Promise.all(
+          notesFiles.map(async (file) => {
+            try {
+              const text = await extractTextFromPDF(file)
+              return text
+            } catch (error) {
+              throw new Error(`Failed to extract text from file "${file.name}". Please ensure it's a valid PDF.`)
             }
-          ]
+          })
+        )
+
+        // Extract text from past test if provided
+        let pastTestText = ""
+        if (pastTestFile) {
+          try {
+            pastTestText = await extractTextFromPDF(pastTestFile)
+          } catch (error) {
+            throw new Error(`Failed to extract text from past test file. Please ensure it's a valid PDF.`)
+          }
         }
-        
-        For multiple choice questions, include 4 options and make sure the answer is one of the options.
-        For other question types, provide a model answer that would receive full marks.
-        
-        Ensure the questions follow the Ontario curriculum for Grade ${grade} ${subject}.
-      `
 
-      const { text: quizJson } = await generateText({
-        model: openai("gpt-3.5-turbo-instruct"),
-        prompt: quizPrompt,
-      })
+        // Configure OpenAI
+        const configuration = {
+          apiKey: process.env.OPENAI_API_KEY,
+        }
 
-      // Parse the quiz JSON
-      const quiz = JSON.parse(quizJson)
+        // Determine subject using AI
+        const subject = await determineSubject(notesText.join("\n"))
 
-      // Create a new quiz in the database
-      const supabase = createClient()
+        // Generate quiz questions
+        const totalQuestions =
+          questionDistribution.multipleChoice +
+          questionDistribution.knowledge +
+          questionDistribution.thinking +
+          questionDistribution.application +
+          questionDistribution.communication
 
-      const { data: quizData, error: quizError } = await supabase
-        .from("quizzes")
-        .insert({
-          title: quiz.title,
-          subject,
-          grade,
-          user_id: mockUserId,
-          question_distribution: questionDistribution,
-        })
-        .select()
-        .single()
+        const quizPrompt = `
+          Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
+          
+          Notes:
+          ${notesText.join("\n")}
+          
+          ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
+          
+          Generate a quiz with exactly ${totalQuestions} questions with the following distribution:
+          - Multiple Choice: ${questionDistribution.multipleChoice}
+          - Knowledge: ${questionDistribution.knowledge}
+          - Thinking: ${questionDistribution.thinking}
+          - Application: ${questionDistribution.application}
+          - Communication: ${questionDistribution.communication}
+          
+          Format the response as a JSON object with the following structure:
+          {
+            "title": "Quiz title based on the content",
+            "questions": [
+              {
+                "type": "multiple_choice",
+                "question": "Question text",
+                "options": ["A", "B", "C", "D"],
+                "correctAnswer": "A",
+                "explanation": "Why this is the correct answer"
+              }
+            ]
+          }
+        `
 
-      if (quizError) {
-        console.error("Database error creating quiz:", quizError)
-        throw new Error(`Failed to create quiz in database: ${quizError.message}`)
+        try {
+          const response = await generateText({
+            model: openai("gpt-3.5-turbo"),
+            prompt: quizPrompt,
+            temperature: 0.7,
+            maxTokens: 2000,
+          })
+
+          if (!response || !response.text) {
+            throw new Error("Failed to generate quiz. Please try again.")
+          }
+
+          // Parse and validate the response
+          try {
+            const quiz = JSON.parse(response.text)
+            if (!quiz.title || !quiz.questions || !Array.isArray(quiz.questions)) {
+              throw new Error("Invalid quiz format generated. Please try again.")
+            }
+            return quiz.id // or however you want to handle the response
+          } catch (error) {
+            if (error instanceof Error) {
+              throw new Error(`Failed to parse quiz response: ${error.message}`)
+            }
+            throw new Error("Failed to parse quiz response. Please try again.")
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            throw new Error(`Failed to generate quiz using AI: ${error.message}`)
+          }
+          throw new Error("Failed to generate quiz using AI. Please try again.")
+        }
+      } catch (error) {
+        throw new Error(`Quiz generation failed: ${error.message}`)
       }
-
-      // Insert questions
-      const questionsToInsert = quiz.questions.map((q: any) => ({
-        quiz_id: quizData.id,
-        text: q.text,
-        type: q.type,
-        options: q.options || null,
-        answer: q.answer,
-      }))
-
-      const { error: questionsError } = await supabase.from("questions").insert(questionsToInsert)
-
-      if (questionsError) {
-        console.error("Database error creating questions:", questionsError)
-        throw new Error(`Failed to create questions in database: ${questionsError.message}`)
-      }
-
-      return quizData.id
     } else {
       // Regular flow for authenticated users
       // Extract notes from PDF files
@@ -319,8 +316,8 @@ export async function createQuiz(formData: FormData): Promise<string> {
       return quizData.id
     }
   } catch (error: any) {
-    console.error("Error creating quiz:", error)
-    throw new Error(`Failed to create quiz: ${error.message}`)
+    console.error("Error in createQuiz:", error)
+    throw new Error(error.message || "An unexpected error occurred while creating the quiz.")
   }
 }
 

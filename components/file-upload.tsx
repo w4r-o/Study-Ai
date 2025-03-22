@@ -150,36 +150,67 @@ export function FileUpload() {
     e.preventDefault()
     setError(null)
 
-    if (files.length === 0) {
-      setError("Please upload at least one PDF file")
-      return
-    }
-
-    if (!grade) {
-      setError("Please select your grade")
-      return
-    }
-
-    console.log("clicked generate practice test")
-    setIsUploading(true)
-
     try {
+      if (files.length === 0) {
+        setError("Please upload at least one PDF file")
+        return
+      }
+
+      if (!grade) {
+        setError("Please select your grade")
+        return
+      }
+
+      console.log("clicked generate practice test")
+      setIsUploading(true)
+
       // Create FormData to send files
       const formData = new FormData()
-      files.forEach((file) => {
-        formData.append("notes", file)
-        console.log(`Processing file: ${file.name}`)
-      })
+      
+      // Add notes files
+      for (const file of files) {
+        try {
+          // Validate file type and size before adding
+          if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+            throw new Error(`File "${file.name}" is not a PDF file`)
+          }
+          validateFileSize(file)
+          
+          console.log(`Processing file: ${file.name}`)
+          formData.append("notes", file)
+        } catch (error) {
+          if (error instanceof Error) {
+            setError(error.message)
+          } else {
+            setError("An error occurred while processing the file")
+          }
+          setIsUploading(false)
+          return
+        }
+      }
 
+      // Add past test if provided
       if (pastTestUploaded) {
-        formData.append("pastTest", pastTestUploaded)
-        console.log(`Processing past test: ${pastTestUploaded.name}`)
+        try {
+          validateFileSize(pastTestUploaded)
+          console.log(`Processing past test: ${pastTestUploaded.name}`)
+          formData.append("pastTest", pastTestUploaded)
+        } catch (error) {
+          if (error instanceof Error) {
+            setError(error.message)
+          } else {
+            setError("An error occurred while processing the past test file")
+          }
+          setIsUploading(false)
+          return
+        }
       }
 
       formData.append("grade", grade)
       formData.append("questionDistribution", JSON.stringify(questionDistribution))
 
       // Call server action to process files and create quiz
+      console.log("Starting quiz generation...")
       const quizId = await createQuiz(formData)
       console.log("Quiz generation completed")
 
@@ -188,7 +219,6 @@ export function FileUpload() {
     } catch (error: any) {
       console.error("Error creating quiz:", error)
       setError(error.message || "Failed to create quiz. Please try again.")
-    } finally {
       setIsUploading(false)
     }
   }
