@@ -1,3 +1,27 @@
+/**
+ * Server-side actions for quiz generation
+ * 
+ * Key Functions:
+ * - createQuiz: Generates quiz from PDF notes
+ * - getQuiz: Retrieves quiz by ID
+ * - submitQuizAnswers: Processes quiz submissions
+ * - getQuizResults: Retrieves quiz results
+ * - getPastQuizzes: Gets user's quiz history
+ * 
+ * Integrations:
+ * - OpenAI API
+ * - Supabase Database
+ * 
+ * Used By:
+ * - components/file-upload.tsx
+ * - components/past-materials.tsx
+ * 
+ * Dependencies:
+ * - lib/pdf-utils.ts
+ * - lib/auth.ts
+ * - lib/supabase/server.ts
+ */
+
 "use server"
 
 import { generateText } from "ai"

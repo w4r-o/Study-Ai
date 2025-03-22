@@ -2,6 +2,28 @@
 
 import { createClient } from "@/lib/supabase/client"
 
+/**
+ * Authentication utilities
+ * 
+ * Key Functions:
+ * - signUp: Creates new user account
+ * - signIn: Authenticates existing user
+ * - signOut: Ends user session
+ * - getCurrentUser: Gets current user info
+ * 
+ * Integrations:
+ * - Supabase Auth
+ * - Supabase Database
+ * 
+ * Used By:
+ * - components/user-auth-form.tsx
+ * - lib/actions.ts
+ * - app/layout.tsx
+ * 
+ * Dependencies:
+ * - lib/supabase/client.ts
+ */
+
 class Auth {
   /**
    * Signs up a new user with email and password

@@ -1,3 +1,25 @@
+/**
+ * File upload and quiz generation component
+ * 
+ * Key Functions:
+ * - handleDrop: Processes dropped PDF files
+ * - handleFileChange: Handles file input changes
+ * - handleSubmit: Processes form submission
+ * - validateFileSize: Validates file size limits
+ * 
+ * Integrations:
+ * - PDF file processing
+ * - Server actions
+ * 
+ * Used By:
+ * - app/page.tsx
+ * 
+ * Dependencies:
+ * - lib/actions.ts
+ * - components/ui/*
+ * - components/api-key-warning.tsx
+ */
+
 "use client"
 
 import type React from "react"

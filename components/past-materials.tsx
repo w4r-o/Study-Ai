@@ -1,3 +1,21 @@
+/**
+ * Past quizzes display component
+ * 
+ * Key Functions:
+ * - fetchQuizzes: Loads user's quiz history
+ * - renderQuizCard: Displays individual quiz info
+ * 
+ * Integrations:
+ * - Supabase Database
+ * 
+ * Used By:
+ * - app/page.tsx
+ * 
+ * Dependencies:
+ * - lib/actions.ts
+ * - components/ui/*
+ */
+
 "use client"
 
 import { useEffect, useState } from "react"

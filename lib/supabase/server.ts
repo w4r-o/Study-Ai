@@ -1,3 +1,23 @@
+/**
+ * Supabase server client configuration
+ * 
+ * Key Functions:
+ * - createClient: Creates Supabase client instance
+ * 
+ * Integrations:
+ * - Supabase
+ * - Next.js cookies
+ * 
+ * Used By:
+ * - lib/actions.ts
+ * - lib/auth.ts
+ * - API routes
+ * 
+ * Dependencies:
+ * - @supabase/supabase-js
+ * - next/headers
+ */
+
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 

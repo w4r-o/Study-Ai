@@ -1,3 +1,20 @@
+/**
+ * Root layout
+ * 
+ * Key Functions:
+ * - RootLayout: Wraps all pages with providers
+ * 
+ * Integrations:
+ * - Theme system
+ * 
+ * Used By:
+ * - Next.js app router
+ * 
+ * Dependencies:
+ * - components/theme-provider.tsx
+ * - app/globals.css
+ */
+
 import type React from "react"
 import type { Metadata } from "next"
 import { ThemeProvider } from "@/components/theme-provider"

@@ -1,6 +1,21 @@
 /**
- * Utility functions for working with PDF files
+ * PDF processing utilities
+ * 
+ * Key Functions:
+ * - extractTextFromPDF: Extracts text from PDF files
+ * 
+ * Integrations:
+ * - PDF parsing system
+ * 
+ * Used By:
+ * - lib/actions.ts
+ * 
+ * Dependencies:
+ * - pdf-parse
+ * - buffer
  */
+
+import { Buffer } from "buffer"
 
 /**
  * Extracts text from a PDF file

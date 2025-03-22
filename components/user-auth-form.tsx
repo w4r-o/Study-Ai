@@ -1,3 +1,36 @@
+/**
+ * User Authentication Form Component
+ * Handles user registration and login functionality.
+ * 
+ * Features:
+ * - User registration form
+ * - Login form
+ * - OAuth provider integration
+ * - Password reset functionality
+ * - Form validation
+ * - Error handling
+ * 
+ * State Management:
+ * - isLoading: Loading state during auth operations
+ * - error: Authentication error state
+ * - formData: User input data
+ * 
+ * Authentication Methods:
+ * - Email/Password authentication
+ * - OAuth providers (if configured)
+ * - Password reset flow
+ * 
+ * File Dependencies:
+ * - lib/auth.ts: Authentication utilities
+ * - components/ui/*: UI components
+ * - lib/supabase/server.ts: Database interactions
+ * 
+ * Security Features:
+ * - Input validation
+ * - Rate limiting
+ * - Secure password handling
+ */
+
 "use client"
 
 import type React from "react"

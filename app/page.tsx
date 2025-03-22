@@ -1,3 +1,17 @@
+/**
+ * Main landing page
+ * 
+ * Used By:
+ * - Root application entry point
+ * 
+ * Dependencies:
+ * - components/file-upload.tsx
+ * - components/past-materials.tsx
+ * - components/user-auth-form.tsx
+ * - components/theme-toggle.tsx
+ * - components/ui/*
+ */
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileUpload } from "@/components/file-upload"
 import { PastMaterials } from "@/components/past-materials"
