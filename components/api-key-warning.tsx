@@ -1,40 +1,39 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 
 export function ApiKeyWarning() {
   const [apiKeyMissing, setApiKeyMissing] = useState(false)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Only run this effect on the client
-    async function checkApiKey() {
+    // Check if API key is available
+    const checkApiKey = async () => {
       try {
         const response = await fetch("/api/check-api-key")
         const data = await response.json()
-        setApiKeyMissing(!data.hasOpenAIKey)
+        setApiKeyMissing(!data.hasAIKey)
       } catch (error) {
         console.error("Error checking API key:", error)
-      } finally {
-        setLoading(false)
       }
     }
 
     checkApiKey()
   }, [])
 
-  // Don't render anything during SSR to avoid hydration mismatch
-  // Only show the warning after client-side check is complete
-  if (loading || !apiKeyMissing) return null
+  if (!apiKeyMissing) {
+    return null
+  }
 
   return (
-    <div
-      className="bg-yellow-100 dark:bg-yellow-900 border border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-200 px-4 py-3 rounded mb-6"
-      role="alert"
-    >
-      <p className="font-bold">OpenAI API Key Missing</p>
-      <p className="text-sm">Please add your OpenAI API key to use the AI features.</p>
-    </div>
+    <Alert variant="destructive" className="mb-4">
+      <ExclamationTriangleIcon className="h-4 w-4" />
+      <AlertTitle>AI API Key Missing</AlertTitle>
+      <AlertDescription className="text-sm">
+        Please add your AI API key to use the AI features.
+      </AlertDescription>
+    </Alert>
   )
 }
 

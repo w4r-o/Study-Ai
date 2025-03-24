@@ -29,6 +29,7 @@ import { openai } from "@ai-sdk/openai"
 import { createClient } from "@/lib/supabase/server"
 import { auth } from "@/lib/auth"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
+import { getAIModel, isAIConfigured } from "@/lib/ai-utils"
 
 // Maximum file size in bytes (20MB)
 const MAX_FILE_SIZE = 20 * 1024 * 1024
@@ -49,141 +50,146 @@ export async function createQuiz(formData: FormData): Promise<string> {
       // Mock user ID for development
       const mockUserId = "mock-user-id"
 
-      // Extract notes from PDF files
+      // Check for notes files
       const notesFiles = formData.getAll("notes") as File[]
-      const pastTestFile = formData.get("pastTest") as File | null
-      const grade = formData.get("grade") as string
-      const questionDistribution = JSON.parse(formData.get("questionDistribution") as string)
-
-      // Validate grade level
-      if (!["9", "10", "11", "12"].includes(grade)) {
-        throw new Error("Invalid grade level. Please select a grade between 9 and 12.")
+      if (notesFiles.length === 0) {
+        throw new Error("No notes files were uploaded")
       }
 
-      // Validate file sizes
+      // Check grade is valid (must be one of 9, 10, 11, 12)
+      const grade = formData.get("grade") as string
+      if (!["9", "10", "11", "12"].includes(grade)) {
+        throw new Error("Invalid grade selected. Please select a grade between 9 and 12.")
+      }
+
+      // Check files for size limits
       for (const file of notesFiles) {
         if (file.size > MAX_FILE_SIZE) {
-          throw new Error(`File "${file.name}" is too large. Maximum file size is 20MB.`)
+          throw new Error(
+            `File ${file.name} exceeds the maximum file size of 20MB. Please upload a smaller file.`,
+          )
         }
       }
 
+      const pastTestFile = formData.get("pastTest") as File
       if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
-        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 20MB.`)
+        throw new Error(
+          `Past test file ${pastTestFile.name} exceeds the maximum file size of 20MB. Please upload a smaller file.`,
+        )
       }
 
-      // Check if OpenAI API key is available and properly formatted
-      if (!process.env.OPENAI_API_KEY?.startsWith('sk-')) {
-        throw new Error("Invalid OpenAI API key format. Please check your environment variables.")
+      // Extract text from PDF files
+      const notesText: string[] = []
+      for (const file of notesFiles) {
+        try {
+          const text = await extractTextFromPDF(file)
+          notesText.push(text)
+        } catch (error) {
+          throw new Error(`Failed to extract text from ${file.name}. Please ensure it's a valid PDF.`)
+        }
       }
+
+      let pastTestText = ""
+      if (pastTestFile) {
+        try {
+          pastTestText = await extractTextFromPDF(pastTestFile)
+          console.log("chatgpt has read the past test pdf")
+        } catch (error) {
+          throw new Error(`Failed to extract text from past test file. Please ensure it's a valid PDF.`)
+        }
+      }
+
+      // Parse question distribution
+      const distributionString = formData.get("questionDistribution") as string
+      const questionDistribution = JSON.parse(distributionString)
+
+      // Check if AI is properly configured
+      if (!isAIConfigured()) {
+        throw new Error("AI service is not configured. Please check your environment variables.")
+      }
+
+      // Configure OpenAI
+      const configuration = {
+        apiKey: process.env.OPENAI_API_KEY,
+      }
+
+      // Determine subject using AI
+      const subject = await determineSubject(notesText.join("\n"))
+
+      // Generate quiz questions
+      const totalQuestions =
+        questionDistribution.multipleChoice +
+        questionDistribution.knowledge +
+        questionDistribution.thinking +
+        questionDistribution.application +
+        questionDistribution.communication
+
+      const quizPrompt = `
+        Create a practice test based on the following notes for a Grade ${grade} student studying ${subject} and the YRDSB cirriculum for the grade.
+        
+        Notes:
+        ${notesText.join("\n")}
+        
+        ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
+        
+        Generate a quiz with exactly ${totalQuestions} questions with the following distribution:
+        - Multiple Choice: ${questionDistribution.multipleChoice}
+        - Knowledge: ${questionDistribution.knowledge}
+        - Thinking: ${questionDistribution.thinking}
+        - Application: ${questionDistribution.application}
+        - Communication: ${questionDistribution.communication}
+        
+        Format the response as a JSON object with the following structure:
+        {
+          "title": "Quiz title based on the content",
+          "questions": [
+            {
+              "type": "multiple_choice",
+              "question": "Question text",
+              "options": ["A", "B", "C", "D"],
+              "correctAnswer": "A",
+              "explanation": "Why this is the correct answer"
+            }
+          ]
+        }
+      `
 
       try {
-        // Extract text from PDFs
-        const notesText = await Promise.all(
-          notesFiles.map(async (file) => {
-            try {
-              const text = await extractTextFromPDF(file)
-              return text
-            } catch (error) {
-              throw new Error(`Failed to extract text from file "${file.name}". Please ensure it's a valid PDF.`)
-            }
-          })
-        )
+        const response = await generateText({
+          model: getAIModel(),
+          prompt: quizPrompt,
+          temperature: 0.7,
+          maxTokens: 2000,
+        })
 
-        // Extract text from past test if provided
-        let pastTestText = ""
-        if (pastTestFile) {
-          try {
-            pastTestText = await extractTextFromPDF(pastTestFile)
-          } catch (error) {
-            throw new Error(`Failed to extract text from past test file. Please ensure it's a valid PDF.`)
-          }
+        if (!response || !response.text) {
+          throw new Error("Failed to generate quiz. No response from AI.")
         }
 
-        // Configure OpenAI
-        const configuration = {
-          apiKey: process.env.OPENAI_API_KEY,
-        }
-
-        // Determine subject using AI
-        const subject = await determineSubject(notesText.join("\n"))
-
-        // Generate quiz questions
-        const totalQuestions =
-          questionDistribution.multipleChoice +
-          questionDistribution.knowledge +
-          questionDistribution.thinking +
-          questionDistribution.application +
-          questionDistribution.communication
-
-        const quizPrompt = `
-          Create a practice test based on the following notes for a Grade ${grade} student studying ${subject} and the YRDSB cirriculum for the grade.
-          
-          Notes:
-          ${notesText.join("\n")}
-          
-          ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
-          
-          Generate a quiz with exactly ${totalQuestions} questions with the following distribution:
-          - Multiple Choice: ${questionDistribution.multipleChoice}
-          - Knowledge: ${questionDistribution.knowledge}
-          - Thinking: ${questionDistribution.thinking}
-          - Application: ${questionDistribution.application}
-          - Communication: ${questionDistribution.communication}
-          
-          Format the response as a JSON object with the following structure:
-          {
-            "title": "Quiz title based on the content",
-            "questions": [
-              {
-                "type": "multiple_choice",
-                "question": "Question text",
-                "options": ["A", "B", "C", "D"],
-                "correctAnswer": "A",
-                "explanation": "Why this is the correct answer"
-              }
-            ]
-          }
-        `
-
+        // Parse and validate the response
         try {
-          const response = await generateText({
-            model: openai("gpt-3.5-turbo"),
-            prompt: quizPrompt,
-            temperature: 0.7,
-            maxTokens: 2000,
-          })
-
-          if (!response || !response.text) {
-            throw new Error("Failed to generate quiz. No response from AI.")
+          const quiz = JSON.parse(response.text)
+          if (!quiz.title || !quiz.questions || !Array.isArray(quiz.questions)) {
+            throw new Error("Invalid quiz format generated. Please try again.")
           }
 
-          // Parse and validate the response
-          try {
-            const quiz = JSON.parse(response.text)
-            if (!quiz.title || !quiz.questions || !Array.isArray(quiz.questions)) {
-              throw new Error("Invalid quiz format generated. Please try again.")
-            }
-
-            // Validate question count
-            if (quiz.questions.length !== totalQuestions) {
-              throw new Error(`Expected ${totalQuestions} questions but got ${quiz.questions.length}. Please try again.`)
-            }
-
-            return quiz.id
-          } catch (error) {
-            if (error instanceof Error) {
-              throw new Error(`Failed to parse quiz response: ${error.message}`)
-            }
-            throw new Error("Failed to parse quiz response. Please try again.")
+          // Validate question count
+          if (quiz.questions.length !== totalQuestions) {
+            throw new Error(`Expected ${totalQuestions} questions but got ${quiz.questions.length}. Please try again.`)
           }
+
+          return quiz.id
         } catch (error) {
           if (error instanceof Error) {
-            throw new Error(`Failed to generate quiz using AI: ${error.message}`)
+            throw new Error(`Failed to parse quiz response: ${error.message}`)
           }
-          throw new Error("Failed to generate quiz using AI. Please try again.")
+          throw new Error("Failed to parse quiz response. Please try again.")
         }
       } catch (error) {
-        throw new Error(`Quiz generation failed: ${error.message}`)
+        if (error instanceof Error) {
+          throw new Error(`Failed to generate quiz using AI: ${error.message}`)
+        }
+        throw new Error("Failed to generate quiz using AI. Please try again.")
       }
     } else {
       // Regular flow for authenticated users
@@ -651,10 +657,56 @@ async function determineSubject(notesText: string): Promise<string> {
   `
 
   const { text: subject } = await generateText({
-    model: openai("gpt-3.5-turbo-instruct"),
+    model: getAIModel(),
     prompt: subjectPrompt,
   })
 
   return subject
+}
+
+/**
+ * Generates explanation for a question answer
+ */
+async function generateExplanation(
+  question: string,
+  options: string[],
+  userAnswer: string,
+  correctAnswer: string,
+  isCorrect: boolean,
+  subject: string,
+  grade: string,
+): Promise<string> {
+  const optionsText = options.map((option, i) => `${String.fromCharCode(65 + i)}. ${option}`).join("\n")
+
+  const prompt = `
+    I'm a Grade ${grade} student studying ${subject}.
+    
+    Here's a question from my recent test:
+    
+    Question: ${question}
+    
+    Options:
+    ${optionsText}
+    
+    I chose: ${userAnswer}
+    The correct answer is: ${correctAnswer}
+    
+    Please provide a clear explanation for why the correct answer is right${
+      !isCorrect ? " and why my answer is wrong" : ""
+    }. Keep your explanation concise, educational, and at the appropriate level for a Grade ${grade} student.
+  `
+
+  try {
+    const { text } = await generateText({
+      model: getAIModel(),
+      prompt,
+      temperature: 0.7,
+    })
+
+    return text
+  } catch (error) {
+    console.error("Error generating explanation:", error)
+    return "Sorry, I couldn't generate an explanation at this time."
+  }
 }
 
