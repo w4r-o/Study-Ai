@@ -1,0 +1,171 @@
+{
+  "quizzes": {
+    "quiz-1743438620050": {
+      "title": "Grade 11 Exponential Functions - Growth And Decay Models (solving Real-world Problems With Exponential Growth And Decay) Quiz",
+      "subject": "Mathematics",
+      "grade": "11",
+      "topic": "Exponential Functions - Growth And Decay Models (solving Real-world Problems With Exponential Growth And Decay)",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the general form of an exponential growth/decay function?",
+          "options": [
+            "A) f(x) = a(b^x)",
+            "B) f(x) = a + bx",
+            "C) f(x) = a(bx)",
+            "D) f(x) = a + b^x"
+          ],
+          "answer": "A) f(x) = a(b^x)",
+          "explanation": "The general form of an exponential growth/decay function is f(x) = a(b^x), where 'a' is the initial value, 'b' is the growth/decay rate, and 'x' is the number of periods."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "If a quantity decreases by 20% per period, what is the decay factor 'b'?",
+          "options": [
+            "A) 0.2",
+            "B) 0.8",
+            "C) 1.2",
+            "D) 0.02"
+          ],
+          "answer": "B) 0.8",
+          "explanation": "For exponential decay, b = 1 - r, where r is the decay rate. Here, r = 0.2, so b = 1 - 0.2 = 0.8."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is an example of exponential decay?",
+          "options": [
+            "A) A population increasing by 3% annually",
+            "B) A car depreciating by 10% per year",
+            "C) A bank account growing by 5% interest compounded annually",
+            "D) A bacteria culture doubling every hour"
+          ],
+          "answer": "B) A car depreciating by 10% per year",
+          "explanation": "Exponential decay involves a quantity decreasing over time. A car depreciating by 10% per year fits this scenario."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the half-life of a substance if it decays to 25% of its initial mass in 10 days?",
+          "options": [
+            "A) 2.5 days",
+            "B) 5 days",
+            "C) 10 days",
+            "D) 20 days"
+          ],
+          "answer": "B) 5 days",
+          "explanation": "The substance decays to 25% in two half-lives (since 0.5^2 = 0.25). Therefore, the half-life is 10 days / 2 = 5 days."
+        },
+        {
+          "id": "5",
+          "type": "shortAnswer",
+          "category": "Knowledge",
+          "text": "Define the term 'half-life' in the context of exponential decay.",
+          "answer": "The half-life is the time it takes for a quantity to reduce to half of its initial value in exponential decay.",
+          "rubric": "1 point for correct definition.",
+          "explanation": "Half-life is a key concept in exponential decay, representing the time required for a quantity to decrease by 50%."
+        },
+        {
+          "id": "6",
+          "type": "shortAnswer",
+          "category": "Knowledge",
+          "text": "Write the formula for exponential growth and identify each variable.",
+          "answer": "f(x) = a(b^x), where 'a' is the initial value, 'b' is the growth factor (1 + r), and 'x' is the number of periods.",
+          "rubric": "1 point for correct formula, 1 point for correct variable identification.",
+          "explanation": "The formula f(x) = a(b^x) models exponential growth, with 'a' as the starting value, 'b' as the growth rate, and 'x' as time."
+        },
+        {
+          "id": "7",
+          "type": "shortAnswer",
+          "category": "Knowledge",
+          "text": "What is the difference between exponential growth and exponential decay?",
+          "answer": "Exponential growth involves quantities increasing over time (b > 1), while exponential decay involves quantities decreasing over time (0 < b < 1).",
+          "rubric": "1 point for correct distinction.",
+          "explanation": "Growth occurs when the base 'b' is greater than 1, and decay occurs when 'b' is between 0 and 1."
+        },
+        {
+          "id": "8",
+          "type": "shortAnswer",
+          "category": "Thinking",
+          "text": "A bacteria culture starts with 200 cells and doubles every 3 hours. Write the function that models the number of cells after 't' hours and find the number of cells after 12 hours.",
+          "answer": "Function: N(t) = 200(2^(t/3)). After 12 hours: N(12) = 200(2^4) = 3200 cells.",
+          "rubric": "1 point for correct function, 1 point for correct calculation.",
+          "explanation": "The doubling time is 3 hours, so the exponent is t/3. After 12 hours, the culture doubles 4 times (12/3 = 4)."
+        },
+        {
+          "id": "9",
+          "type": "shortAnswer",
+          "category": "Thinking",
+          "text": "A radioactive substance has a half-life of 8 days. If the initial mass is 160 mg, how much remains after 24 days?",
+          "answer": "After 24 days: 160(0.5)^(24/8) = 160(0.5)^3 = 20 mg.",
+          "rubric": "1 point for correct setup, 1 point for correct answer.",
+          "explanation": "24 days is 3 half-lives (24/8 = 3). The remaining mass is calculated as 160 mg multiplied by 0.5 raised to the power of 3."
+        },
+        {
+          "id": "10",
+          "type": "shortAnswer",
+          "category": "Thinking",
+          "text": "An investment grows from $5000 to $6050 in 2 years. Determine the annual growth rate.",
+          "answer": "6050 = 5000(b)^2 → b = √(6050/5000) ≈ 1.1 → r = 0.1 or 10%.",
+          "rubric": "1 point for correct equation, 1 point for correct rate.",
+          "explanation": "Solve for 'b' in the equation 6050 = 5000(b)^2. The growth rate 'r' is b - 1."
+        },
+        {
+          "id": "11",
+          "type": "shortAnswer",
+          "category": "Application",
+          "text": "A car worth $25,000 depreciates by 12% per year. How much will it be worth after 5 years?",
+          "answer": "Value after 5 years: 25000(0.88)^5 ≈ $13,181.25.",
+          "rubric": "1 point for correct function, 1 point for correct calculation.",
+          "explanation": "The decay factor is 1 - 0.12 = 0.88. The value after 5 years is calculated by multiplying the initial value by 0.88^5."
+        },
+        {
+          "id": "12",
+          "type": "shortAnswer",
+          "category": "Application",
+          "text": "A city's population grows from 50,000 to 60,000 in 4 years. Assuming exponential growth, what will the population be in 10 years?",
+          "answer": "First, find b: 60000 = 50000(b)^4 → b ≈ 1.0466. Then, P(10) = 50000(1.0466)^10 ≈ 78,000.",
+          "rubric": "1 point for finding 'b', 1 point for correct projection.",
+          "explanation": "Solve for 'b' using the 4-year data, then use it to project the population after 10 years."
+        },
+        {
+          "id": "13",
+          "type": "shortAnswer",
+          "category": "Communication",
+          "text": "Explain why the function f(x) = 1000(0.95)^x models exponential decay and describe a real-world scenario it could represent.",
+          "answer": "The function models decay because 0.95 < 1. It could represent a drug's concentration in the body decreasing by 5% per hour.",
+          "rubric": "1 point for identifying decay, 1 point for plausible scenario.",
+          "explanation": "The base 0.95 indicates a 5% decrease per period. This could apply to drug decay, radioactive decay, or depreciation."
+        },
+        {
+          "id": "14",
+          "type": "shortAnswer",
+          "category": "Communication",
+          "text": "A student claims that a function with b = 1.2 models exponential decay. Explain why this is incorrect.",
+          "answer": "A decay function requires 0 < b < 1. Since 1.2 > 1, it models growth, not decay.",
+          "rubric": "1 point for correct explanation.",
+          "explanation": "Exponential decay requires the base 'b' to be between 0 and 1. A base greater than 1 indicates growth."
+        }
+      ],
+      "createdAt": 1743438620050,
+      "totalQuestions": 14
+    }
+  },
+  "pastQuizzes": [
+    {
+      "id": "quiz-1743438620050",
+      "title": "Grade 11 Exponential Functions - Growth And Decay Models (solving Real-world Problems With Exponential Growth And Decay) Quiz",
+      "subject": "Mathematics",
+      "grade": "11",
+      "topic": "Exponential Functions - Growth And Decay Models (solving Real-world Problems With Exponential Growth And Decay)",
+      "createdAt": "2025-03-31T16:30:20.050Z",
+      "totalQuestions": 14
+    }
+  ]
+}
