@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { getQuiz } from "@/lib/actions"
 import { use } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 import 'katex/dist/katex.min.css'
 import katex from 'katex'
 import { Textarea } from "@/components/ui/textarea"
+import type { ReactElement } from 'react'
 
 interface Question {
   id: string;
@@ -36,33 +37,37 @@ interface Quiz {
 
 // Function to render LaTeX
 function renderLatex(text: string) {
-  if (!text) return text;
-  
-  // Regular expression to match LaTeX expressions between $ signs
-  const latexRegex = /\$(.*?)\$/g;
-  
-  // Split the text into parts and render LaTeX where needed
-  const parts = text.split(latexRegex);
-  
-  return parts.map((part, index) => {
-    if (index % 2 === 0) {
-      // Regular text
-      return part;
-    } else {
-      // LaTeX expression
-      try {
-        const html = katex.renderToString(part, {
-          throwOnError: false,
-          displayMode: false
-        });
-        return <span key={index} dangerouslySetInnerHTML={{ __html: html }} />;
-      } catch (error) {
-        console.error('LaTeX rendering error:', error);
-        return <span key={index}>${part}$</span>;
-      }
+  // First handle display math with \[ \]
+  text = text.replace(/\\\[(.*?)\\\]/g, (_, math) => {
+    try {
+      return katex.renderToString(math, { displayMode: true });
+    } catch (error) {
+      console.error('KaTeX display math error:', error);
+      return math;
     }
   });
+
+  // Then handle inline math with \( \) and $ $
+  text = text.replace(/\\\((.*?)\\\)|\$(.*?)\$/g, (_, math1, math2) => {
+    const math = math1 || math2;
+    try {
+      return katex.renderToString(math, { displayMode: false });
+    } catch (error) {
+      console.error('KaTeX inline math error:', error);
+      return math;
+    }
+  });
+
+  // Handle special cases like "depreciates by"
+  text = text.replace(/(\w+)by(\w+)/g, '$1 by $2');
+  
+  return <div dangerouslySetInnerHTML={{ __html: text }} />;
 }
+
+// Function to render text with LaTeX
+const renderText = (text: string): ReactElement => {
+  return <div className="math-text">{renderLatex(text)}</div>;
+};
 
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -142,11 +147,6 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     setSelectedAnswers({});
     setCurrentQuestion(0);
     setShowResults(false);
-  };
-
-  // Function to render text with LaTeX
-  const renderText = (text: string) => {
-    return <span className="math-text">{renderLatex(text)}</span>;
   };
 
   if (loading) {
@@ -329,15 +329,18 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   }) => {
     return (
       <div className="space-y-4">
-        <div className="text-lg font-medium">
-          {renderText(question.text)}
-        </div>
-        <Textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Type your answer here..."
-          className="min-h-[200px] p-4"
-        />
+        <div className="text-lg">{renderLatex(question.text)}</div>
+        <label>
+          <textarea
+            name="answer"
+            defaultValue={value}
+            onBlur={(e) => onChange(e.target.value)}
+            rows={6}
+            cols={50}
+            className="w-full p-4 text-lg border rounded-lg bg-gray-800 border-gray-700 text-white"
+            placeholder="Type your answer here..."
+          />
+        </label>
       </div>
     );
   };

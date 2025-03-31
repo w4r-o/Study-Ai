@@ -5,17 +5,16 @@
  * - extractTextFromPDF: Extracts text from PDF files
  * 
  * Integrations:
- * - PDF parsing system
+ * - pdf2json
  * 
  * Used By:
  * - lib/actions.ts
  * 
  * Dependencies:
- * - pdf-parse
- * - buffer
+ * - pdf2json
  */
 
-import { Buffer } from "buffer"
+import PDFParser from 'pdf2json';
 
 /**
  * Extracts text from a PDF file
@@ -24,36 +23,62 @@ import { Buffer } from "buffer"
  */
 export async function extractTextFromPDF(file: File): Promise<string> {
   try {
-    // In a real implementation, we would use a PDF parsing library
-    // For this example, we'll simulate text extraction
+    console.log("Starting PDF extraction for:", file.name);
+    console.log("File size:", file.size, "bytes");
 
     // Convert file to array buffer
-    const arrayBuffer = await file.arrayBuffer()
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Get the file name without extension
-    const fileName = file.name.replace(/\.[^/.]+$/, "")
+    // Create a new parser instance
+    const pdfParser = new PDFParser();
 
-    // For this example, we'll return a placeholder message with the file name
-    // This allows us to at least see what file was processed
-    return `Content from ${fileName}: 
-    
-    This is simulated text extraction from the PDF file "${file.name}". 
-    
-    In a real implementation, we would use a PDF parsing library to extract the actual text content.
-    
-    For demonstration purposes, let's assume this file contains information about:
-    - Key concepts and definitions
-    - Example problems and solutions
-    - Practice exercises
-    - Summary of important formulas or principles
-    
-    The content would be used to generate appropriate quiz questions based on the selected grade level and question types.`
+    // Parse PDF content
+    const text = await new Promise<string>((resolve, reject) => {
+      pdfParser.on('pdfParser_dataReady', (pdfData) => {
+        try {
+          // Convert PDF data to text
+          const rawText = pdfData.Pages.map(page => 
+            page.Texts.map(text => 
+              decodeURIComponent(text.R.map(r => r.T).join(' '))
+            ).join(' ')
+          ).join('\n\n');
+
+          resolve(rawText);
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      pdfParser.on('pdfParser_dataError', (error) => {
+        reject(error);
+      });
+
+      // Load PDF data
+      pdfParser.parseBuffer(buffer);
+    });
+
+    // Clean up the extracted text
+    const cleanedText = text
+      // Remove multiple newlines
+      .replace(/\n{3,}/g, '\n\n')
+      // Remove multiple spaces
+      .replace(/[ \t]+/g, ' ')
+      // Clean up common PDF artifacts
+      .replace(/[^\S\r\n]+$/gm, '')
+      // Fix common encoding issues
+      .replace(/\\u[\dA-F]{4}/gi, match => 
+        String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16))
+      )
+      .trim();
+
+    console.log("PDF extraction complete:");
+    console.log("- Text length:", cleanedText.length, "characters");
+
+    return cleanedText;
   } catch (error) {
-    console.error("Error extracting text from PDF:", error)
-    return `Failed to extract text from ${file.name}. Using placeholder content instead.
-    
-    This is placeholder content that will be used to generate quiz questions.
-    The questions will be general in nature since we couldn't extract the actual content.`
+    console.error("Error extracting text from PDF:", error);
+    throw new Error(`Failed to extract text from ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

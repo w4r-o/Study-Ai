@@ -93,50 +93,53 @@ export async function generateText(
       messages: [
         { 
           role: "system", 
-          content: prompt.includes("Analyze these") ? 
-            // Topic determination prompt - simplified and more direct
-            `You are a mathematics curriculum expert. Analyze the given text and identify the specific mathematical topic.
-
-OUTPUT FORMAT (return EXACTLY this with NO other text):
-Mathematics
-Unit: [curriculum unit - be specific, no "General"]
-Topic: [specific topic - be specific, no "General"]
-Subtopic: [specific concept]
-
-Example:
-Mathematics
-Unit: Quadratic Relations
-Topic: Graphing Quadratics
-Subtopic: Vertex Form and Transformations` :
-            // Quiz generation prompt - more structured
-            `Generate a mathematics quiz in this EXACT JSON format:
-
-{
-  "title": "Mathematics Quiz",
-  "subject": "Mathematics",
-  "grade": "11",
-  "topic": "Your topic here",
-  "questions": [
-    {
-      "id": "1",
-      "type": "multipleChoice",
-      "text": "Clear question text",
-      "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
-      "answer": "A) Option 1",
-      "explanation": "Clear explanation"
-    }
-  ]
-}
-
-Rules:
-1. Return ONLY valid JSON
-2. Questions must be topic-specific
-3. Multiple choice: exactly 4 options labeled A) to D)
-4. Short answer: no options array needed`
+          content: prompt.includes("determine the academic subject") ?
+            // Subject determination prompt
+            `You are an expert teacher analyzing educational content.
+            Your task is to determine the primary academic subject of the provided text.
+            
+            RULES:
+            1. Choose ONLY ONE subject from: Mathematics, Physics, Chemistry, Biology, History, English, Geography, Computer Science, Healthcare
+            2. Respond with ONLY the subject name - no other text
+            3. Look for subject-specific terminology and concepts
+            4. Consider the overall context and focus
+            5. If the content is about medical or health topics, choose Healthcare
+            
+            Analyze this content:
+            ${prompt.replace(/determine the academic subject/i, '').trim()}` :
+            prompt.includes("determine the specific unit and topic") ?
+            // Topic determination prompt
+            `You are an expert teacher analyzing educational content.
+            Your task is to determine the specific unit, topic, and subtopic being covered.
+            
+            RULES:
+            1. Use only information directly present in the text
+            2. Be as specific as possible while remaining accurate
+            3. Never use generic terms like "General" or "Basic"
+            4. Use proper terminology for the field
+            5. Consider the depth and focus of the content
+            
+            Format your response EXACTLY as:
+            Unit: [Main area of study]
+            Topic: [Specific topic within that unit]
+            Subtopic: [Specific concept being covered]
+            
+            Example for Healthcare:
+            Unit: Physical Therapy
+            Topic: Neuromuscular Conditions
+            Subtopic: Treatment Approaches and Assessment
+            
+            Analyze this content:
+            ${prompt.replace(/determine the specific unit and topic/i, '').trim()}` :
+            // Quiz generation prompt
+            `You are a teacher creating a quiz. ${prompt}`
         },
-        { role: "user", content: prompt }
+        { 
+          role: "user", 
+          content: prompt
+        }
       ],
-      temperature: 0.2,  // Lower temperature for more consistent formatting
+      temperature: temperature,
       max_tokens: maxTokens
     };
     
@@ -158,146 +161,63 @@ Rules:
       body: JSON.stringify(requestBody)
     });
 
-    console.log(`Response status: ${response.status} ${response.statusText}`);
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error("OpenRouter API error response:", errorText);
-      
-      if (response.status === 401) {
-        throw new Error("Invalid API key. Please check your environment configuration.");
-      } else if (response.status === 429) {
-        throw new Error("Rate limit exceeded. Please try again in a few minutes.");
-      } else if (response.status === 500) {
-        throw new Error("OpenRouter service error. Please try again later.");
-      }
-      
       throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
     console.log("OpenRouter API response received");
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error("Invalid response format from OpenRouter API:", data);
+    if (!data.choices?.[0]?.message?.content) {
       throw new Error("Invalid response format from OpenRouter API");
     }
 
-    const rawContent = data.choices[0].message.content;
+    const rawContent = data.choices[0].message.content.trim();
     console.log("\nRaw response content:", rawContent);
 
-    // If this is a topic determination request
-    if (prompt.includes("Analyze these")) {
-      // For topic determination, expect a simple text response
-      const lines: string[] = rawContent
-        .split('\n')
-        .map((line: string) => line.trim())
-        .filter(Boolean);
+    // Handle different types of responses
+    if (prompt.includes("determine the academic subject")) {
+      // For subject determination, return the single word response
+      return rawContent.split(/[\n\r]+/)[0].trim();
+    } 
+    else if (prompt.includes("determine the specific unit and topic")) {
+      // For topic determination, parse the structured response
+      const lines: string[] = rawContent.split(/[\n\r]+/).map((line: string) => line.trim()).filter(Boolean);
       
-      // Log the raw response for debugging
-      console.log("Topic determination response lines:", lines);
+      const unit = lines.find((l: string) => l.startsWith('Unit:'))?.replace('Unit:', '').trim();
+      const topic = lines.find((l: string) => l.startsWith('Topic:'))?.replace('Topic:', '').trim();
+      const subtopic = lines.find((l: string) => l.startsWith('Subtopic:'))?.replace('Subtopic:', '').trim();
       
-      if (lines.length < 3) {
-        console.error("Not enough lines in response:", lines);
-        throw new Error("Invalid response format - missing required fields");
+      if (!unit || !topic) {
+        throw new Error("Missing required topic determination fields");
       }
-
-      const subject = lines[0];
-      const unit = lines.find((l: string) => l.startsWith("Unit:"))?.replace("Unit:", "").trim();
-      const topic = lines.find((l: string) => l.startsWith("Topic:"))?.replace("Topic:", "").trim();
-      const subtopic = lines.find((l: string) => l.startsWith("Subtopic:"))?.replace("Subtopic:", "").trim();
-
-      // Validate each field
-      if (!subject || subject !== "Mathematics") {
-        throw new Error("Invalid subject - must be Mathematics");
-      }
-      if (!unit || unit.toLowerCase().includes("general")) {
-        throw new Error("Invalid unit - must be specific (not General)");
-      }
-      if (!topic || topic.toLowerCase().includes("general")) {
-        throw new Error("Invalid topic - must be specific (not General)");
-      }
-      if (!subtopic) {
-        throw new Error("Missing subtopic");
-      }
-
-      console.log("Topic Determination Results:");
-      console.log("- Subject:", subject);
-      console.log("- Unit:", unit);
-      console.log("- Topic:", topic);
-      console.log("- Subtopic:", subtopic);
-
-      return JSON.stringify({ subject, unit, topic, subtopic });
-    }
-
-    // For quiz generation, try direct JSON parse first
-    try {
-      // Remove any potential text before or after the JSON
-      const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const possibleJson = jsonMatch[0];
-        try {
-          const parsed = JSON.parse(possibleJson);
-          if (parsed.questions && Array.isArray(parsed.questions)) {
-            console.log("Successfully parsed direct JSON response");
-            return JSON.stringify(parsed, null, 2);
-          }
-        } catch (e) {
-          console.log("Direct JSON parse failed, will try cleanup...");
-        }
-      }
-    } catch (directError) {
-      console.log("Initial JSON extraction failed, will try cleanup...");
-    }
-
-    // Clean up the response for JSON parsing
-    let cleanContent = rawContent
-      .replace(/```json\s*|\s*```/g, '')     // Remove code blocks
-      .replace(/\n\s*/g, ' ')                // Normalize whitespace
-      .trim();
-
-    // Find the JSON structure
-    const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error("No JSON structure found in:", cleanContent);
-      throw new Error("Invalid response format - expected JSON structure");
-    }
-
-    let jsonContent = jsonMatch[0]
-      .replace(/,(\s*[}\]])/g, '$1')         // Fix trailing commas
-      .replace(/([{,])\s*"(\w+)":/g, '$1"$2":') // Fix property formatting
-      .trim();
-
-    try {
-      const parsedContent = JSON.parse(jsonContent);
       
-      // Validate structure
-      if (!parsedContent.questions?.length) {
-        throw new Error("Quiz must contain questions array");
-      }
-
-      // Clean up questions
-      parsedContent.questions = parsedContent.questions.map((q: any, index: number) => {
-        if (!q.text || !q.type || (q.type === 'multipleChoice' && (!Array.isArray(q.options) || q.options.length !== 4))) {
-          throw new Error(`Question ${index + 1} has invalid format`);
+      return `Unit: ${unit}\nTopic: ${topic}${subtopic ? `\nSubtopic: ${subtopic}` : ''}`;
+    }
+    else {
+      // For quiz generation, expect and validate JSON
+      try {
+        const startIndex = rawContent.indexOf('{');
+        const endIndex = rawContent.lastIndexOf('}');
+        
+        if (startIndex === -1 || endIndex === -1) {
+          throw new Error("No valid JSON structure found in response");
         }
 
-        return {
-          id: q.id || String(index + 1),
-          type: q.type,
-          text: q.text.trim(),
-          options: q.type === 'multipleChoice' ? q.options.map((opt: string) => opt.trim()) : [],
-          answer: q.answer.trim(),
-          explanation: (q.explanation || '').trim()
-        };
-      });
+        const jsonContent = rawContent.slice(startIndex, endIndex + 1);
+        const parsed = JSON.parse(jsonContent);
 
-      console.log(`Successfully parsed quiz with ${parsedContent.questions.length} questions`);
-      return JSON.stringify(parsedContent, null, 2);
-    } catch (error) {
-      console.error("Failed to parse quiz:", error);
-      console.error("Attempted content:", jsonContent);
-      throw new Error(`Failed to parse quiz: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        if (!parsed.questions?.length) {
+          throw new Error("Invalid quiz structure - missing questions array");
+        }
+
+        return jsonContent;
+      } catch (error) {
+        console.error("Failed to parse quiz JSON:", error);
+        throw new Error("Failed to generate valid quiz structure");
+      }
     }
   } catch (error) {
     console.error("Error in generateText:", error);

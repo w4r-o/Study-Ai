@@ -9,6 +9,13 @@ import { getQuizResults } from "@/lib/actions"
 import { CheckCircle, XCircle, ArrowRight, BookOpen, Home } from "lucide-react"
 import Link from "next/link"
 
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
 type QuestionResult = {
   id: string
   text: string
@@ -31,7 +38,7 @@ type QuizResult = {
   questions: QuestionResult[]
 }
 
-export default function ResultsPage({ params }: { params: { id: string } }) {
+export default function ResultsPage({ params }: PageProps) {
   const [result, setResult] = useState<QuizResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"overview" | "review">("overview")

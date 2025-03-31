@@ -32,11 +32,9 @@ import { generateText, isAIConfigured } from "@/lib/openrouter-api"
 // Maximum file size in bytes (20MB)
 const MAX_FILE_SIZE = 20 * 1024 * 1024
 
-// In-memory store for quizzes during development
-const quizStore: { [key: string]: QuizData } = {};
-
-// In-memory store for past quizzes
-const pastQuizzesStore: {
+// Quiz storage with persistence
+let quizStore: { [key: string]: QuizData } = {};
+let pastQuizzesStore: {
   id: string;
   title: string;
   subject: string;
@@ -45,6 +43,37 @@ const pastQuizzesStore: {
   createdAt: string;
   totalQuestions: number;
 }[] = [];
+
+// Load quiz data from file if it exists
+try {
+  const fs = require('fs');
+  const path = require('path');
+  const dataPath = path.join(process.cwd(), '.quiz-data.json');
+  
+  if (fs.existsSync(dataPath)) {
+    const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    quizStore = data.quizzes || {};
+    pastQuizzesStore = data.pastQuizzes || [];
+  }
+} catch (error) {
+  console.error('Error loading quiz data:', error);
+}
+
+// Save quiz data to file
+function saveQuizData() {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const dataPath = path.join(process.cwd(), '.quiz-data.json');
+    
+    fs.writeFileSync(dataPath, JSON.stringify({
+      quizzes: quizStore,
+      pastQuizzes: pastQuizzesStore
+    }, null, 2));
+  } catch (error) {
+    console.error('Error saving quiz data:', error);
+  }
+}
 
 interface QuizQuestion {
   id: string;
@@ -74,9 +103,9 @@ function escapeLatexForJson(text: string) {
 
 // Helper function to clear quiz store
 function clearQuizStore() {
-  Object.keys(quizStore).forEach(key => {
-    delete quizStore[key];
-  });
+  quizStore = {};
+  pastQuizzesStore = [];
+  saveQuizData();
 }
 
 // Helper function to convert LaTeX commands to actual symbols
@@ -277,7 +306,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
        - Specify expected key points
        - Match the question style to its category
     4. Use actual mathematical symbols (≠, ≤, ≥, ∞, ∈, ℝ)
-    5. Questions MUST be based on the notes provided
+    5. Questions MUST be based on the notes, unit, subtopic, topic, and grade and yrdsb curriculum. 
     `;
 
     let quizText = await generateText(prompt, {
@@ -311,10 +340,13 @@ export async function createQuiz(formData: FormData): Promise<string> {
         throw new Error("Invalid quiz structure");
       }
       
-      if (quiz.questions.length !== numQuestions) {
-        console.error(`Question count mismatch: expected ${numQuestions}, got ${quiz.questions.length}`);
-        throw new Error("Generated quiz has incorrect number of questions");
+      // Ensure we have at least some questions
+      if (quiz.questions.length === 0) {
+        throw new Error("No questions generated");
       }
+
+      // Log the actual question count for debugging
+      console.log(`Generated ${quiz.questions.length} questions (expected ${numQuestions})`);
 
       // Update validation to check category counts
       const questionsByCategory = {
@@ -325,23 +357,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
         communication: quiz.questions.filter(q => q.type === "shortAnswer" && q.category === "Communication").length
       };
 
-      if (questionsByCategory.multipleChoice !== multipleChoice ||
-          questionsByCategory.knowledge !== knowledge ||
-          questionsByCategory.thinking !== thinking ||
-          questionsByCategory.application !== application ||
-          questionsByCategory.communication !== communication) {
-        console.error("Question distribution mismatch:", {
-          expected: {
-            multipleChoice,
-            knowledge,
-            thinking,
-            application,
-            communication
-          },
-          actual: questionsByCategory
-        });
-        throw new Error("Generated quiz has incorrect question distribution");
-      }
+      console.log("Questions by category:", questionsByCategory);
 
       // Convert LaTeX commands to actual symbols
       quiz.questions = quiz.questions.map(q => ({
@@ -377,6 +393,9 @@ export async function createQuiz(formData: FormData): Promise<string> {
         totalQuestions: quiz.questions.length
       });
       
+      // Save data to file
+      saveQuizData();
+      
       console.log("=== Quiz Generation Complete ===\n");
       return quizId;
       
@@ -397,7 +416,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
 async function determineSubject(notesText: string): Promise<string> {
   const subjectPrompt = `
     Based on these notes, determine the academic subject.
-    Respond with ONLY ONE of these subjects: Mathematics, Physics, Chemistry, Biology, History, English, Geography, Computer Science
+    Respond with ONLY ONE of these subjects: Mathematics, Physics, Chemistry, Biology, History, English, Geography, Computer Science, Healthcare
     Do not include any other text, formatting, or punctuation.
     
     Notes:
@@ -413,10 +432,14 @@ async function determineSubject(notesText: string): Promise<string> {
     const subject = response.replace(/['".,]/g, '').trim();
     console.log("Determined subject:", subject);
     
-    return subject || "Mathematics";
+    if (!subject) {
+      throw new Error("Could not determine subject from notes");
+    }
+    
+    return subject;
   } catch (error) {
     console.error("Error determining subject:", error);
-    return "Mathematics";
+    throw error;
   }
 }
 
@@ -425,32 +448,33 @@ async function determineSubject(notesText: string): Promise<string> {
  */
 async function determineTopic(notesText: string, subject: string): Promise<string> {
   const topicPrompt = `
-    You are a YRDSB high school teacher. Analyze these ${subject} notes and determine the specific unit and topic.
-
+    You are a teacher analyzing these ${subject} notes to determine the specific unit and topic.
     
     Format your response EXACTLY as:
     ${subject}
-    Unit: [Find the component of study which forms part of your course an example would be Mathematics > Algebra > Linear Functions]
+    Unit: [Main area of study]
     Topic: [Specific topic within that unit]
     Subtopic: [Specific concept being covered]
     
-    Example responses:
+    Requirements:
+    1. Unit MUST be specific to the subject matter
+    2. Topic should be specific but standardized
+    3. Subtopic should detail the exact concepts covered
+    4. Use official terminology for the field
+    5. Be as specific as possible while remaining accurate
+    6. NEVER use "General" as a classification
+    
+    Example for Healthcare:
+    Healthcare
+    Unit: Physical Therapy
+    Topic: Neuromuscular Conditions
+    Subtopic: Treatment Approaches and Assessment
+    
+    Example for Mathematics:
     Mathematics
     Unit: Functions
     Topic: Exponential Functions
     Subtopic: Growth and Decay Applications
-    
-    Mathematics
-    Unit: Algebra
-    Topic: Polynomial Functions
-    Subtopic: Factoring Trinomials
-    
-    Requirements: - MUST FOLLOW THESE
-    1. Unit MUST be specific like a break down of Functions > Exponential Functions > Growth and Decay Applications like how I did NEVER classify as "General Mathematics" MUST BE SPECIFIC
-    2. Topic should be specific but standardized
-    3. Subtopic should detail the exact concepts covered
-    4. Use official curriculum terminology
-    5. Be as specific as possible while remaining accurate
     
     Analyze these notes and respond ONLY in the format shown above:
     
@@ -485,11 +509,11 @@ async function determineTopic(notesText: string, subject: string): Promise<strin
     if (!unit || !topic) {
       console.log("\nFalling back to keyword extraction...");
       const keywords = extractTopicKeywords(notesText, subject);
-      if (keywords) {
-        console.log("Found keywords:", keywords);
-        return keywords;
+      if (!keywords) {
+        throw new Error("Could not determine topic from notes");
       }
-      return `General ${subject}`;
+      console.log("Found keywords:", keywords);
+      return keywords;
     }
     
     // Combine components into a descriptive topic
@@ -505,7 +529,7 @@ async function determineTopic(notesText: string, subject: string): Promise<strin
     return cleanupTopic(fullTopic);
   } catch (error) {
     console.error("Error in topic determination:", error);
-    return `General ${subject}`;
+    throw error;
   }
 }
 
