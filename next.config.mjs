@@ -13,10 +13,19 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  env: {
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    OPENROUTER_REFERRER: process.env.OPENROUTER_REFERRER,
+    OPENROUTER_SITE: process.env.OPENROUTER_SITE,
+    MODEL_PROVIDER: process.env.MODEL_PROVIDER
+  },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    serverActions: {
+      allowedOrigins: ["localhost:3000", "localhost:3005"]
+    }
   },
 }
 

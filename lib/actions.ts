@@ -9,7 +9,7 @@
  * - getPastQuizzes: Gets user's quiz history
  * 
  * Integrations:
- * - OpenAI API
+ * - DeepSeek AI via OpenRouter
  * - Supabase Database
  * 
  * Used By:
@@ -18,21 +18,103 @@
  * 
  * Dependencies:
  * - lib/pdf-utils.ts
- * - lib/auth.ts
+ * - lib/server-auth.ts
  * - lib/supabase/server.ts
  */
 
 "use server"
 
-import { generateText } from "ai"
-import { openai } from "@ai-sdk/openai"
 import { createClient } from "@/lib/supabase/server"
-import { auth } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/server-auth"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
-import { getAIModel, isAIConfigured } from "@/lib/ai-utils"
+import { generateText, isAIConfigured } from "@/lib/openrouter-api"
 
 // Maximum file size in bytes (20MB)
 const MAX_FILE_SIZE = 20 * 1024 * 1024
+
+// In-memory store for quizzes during development
+const quizStore: { [key: string]: QuizData } = {};
+
+// In-memory store for past quizzes
+const pastQuizzesStore: {
+  id: string;
+  title: string;
+  subject: string;
+  grade: string;
+  topic: string;
+  createdAt: string;
+  totalQuestions: number;
+}[] = [];
+
+interface QuizQuestion {
+  id: string;
+  text: string;
+  type: "multipleChoice" | "shortAnswer";
+  category: "Multiple Choice" | "Knowledge" | "Thinking" | "Application" | "Communication";
+  options?: string[];
+  answer: string;
+  explanation?: string;
+  rubric?: string; // For short answer questions
+}
+
+interface QuizData {
+  title: string;
+  subject: string;
+  grade: string;
+  topic: string;
+  questions: QuizQuestion[];
+  createdAt: number;
+  totalQuestions: number;
+}
+
+// Helper function to escape LaTeX in JSON
+function escapeLatexForJson(text: string) {
+  return text.replace(/\\/g, '\\\\');
+}
+
+// Helper function to clear quiz store
+function clearQuizStore() {
+  Object.keys(quizStore).forEach(key => {
+    delete quizStore[key];
+  });
+}
+
+// Helper function to convert LaTeX commands to actual symbols
+function convertLatexToSymbols(text: string): string {
+  const replacements: [RegExp, string][] = [
+    [/\\neq/g, '≠'],
+    [/\\leq/g, '≤'],
+    [/\\geq/g, '≥'],
+    [/\\infty/g, '∞'],
+    [/\\in/g, '∈'],
+    [/\\subset/g, '⊂'],
+    [/\\supset/g, '⊃'],
+    [/\\cup/g, '∪'],
+    [/\\cap/g, '∩'],
+    [/\\emptyset/g, '∅'],
+    [/\\pm/g, '±'],
+    [/\\times/g, '×'],
+    [/\\div/g, '÷'],
+    [/\\cdot/g, '·'],
+    [/\\rightarrow/g, '→'],
+    [/\\leftarrow/g, '←'],
+    [/\\Rightarrow/g, '⇒'],
+    [/\\Leftarrow/g, '⇐'],
+    [/\\xer/g, 'ℝ'],  // For domain x ∈ ℝ
+    [/\\yer/g, 'ℝ'],  // For range y ∈ ℝ
+    [/\\mathbb{R}/g, 'ℝ'],
+    [/\\alpha/g, 'α'],
+    [/\\beta/g, 'β'],
+    [/\\theta/g, 'θ'],
+    [/\\pi/g, 'π']
+  ];
+
+  let result = text;
+  for (const [pattern, symbol] of replacements) {
+    result = result.replace(pattern, symbol);
+  }
+  return result;
+}
 
 /**
  * Creates a new quiz based on uploaded notes
@@ -41,296 +123,526 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024
  */
 export async function createQuiz(formData: FormData): Promise<string> {
   try {
-    // Get the current user
-    const user = await auth.getCurrentUser()
+    console.log("\n=== Starting Quiz Generation ===");
+    console.log("Timestamp:", new Date().toISOString());
+    
+    // Clear previous quiz data
+    clearQuizStore();
+    console.log("Cleared previous quiz data");
+    
+    // Get and validate form data
+    const notesFiles = formData.getAll("notes") as File[];
+    const grade = formData.get("grade")?.toString() || "11";
+    
+    // Get question distribution
+    const multipleChoice = parseInt(formData.get("multipleChoice")?.toString() || "0", 10);
+    const knowledge = parseInt(formData.get("knowledge")?.toString() || "0", 10);
+    const thinking = parseInt(formData.get("thinking")?.toString() || "0", 10);
+    const application = parseInt(formData.get("application")?.toString() || "0", 10);
+    const communication = parseInt(formData.get("communication")?.toString() || "0", 10);
 
-    // For development/testing, create a mock user if not logged in
-    if (!user) {
-      console.log("No authenticated user found, using mock user for development")
-      // Mock user ID for development
-      const mockUserId = "mock-user-id"
-
-      // Check for notes files
-      const notesFiles = formData.getAll("notes") as File[]
-      if (notesFiles.length === 0) {
-        throw new Error("No notes files were uploaded")
-      }
-
-      // Check grade is valid (must be one of 9, 10, 11, 12)
-      const grade = formData.get("grade") as string
-      if (!["9", "10", "11", "12"].includes(grade)) {
-        throw new Error("Invalid grade selected. Please select a grade between 9 and 12.")
-      }
-
-      // Check files for size limits
-      for (const file of notesFiles) {
-        if (file.size > MAX_FILE_SIZE) {
-          throw new Error(
-            `File ${file.name} exceeds the maximum file size of 20MB. Please upload a smaller file.`,
-          )
-        }
-      }
-
-      const pastTestFile = formData.get("pastTest") as File
-      if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
-        throw new Error(
-          `Past test file ${pastTestFile.name} exceeds the maximum file size of 20MB. Please upload a smaller file.`,
-        )
-      }
-
-      // Extract text from PDF files
-      const notesText: string[] = []
-      for (const file of notesFiles) {
-        try {
-          const text = await extractTextFromPDF(file)
-          notesText.push(text)
-        } catch (error) {
-          throw new Error(`Failed to extract text from ${file.name}. Please ensure it's a valid PDF.`)
-        }
-      }
-
-      let pastTestText = ""
-      if (pastTestFile) {
-        try {
-          pastTestText = await extractTextFromPDF(pastTestFile)
-          console.log("chatgpt has read the past test pdf")
-        } catch (error) {
-          throw new Error(`Failed to extract text from past test file. Please ensure it's a valid PDF.`)
-        }
-      }
-
-      // Parse question distribution
-      const distributionString = formData.get("questionDistribution") as string
-      const questionDistribution = JSON.parse(distributionString)
-
-      // Check if AI is properly configured
-      if (!isAIConfigured()) {
-        throw new Error("AI service is not configured. Please check your environment variables.")
-      }
-
-      // Configure OpenAI
-      const configuration = {
-        apiKey: process.env.OPENAI_API_KEY,
-      }
-
-      // Determine subject using AI
-      const subject = await determineSubject(notesText.join("\n"))
-
-      // Generate quiz questions
-      const totalQuestions =
-        questionDistribution.multipleChoice +
-        questionDistribution.knowledge +
-        questionDistribution.thinking +
-        questionDistribution.application +
-        questionDistribution.communication
-
-      const quizPrompt = `
-        Create a practice test based on the following notes for a Grade ${grade} student studying ${subject} and the YRDSB cirriculum for the grade.
-        
-        Notes:
-        ${notesText.join("\n")}
-        
-        ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
-        
-        Generate a quiz with exactly ${totalQuestions} questions with the following distribution:
-        - Multiple Choice: ${questionDistribution.multipleChoice}
-        - Knowledge: ${questionDistribution.knowledge}
-        - Thinking: ${questionDistribution.thinking}
-        - Application: ${questionDistribution.application}
-        - Communication: ${questionDistribution.communication}
-        
-        Format the response as a JSON object with the following structure:
-        {
-          "title": "Quiz title based on the content",
-          "questions": [
-            {
-              "type": "multiple_choice",
-              "question": "Question text",
-              "options": ["A", "B", "C", "D"],
-              "correctAnswer": "A",
-              "explanation": "Why this is the correct answer"
-            }
-          ]
-        }
-      `
-
-      try {
-        const response = await generateText({
-          model: getAIModel(),
-          prompt: quizPrompt,
-          temperature: 0.7,
-          maxTokens: 2000,
-        })
-
-        if (!response || !response.text) {
-          throw new Error("Failed to generate quiz. No response from AI.")
-        }
-
-        // Parse and validate the response
-        try {
-          const quiz = JSON.parse(response.text)
-          if (!quiz.title || !quiz.questions || !Array.isArray(quiz.questions)) {
-            throw new Error("Invalid quiz format generated. Please try again.")
-          }
-
-          // Validate question count
-          if (quiz.questions.length !== totalQuestions) {
-            throw new Error(`Expected ${totalQuestions} questions but got ${quiz.questions.length}. Please try again.`)
-          }
-
-          return quiz.id
-        } catch (error) {
-          if (error instanceof Error) {
-            throw new Error(`Failed to parse quiz response: ${error.message}`)
-          }
-          throw new Error("Failed to parse quiz response. Please try again.")
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          throw new Error(`Failed to generate quiz using AI: ${error.message}`)
-        }
-        throw new Error("Failed to generate quiz using AI. Please try again.")
-      }
-    } else {
-      // Regular flow for authenticated users
-      // Extract notes from PDF files
-      const notesFiles = formData.getAll("notes") as File[]
-      const pastTestFile = formData.get("pastTest") as File | null
-      const grade = formData.get("grade") as string
-      const questionDistribution = JSON.parse(formData.get("questionDistribution") as string)
-
-      // Validate grade level
-      if (!["9", "10", "11", "12"].includes(grade)) {
-        throw new Error("Invalid grade level. Please select a grade between 9 and 12.")
-      }
-
-      // Validate file sizes
-      for (const file of notesFiles) {
-        if (file.size > MAX_FILE_SIZE) {
-          throw new Error(`File "${file.name}" is too large. Maximum file size is 20MB.`)
-        }
-      }
-
-      if (pastTestFile && pastTestFile.size > MAX_FILE_SIZE) {
-        throw new Error(`Past test file "${pastTestFile.name}" is too large. Maximum file size is 20MB.`)
-      }
-
-      // Check if OpenAI API key is available
-      if (!process.env.OPENAI_API_KEY) {
-        throw new Error("OpenAI API key is not configured. Please add it to your environment variables.")
-      }
-
-      // Extract text from PDFs
-      const notesText = await Promise.all(
-        notesFiles.map(async (file) => {
-          const text = await extractTextFromPDF(file)
-          return text
-        })
-      )
-
-      // Extract text from past test if provided
-      let pastTestText = ""
-      if (pastTestFile) {
-        pastTestText = await extractTextFromPDF(pastTestFile)
-      }
-
-      // Determine subject using AI
-      const subject = await determineSubject(notesText.join("\n"))
-
-      // Generate quiz questions
-      const totalQuestions =
-        questionDistribution.multipleChoice +
-        questionDistribution.knowledge +
-        questionDistribution.thinking +
-        questionDistribution.application +
-        questionDistribution.communication
-
-      // Create quiz prompt
-      const quizPrompt = `
-        Create a practice test based on the following notes for a Grade ${grade} student studying ${subject}.
-        
-        Notes:
-        ${notesText.join("\n")}
-        
-        ${pastTestFile ? `Past Test for Reference:\n${pastTestText}` : ""}
-        
-        Generate a quiz with exactly ${totalQuestions} questions with the following distribution:
-        - Multiple Choice: ${questionDistribution.multipleChoice}
-        - Knowledge: ${questionDistribution.knowledge}
-        - Thinking: ${questionDistribution.thinking}
-        - Application: ${questionDistribution.application}
-        - Communication: ${questionDistribution.communication}
-        
-        Format the response as a JSON object with the following structure:
-        {
-          "title": "Quiz title based on the content",
-          "questions": [
-            {
-              "id": "1",
-              "text": "Question text",
-              "type": "multipleChoice", // or "knowledge", "thinking", "application", "communication"
-              "options": ["Option A", "Option B", "Option C", "Option D"], // only for multipleChoice
-              "answer": "Correct answer"
-            }
-          ]
-        }
-        
-        For multiple choice questions, include 4 options and make sure the answer is one of the options.
-        For other question types, provide a model answer that would receive full marks.
-        
-        Ensure the questions follow the Ontario curriculum for Grade ${grade} ${subject}.
-      `
-
-      const { text: quizJson } = await generateText({
-        model: openai("gpt-3.5-turbo-instruct"),
-        prompt: quizPrompt,
-      })
-
-      // Parse the quiz JSON
-      const quiz = JSON.parse(quizJson)
-
-      // Create a new quiz in the database
-      const supabase = createClient()
-
-      const { data: quizData, error: quizError } = await supabase
-        .from("quizzes")
-        .insert({
-          title: quiz.title,
-          subject,
-          grade,
-          user_id: user.id,
-          question_distribution: questionDistribution,
-        })
-        .select()
-        .single()
-
-      if (quizError) {
-        console.error("Database error creating quiz:", quizError)
-        throw new Error(`Failed to create quiz in database: ${quizError.message}`)
-      }
-
-      // Insert questions
-      const questionsToInsert = quiz.questions.map((q: any) => ({
-        quiz_id: quizData.id,
-        text: q.text,
-        type: q.type,
-        options: q.options || null,
-        answer: q.answer,
-      }))
-
-      const { error: questionsError } = await supabase.from("questions").insert(questionsToInsert)
-
-      if (questionsError) {
-        console.error("Database error creating questions:", questionsError)
-        throw new Error(`Failed to create questions in database: ${questionsError.message}`)
-      }
-
-      return quizData.id
+    // Calculate total questions
+    const numQuestions = multipleChoice + knowledge + thinking + application + communication;
+    
+    // Validate question counts
+    if (numQuestions === 0) {
+      throw new Error("Please specify the number of questions for at least one category");
     }
-  } catch (error: any) {
-    console.error("Error in createQuiz:", error)
-    throw new Error(error.message || "An unexpected error occurred while creating the quiz.")
+    
+    if (numQuestions > 50) {
+      throw new Error("Total number of questions cannot exceed 50");
+    }
+
+    // Log question distribution
+    console.log(`Question Distribution:
+- Multiple Choice: ${multipleChoice}
+- Knowledge: ${knowledge}
+- Thinking: ${thinking}
+- Application: ${application}
+- Communication: ${communication}
+- Total Questions: ${numQuestions}`);
+
+    if (notesFiles.length === 0) {
+      throw new Error("No notes files were uploaded");
+    }
+
+    // Extract text from PDF files with more content
+    const notesText: string[] = [];
+    let totalCharacters = 0;
+    
+    for (const file of notesFiles) {
+      try {
+        console.log(`\nProcessing file: ${file.name}`);
+        const text = await extractTextFromPDF(file);
+        totalCharacters += text.length;
+        console.log(`- Extracted ${text.length} characters`);
+        notesText.push(text);
+      } catch (error) {
+        console.error(`Error processing ${file.name}:`, error);
+        throw new Error(`Failed to process ${file.name}. Please ensure it's a valid PDF.`);
+      }
+    }
+    
+    console.log(`\nTotal characters extracted: ${totalCharacters}`);
+
+    // Determine subject from notes content
+    console.log("\nDetermining subject...");
+    const subject = await determineSubject(notesText.join("\n"));
+    console.log(`- Determined subject: ${subject}`);
+
+    // Determine specific topic with more context
+    console.log("\nDetermining topic...");
+    const topic = await determineTopic(notesText.join("\n"), subject);
+    console.log(`- Determined topic: ${topic}`);
+    console.log(`\nGenerating ${numQuestions} questions for ${subject} > ${topic} (Grade ${grade})`);
+
+    // Generate quiz using DeepSeek with increased tokens
+    console.log("\nGenerating quiz with DeepSeek...");
+    const fullNotesText = notesText.join("\n").substring(0, 3000);
+    
+    const prompt = `
+    You are a mathematics teacher at York Region District School Board creating a Grade ${grade} test.
+    
+    CRITICAL: You MUST generate questions according to this exact distribution:
+    1. Multiple Choice Questions: ${multipleChoice} questions
+       - Focus on basic concept understanding and recall
+       - Each must have exactly 4 options (A, B, C, D)
+    
+    2. Knowledge Questions: ${knowledge} questions
+       - Short answer format
+       - Test recall and basic understanding
+       - Focus on definitions, formulas, and basic concepts
+    
+    3. Thinking Questions: ${thinking} questions
+       - Short answer format
+       - Test problem-solving and analytical skills
+       - Include multi-step problems and reasoning
+    
+    4. Application Questions: ${application} questions
+       - Short answer format
+       - Test real-world applications
+       - Include word problems and practical scenarios
+    
+    5. Communication Questions: ${communication} questions
+       - Short answer format
+       - Test explanation and justification
+       - Ask students to explain their reasoning or process
+    
+    Total: ${numQuestions} questions
+    
+    Base all questions on these notes:
+    ${fullNotesText}
+    
+    Response Format (MUST be valid JSON):
+    {
+      "title": "Grade ${grade} ${topic} Quiz",
+      "subject": "${subject}",
+      "grade": "${grade}",
+      "topic": "${topic}",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Question text here",
+          "options": [
+            "A) First option",
+            "B) Second option",
+            "C) Third option",
+            "D) Fourth option"
+          ],
+          "answer": "A) First option",
+          "explanation": "Step-by-step explanation"
+        },
+        {
+          "id": "2",
+          "type": "shortAnswer",
+          "category": "Knowledge",
+          "text": "Knowledge question text",
+          "answer": "Expected answer points",
+          "rubric": "Clear grading criteria",
+          "explanation": "Detailed solution"
+        }
+      ]
+    }
+
+    STRICT REQUIREMENTS:
+    1. Generate EXACTLY the specified number of questions for each category
+    2. For multiple choice questions:
+       - Each option MUST start with A), B), C), or D)
+       - Options MUST be unique (no duplicates)
+       - Answer MUST match one option exactly
+    3. For short answer questions:
+       - Include clear grading criteria
+       - Specify expected key points
+       - Match the question style to its category
+    4. Use actual mathematical symbols (≠, ≤, ≥, ∞, ∈, ℝ)
+    5. Questions MUST be based on the notes provided
+    `;
+
+    let quizText = await generateText(prompt, {
+      temperature: 0.3,
+      maxTokens: 5000
+    });
+
+    // Process quiz response
+    console.log("\nProcessing quiz response...");
+    try {
+      // Clean up the response
+      quizText = quizText.trim();
+      if (quizText.includes('```')) {
+        quizText = quizText.replace(/```json\n|\n```|```/g, '').trim();
+      }
+
+      // Find JSON boundaries
+      const startIndex = quizText.indexOf('{');
+      const endIndex = quizText.lastIndexOf('}');
+      
+      if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+        throw new Error("Invalid JSON format in response");
+      }
+      
+      // Extract and parse JSON
+      quizText = quizText.slice(startIndex, endIndex + 1);
+      const quiz = JSON.parse(quizText) as QuizData;
+      
+      // Validate quiz structure
+      if (!quiz.title || !quiz.subject || !quiz.grade || !Array.isArray(quiz.questions)) {
+        throw new Error("Invalid quiz structure");
+      }
+      
+      if (quiz.questions.length !== numQuestions) {
+        console.error(`Question count mismatch: expected ${numQuestions}, got ${quiz.questions.length}`);
+        throw new Error("Generated quiz has incorrect number of questions");
+      }
+
+      // Update validation to check category counts
+      const questionsByCategory = {
+        multipleChoice: quiz.questions.filter(q => q.type === "multipleChoice").length,
+        knowledge: quiz.questions.filter(q => q.type === "shortAnswer" && q.category === "Knowledge").length,
+        thinking: quiz.questions.filter(q => q.type === "shortAnswer" && q.category === "Thinking").length,
+        application: quiz.questions.filter(q => q.type === "shortAnswer" && q.category === "Application").length,
+        communication: quiz.questions.filter(q => q.type === "shortAnswer" && q.category === "Communication").length
+      };
+
+      if (questionsByCategory.multipleChoice !== multipleChoice ||
+          questionsByCategory.knowledge !== knowledge ||
+          questionsByCategory.thinking !== thinking ||
+          questionsByCategory.application !== application ||
+          questionsByCategory.communication !== communication) {
+        console.error("Question distribution mismatch:", {
+          expected: {
+            multipleChoice,
+            knowledge,
+            thinking,
+            application,
+            communication
+          },
+          actual: questionsByCategory
+        });
+        throw new Error("Generated quiz has incorrect question distribution");
+      }
+
+      // Convert LaTeX commands to actual symbols
+      quiz.questions = quiz.questions.map(q => ({
+        ...q,
+        text: convertLatexToSymbols(q.text),
+        options: q.options?.map(convertLatexToSymbols),
+        answer: convertLatexToSymbols(q.answer),
+        explanation: q.explanation ? convertLatexToSymbols(q.explanation) : undefined,
+        rubric: q.rubric ? convertLatexToSymbols(q.rubric) : undefined
+      }));
+
+      // Create quiz ID and store
+      const quizId = `quiz-${Date.now()}`;
+      console.log(`\nStoring quiz with ID: ${quizId}`);
+      
+      quizStore[quizId] = {
+        ...quiz,
+        createdAt: Date.now(),
+        topic: topic,
+        subject: subject,
+        grade: grade,
+        totalQuestions: quiz.questions.length
+      };
+      
+      // Store in past materials
+      pastQuizzesStore.push({
+        id: quizId,
+        title: quiz.title,
+        subject: subject,
+        grade: grade,
+        topic: topic,
+        createdAt: new Date().toISOString(),
+        totalQuestions: quiz.questions.length
+      });
+      
+      console.log("=== Quiz Generation Complete ===\n");
+      return quizId;
+      
+    } catch (error) {
+      console.error("\nError processing quiz response:", error);
+      throw new Error("Failed to generate quiz. Please try again.");
+    }
+  } catch (error) {
+    console.error("\n=== Quiz Generation Failed ===");
+    console.error(error);
+    throw error;
   }
+}
+
+/**
+ * Determines the subject of the notes using DeepSeek
+ */
+async function determineSubject(notesText: string): Promise<string> {
+  const subjectPrompt = `
+    Based on these notes, determine the academic subject.
+    Respond with ONLY ONE of these subjects: Mathematics, Physics, Chemistry, Biology, History, English, Geography, Computer Science
+    Do not include any other text, formatting, or punctuation.
+    
+    Notes:
+    ${notesText.substring(0, 2000)}
+  `;
+
+  try {
+    const response = await generateText(subjectPrompt, {
+      temperature: 0.3,
+      maxTokens: 100
+    });
+    
+    const subject = response.replace(/['".,]/g, '').trim();
+    console.log("Determined subject:", subject);
+    
+    return subject || "Mathematics";
+  } catch (error) {
+    console.error("Error determining subject:", error);
+    return "Mathematics";
+  }
+}
+
+/**
+ * Determines the specific topic of the notes
+ */
+async function determineTopic(notesText: string, subject: string): Promise<string> {
+  const topicPrompt = `
+    You are a YRDSB high school teacher. Analyze these ${subject} notes and determine the specific unit and topic.
+
+    
+    Format your response EXACTLY as:
+    ${subject}
+    Unit: [Find the component of study which forms part of your course an example would be Mathematics > Algebra > Linear Functions]
+    Topic: [Specific topic within that unit]
+    Subtopic: [Specific concept being covered]
+    
+    Example responses:
+    Mathematics
+    Unit: Functions
+    Topic: Exponential Functions
+    Subtopic: Growth and Decay Applications
+    
+    Mathematics
+    Unit: Algebra
+    Topic: Polynomial Functions
+    Subtopic: Factoring Trinomials
+    
+    Requirements: - MUST FOLLOW THESE
+    1. Unit MUST be specific like a break down of Functions > Exponential Functions > Growth and Decay Applications like how I did NEVER classify as "General Mathematics" MUST BE SPECIFIC
+    2. Topic should be specific but standardized
+    3. Subtopic should detail the exact concepts covered
+    4. Use official curriculum terminology
+    5. Be as specific as possible while remaining accurate
+    
+    Analyze these notes and respond ONLY in the format shown above:
+    
+    ${notesText.substring(0, 3000)}
+  `;
+
+  try {
+    const response = await generateText(topicPrompt, {
+      temperature: 0.3,
+      maxTokens: 3000
+    });
+    
+    // Clean up response and extract components
+    const cleanResponse = response.replace(/['"]/g, '').trim();
+    console.log("\nRaw topic determination:", cleanResponse);
+    
+    // Extract unit, topic, and subtopic using regex
+    const unitMatch = cleanResponse.match(/Unit:\s*([^\n]+)/);
+    const topicMatch = cleanResponse.match(/Topic:\s*([^\n]+)/);
+    const subtopicMatch = cleanResponse.match(/Subtopic:\s*([^\n]+)/);
+    
+    const unit = unitMatch ? unitMatch[1].trim() : '';
+    const topic = topicMatch ? topicMatch[1].trim() : '';
+    const subtopic = subtopicMatch ? subtopicMatch[1].trim() : '';
+    
+    console.log("Extracted components:");
+    console.log("- Unit:", unit);
+    console.log("- Topic:", topic);
+    console.log("- Subtopic:", subtopic);
+    
+    // If we couldn't extract the components, try keyword extraction
+    if (!unit || !topic) {
+      console.log("\nFalling back to keyword extraction...");
+      const keywords = extractTopicKeywords(notesText, subject);
+      if (keywords) {
+        console.log("Found keywords:", keywords);
+        return keywords;
+      }
+      return `General ${subject}`;
+    }
+    
+    // Combine components into a descriptive topic
+    let fullTopic = unit;
+    if (topic && topic !== unit) {
+      fullTopic += ` - ${topic}`;
+    }
+    if (subtopic && subtopic !== topic) {
+      fullTopic += ` (${subtopic})`;
+    }
+    
+    console.log("Final topic:", fullTopic);
+    return cleanupTopic(fullTopic);
+  } catch (error) {
+    console.error("Error in topic determination:", error);
+    return `General ${subject}`;
+  }
+}
+
+/**
+ * Get example topics for a given subject
+ */
+function getTopicExamples(subject: string): string {
+  const examples: Record<string, string[]> = {
+    Mathematics: [
+      "Exponential Functions",
+      "Quadratic Functions",
+      "Trigonometry",
+      "Linear Functions",
+      "Polynomial Functions"
+    ],
+    Physics: [
+      "Kinematics",
+      "Forces and Motion",
+      "Energy and Work",
+      "Waves",
+      "Electricity"
+    ],
+    Chemistry: [
+      "Chemical Bonding",
+      "Stoichiometry",
+      "Acids and Bases",
+      "Organic Chemistry",
+      "Thermodynamics"
+    ],
+    Biology: [
+      "Cell Biology",
+      "Genetics",
+      "Evolution",
+      "Ecology",
+      "Human Body Systems"
+    ],
+    History: [
+      "World War II",
+      "Industrial Revolution",
+      "Cold War",
+      "Ancient Civilizations",
+      "Renaissance"
+    ],
+    English: [
+      "Shakespeare",
+      "Poetry Analysis",
+      "Essay Writing",
+      "Literary Devices",
+      "Novel Study"
+    ],
+    Geography: [
+      "Climate Change",
+      "Physical Geography",
+      "Human Geography",
+      "Resource Management",
+      "Urban Development"
+    ],
+    "Computer Science": [
+      "Programming Fundamentals",
+      "Data Structures",
+      "Algorithms",
+      "Web Development",
+      "Database Design"
+    ]
+  };
+
+  return (examples[subject] || ["General Topics"]).join(", ");
+}
+
+/**
+ * Extract topic keywords from notes text
+ */
+function extractTopicKeywords(notesText: string, subject: string): string {
+  if (subject === "Mathematics") {
+    // Look for mathematical concepts first
+    const mathConcepts = [
+      "function", "equation", "expression", "polynomial",
+      "exponential", "logarithm", "trigonometry", "geometry",
+      "probability", "statistics", "vector", "matrix",
+      "derivative", "integral", "calculus", "algebra"
+    ];
+    
+    const words = notesText.toLowerCase().split(/\s+/);
+    for (const concept of mathConcepts) {
+      if (words.includes(concept)) {
+        // Found a math concept, look for related terms
+        const conceptIndex = words.indexOf(concept);
+        const surroundingWords = words.slice(Math.max(0, conceptIndex - 3), conceptIndex + 4);
+        return surroundingWords
+          .filter(word => word.length > 3)
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+      }
+    }
+  }
+  
+  // If no math concepts found, try general topic indicators
+  const indicators = [
+    "Chapter", "Unit", "Topic", "Section",
+    "Lesson", "Introduction to", "Understanding"
+  ];
+  
+  const lines = notesText.split('\n');
+  for (const line of lines) {
+    for (const indicator of indicators) {
+      if (line.includes(indicator)) {
+        const topic = line
+          .replace(indicator, '')
+          .replace(/[:\-\d]/g, '')
+          .trim();
+        if (topic.length > 3) {
+          return topic;
+        }
+      }
+    }
+  }
+  
+  return '';
+}
+
+/**
+ * Clean up a topic string
+ */
+function cleanupTopic(topic: string): string {
+  return topic
+    // Remove unit/chapter numbers
+    .replace(/^(unit|chapter|section|lesson)\s*\d+/i, '')
+    // Remove grade levels
+    .replace(/grade\s*\d+/i, '')
+    // Remove common prefixes
+    .replace(/^(introduction to|understanding|basics of)/i, '')
+    // Remove extra whitespace
+    .trim()
+    // Capitalize first letter of each word
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
 
 /**
@@ -339,42 +651,46 @@ export async function createQuiz(formData: FormData): Promise<string> {
  * @returns The quiz data
  */
 export async function getQuiz(id: string) {
+  console.log("Getting quiz with ID:", id);
+  
   try {
-    const supabase = createClient()
-
-    // Get the quiz
-    const { data: quiz, error: quizError } = await supabase.from("quizzes").select("*").eq("id", id).single()
-
-    if (quizError) {
-      throw new Error(`Failed to get quiz: ${quizError.message}`)
+    // Get quiz from memory store
+    const quiz = quizStore[id];
+    if (!quiz) {
+      console.error("Quiz not found in store for ID:", id);
+      throw new Error("Quiz not found");
+    }
+    
+    // Validate quiz structure before returning
+    if (!quiz.questions || !Array.isArray(quiz.questions)) {
+      console.error("Invalid quiz structure - missing questions array:", quiz);
+      throw new Error("Invalid quiz structure");
     }
 
-    // Get the questions
-    const { data: questions, error: questionsError } = await supabase
-      .from("questions")
-      .select("*")
-      .eq("quiz_id", id)
-      .order("id")
-
-    if (questionsError) {
-      throw new Error(`Failed to get questions: ${questionsError.message}`)
-    }
-
-    return {
-      id: quiz.id,
+    // Ensure each question has required fields
+    quiz.questions = quiz.questions.map((q: Partial<QuizQuestion>, index: number) => ({
+      id: q.id || (index + 1).toString(),
+      text: q.text || "",
+      type: q.type || "multipleChoice",
+      category: q.category || (q.type === "multipleChoice" ? "Multiple Choice" : "Knowledge"),
+      options: Array.isArray(q.options) ? q.options : [],
+      answer: q.answer || "",
+      explanation: q.explanation || ""
+    }));
+    
+    // Log quiz details for debugging
+    console.log("Retrieved quiz data:", {
       title: quiz.title,
-      subject: quiz.subject,
-      grade: quiz.grade,
-      questions: questions.map((q) => ({
-        id: q.id,
-        text: q.text,
-        type: q.type,
-        options: q.options,
-      })),
-    }
+      topic: quiz.topic,
+      createdAt: new Date(quiz.createdAt).toISOString(),
+      questionCount: quiz.questions.length,
+      firstQuestion: quiz.questions[0]
+    });
+    
+    return quiz;
   } catch (error: any) {
-    console.error("Error getting quiz:", error)
-    throw new Error(`Failed to get quiz: ${error.message}`)
+    console.error("Error getting quiz:", error);
+    throw new Error(`Failed to get quiz: ${error.message}`);
   }
 }
 
@@ -386,124 +702,16 @@ export async function getQuiz(id: string) {
  */
 export async function submitQuizAnswers(quizId: string, answers: Record<string, string>) {
   try {
-    const user = await auth.getCurrentUser()
-
-    if (!user) {
-      throw new Error("You must be logged in to submit a quiz")
-    }
-
-    // Check if OpenAI API key is available
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error("OpenAI API key is not configured. Please add it to your environment variables.")
-    }
-
-    const supabase = createClient()
-
-    // Get the quiz
-    const { data: quiz, error: quizError } = await supabase.from("quizzes").select("*").eq("id", quizId).single()
-
-    if (quizError) {
-      throw new Error(`Failed to get quiz: ${quizError.message}`)
-    }
-
-    // Get the questions with answers
-    const { data: questions, error: questionsError } = await supabase
-      .from("questions")
-      .select("*")
-      .eq("quiz_id", quizId)
-      .order("id")
-
-    if (questionsError) {
-      throw new Error(`Failed to get questions: ${questionsError.message}`)
-    }
-
-    // Generate explanations and grade answers
-    const questionsWithUserAnswers = questions.map((q) => ({
-      id: q.id,
-      text: q.text,
-      type: q.type,
-      options: q.options,
-      correctAnswer: q.answer,
-      userAnswer: answers[q.id] || "",
-    }))
-
-    const explanationPrompt = `
-      You are a helpful tutor. For each of the following questions, evaluate the student's answer and provide:
-      1. Whether the answer is correct or incorrect
-      2. A detailed explanation of why the answer is correct or incorrect
-      3. For incorrect answers, explain the correct approach
-      
-      Questions and Answers:
-      ${questionsWithUserAnswers
-        .map(
-          (q, i) => `
-        Question ${i + 1} (${q.type}): ${q.text}
-        ${q.options ? `Options: ${JSON.stringify(q.options)}` : ""}
-        Correct Answer: ${q.correctAnswer}
-        Student's Answer: ${q.userAnswer || "(No answer provided)"}
-      `,
-        )
-        .join("\n\n")}
-      
-      Format your response as a JSON array with the following structure:
-      [
-        {
-          "id": "question_id",
-          "isCorrect": true/false,
-          "explanation": "Detailed explanation"
-        }
-      ]
-    `
-
-    const { text: explanationsJson } = await generateText({
-      model: openai("gpt-3.5-turbo-instruct"),
-      prompt: explanationPrompt,
-    })
-
-    const explanations = JSON.parse(explanationsJson)
-
-    // Calculate score
-    const score = explanations.filter((e: any) => e.isCorrect).length
-
-    // Create result in database
-    const { data: result, error: resultError } = await supabase
-      .from("quiz_results")
-      .insert({
-        quiz_id: quizId,
-        user_id: user.id,
-        score,
-        total_questions: questions.length,
-      })
-      .select()
-      .single()
-
-    if (resultError) {
-      throw new Error(`Failed to create result: ${resultError.message}`)
-    }
-
-    // Insert answer details
-    const answersToInsert = questionsWithUserAnswers.map((q, i) => {
-      const explanation = explanations.find((e: any) => e.id === q.id)
-
-      return {
-        result_id: result.id,
-        question_id: q.id,
-        user_answer: q.userAnswer,
-        is_correct: explanation?.isCorrect || false,
-        explanation: explanation?.explanation || "No explanation provided",
-      }
-    })
-
-    const { error: answersError } = await supabase.from("answer_details").insert(answersToInsert)
-
-    if (answersError) {
-      throw new Error(`Failed to save answers: ${answersError.message}`)
-    }
-
-    return result.id
+    // Mock implementation for development
+    console.log("Mock quiz submission for ID:", quizId);
+    console.log("Answers:", answers);
+    
+    // Simple explanation generation with DeepSeek can go here in the future
+    
+    return `mock-result-${Date.now()}`;
   } catch (error: any) {
-    console.error("Error submitting quiz:", error)
-    throw new Error(`Failed to submit quiz: ${error.message}`)
+    console.error("Error submitting quiz:", error);
+    throw new Error(`Failed to submit quiz: ${error.message}`);
   }
 }
 
@@ -514,70 +722,21 @@ export async function submitQuizAnswers(quizId: string, answers: Record<string, 
  */
 export async function getQuizResults(resultId: string) {
   try {
-    const supabase = createClient()
-
-    // Get the result
-    const { data: result, error: resultError } = await supabase
-      .from("quiz_results")
-      .select(`
-        *,
-        quiz:quiz_id (
-          id,
-          title,
-          subject,
-          grade
-        )
-      `)
-      .eq("id", resultId)
-      .single()
-
-    if (resultError) {
-      throw new Error(`Failed to get result: ${resultError.message}`)
-    }
-
-    // Get the answer details with questions
-    const { data: answerDetails, error: detailsError } = await supabase
-      .from("answer_details")
-      .select(`
-        *,
-        question:question_id (
-          id,
-          text,
-          type,
-          options,
-          answer
-        )
-      `)
-      .eq("result_id", resultId)
-      .order("id")
-
-    if (detailsError) {
-      throw new Error(`Failed to get answer details: ${detailsError.message}`)
-    }
-
-    // Format the response
+    // Mock implementation for development
+    console.log("Mock getting quiz results for ID:", resultId);
     return {
-      id: result.id,
-      quizId: result.quiz_id,
-      title: result.quiz.title,
-      subject: result.quiz.subject,
-      grade: result.quiz.grade,
-      score: result.score,
-      totalQuestions: result.total_questions,
-      questions: answerDetails.map((detail) => ({
-        id: detail.question.id,
-        text: detail.question.text,
-        type: detail.question.type,
-        options: detail.question.options,
-        userAnswer: detail.user_answer,
-        correctAnswer: detail.question.answer,
-        isCorrect: detail.is_correct,
-        explanation: detail.explanation,
-      })),
-    }
+      id: resultId,
+      quizId: "mock-quiz-id",
+      title: "Mock Quiz",
+      subject: "Mathematics",
+      grade: "11",
+      score: 8,
+      totalQuestions: 10,
+      questions: [],
+    };
   } catch (error: any) {
-    console.error("Error getting quiz results:", error)
-    throw new Error(`Failed to get quiz results: ${error.message}`)
+    console.error("Error getting quiz results:", error);
+    throw new Error(`Failed to get quiz results: ${error.message}`);
   }
 }
 
@@ -587,126 +746,9 @@ export async function getQuizResults(resultId: string) {
  */
 export async function getPastQuizzes() {
   try {
-    const user = await auth.getCurrentUser()
-
-    if (!user) {
-      return []
-    }
-
-    const supabase = createClient()
-
-    // Get quizzes created by the user
-    const { data: quizzes, error: quizzesError } = await supabase
-      .from("quizzes")
-      .select(`
-        id,
-        title,
-        subject,
-        grade,
-        created_at
-      `)
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-
-    if (quizzesError) {
-      throw new Error(`Failed to get quizzes: ${quizzesError.message}`)
-    }
-
-    // Get the latest result for each quiz
-    const quizzesWithResults = await Promise.all(
-      quizzes.map(async (quiz) => {
-        const { data: result, error: resultError } = await supabase
-          .from("quiz_results")
-          .select("id, score, total_questions")
-          .eq("quiz_id", quiz.id)
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle()
-
-        return {
-          id: quiz.id,
-          title: quiz.title,
-          subject: quiz.subject,
-          grade: quiz.grade,
-          createdAt: quiz.created_at,
-          score: result?.score,
-          totalQuestions: result?.total_questions || 0,
-          resultId: result?.id,
-        }
-      }),
-    )
-
-    return quizzesWithResults
+    return pastQuizzesStore;
   } catch (error: any) {
-    console.error("Error getting past quizzes:", error)
-    throw new Error(`Failed to get past quizzes: ${error.message}`)
+    console.error("Error getting past quizzes:", error);
+    throw new Error(`Failed to get past quizzes: ${error.message}`);
   }
 }
-
-/**
- * Determines the subject of the notes using AI
- */
-async function determineSubject(notesText: string): Promise<string> {
-  const subjectPrompt = `
-    Based on the following notes, determine the academic subject. 
-    Respond with only the subject name (e.g., "Mathematics", "Biology", "History", etc.).
-    
-    Notes:
-    ${notesText.substring(0, 2000)}
-  `
-
-  const { text: subject } = await generateText({
-    model: getAIModel(),
-    prompt: subjectPrompt,
-  })
-
-  return subject
-}
-
-/**
- * Generates explanation for a question answer
- */
-async function generateExplanation(
-  question: string,
-  options: string[],
-  userAnswer: string,
-  correctAnswer: string,
-  isCorrect: boolean,
-  subject: string,
-  grade: string,
-): Promise<string> {
-  const optionsText = options.map((option, i) => `${String.fromCharCode(65 + i)}. ${option}`).join("\n")
-
-  const prompt = `
-    I'm a Grade ${grade} student studying ${subject}.
-    
-    Here's a question from my recent test:
-    
-    Question: ${question}
-    
-    Options:
-    ${optionsText}
-    
-    I chose: ${userAnswer}
-    The correct answer is: ${correctAnswer}
-    
-    Please provide a clear explanation for why the correct answer is right${
-      !isCorrect ? " and why my answer is wrong" : ""
-    }. Keep your explanation concise, educational, and at the appropriate level for a Grade ${grade} student.
-  `
-
-  try {
-    const { text } = await generateText({
-      model: getAIModel(),
-      prompt,
-      temperature: 0.7,
-    })
-
-    return text
-  } catch (error) {
-    console.error("Error generating explanation:", error)
-    return "Sorry, I couldn't generate an explanation at this time."
-  }
-}
-

@@ -207,19 +207,38 @@ export function FileUpload() {
         }
       }
 
+      // Add other form data
       formData.append("grade", grade)
-      formData.append("questionDistribution", JSON.stringify(questionDistribution))
+      
+      // Add question distribution values individually
+      formData.append("multipleChoice", questionDistribution.multipleChoice.toString())
+      formData.append("knowledge", questionDistribution.knowledge.toString())
+      formData.append("thinking", questionDistribution.thinking.toString())
+      formData.append("application", questionDistribution.application.toString())
+      formData.append("communication", questionDistribution.communication.toString())
 
       // Call server action to process files and create quiz
       console.log("Starting quiz generation...")
-      const quizId = await createQuiz(formData)
+      
+      try {
+        const quizId = await createQuiz(formData)
+        console.log("Quiz generated successfully with ID:", quizId)
+        
+        if (!quizId) {
+          throw new Error("Failed to generate quiz. No quiz ID returned.")
+        }
 
-      if (!quizId) {
-        throw new Error("Failed to generate quiz. No quiz ID returned.")
+        console.log("Quiz generation completed, redirecting to:", `/quiz/${quizId}`)
+        router.push(`/quiz/${quizId}`)
+      } catch (error) {
+        console.error("Server error creating quiz:", error)
+        if (error instanceof Error) {
+          setError(`Error from server: ${error.message}`)
+        } else {
+          setError("An unexpected error occurred while creating the quiz on the server.")
+        }
+        setIsUploading(false)
       }
-
-      console.log("Quiz generation completed")
-      router.push(`/quiz/${quizId}`)
     } catch (error: any) {
       console.error("Error creating quiz:", error)
       setError(error.message || "Failed to create quiz. Please try again.")

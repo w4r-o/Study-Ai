@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server"
-import { isAIConfigured } from "@/lib/ai-utils"
 
 export async function GET() {
-  // This code only runs on the server
-  const hasOpenAIKey = !!process.env.OPENAI_API_KEY
-
+  // Directly check if API key exists and has the correct format
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const hasValidApiKey = !!apiKey && apiKey.startsWith("sk-or-");
+  
+  console.log(`API check: API key exists: ${!!apiKey}, Is valid format: ${hasValidApiKey}`);
+  
   return NextResponse.json({
-    hasAIKey: isAIConfigured(),
+    hasAIKey: hasValidApiKey,
     hasSupabase: !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   })
 }

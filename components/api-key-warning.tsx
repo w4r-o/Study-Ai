@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 
 export function ApiKeyWarning() {
   const [apiKeyMissing, setApiKeyMissing] = useState(false)
@@ -28,10 +27,9 @@ export function ApiKeyWarning() {
 
   return (
     <Alert variant="destructive" className="mb-4">
-      <ExclamationTriangleIcon className="h-4 w-4" />
-      <AlertTitle>AI API Key Missing</AlertTitle>
+      <AlertTitle>⚠️ DeepSeek API Key Missing</AlertTitle>
       <AlertDescription className="text-sm">
-        Please add your AI API key to use the AI features.
+        Please add your DeepSeek API key to use the AI features.
       </AlertDescription>
     </Alert>
   )

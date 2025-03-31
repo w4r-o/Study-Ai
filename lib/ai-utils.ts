@@ -6,25 +6,54 @@
  */
 
 import { openai } from "@ai-sdk/openai"
-import { openrouter } from "@ai-sdk/openrouter"
 import { env } from "./env"
+import { generateOpenRouterText } from "./openrouter-api"
 
 /**
- * Get the appropriate AI model based on environment configuration
- * @param modelName The model name to use (defaults to appropriate values based on provider)
- * @returns The configured AI model
+ * Generate text using the configured AI model
+ * @param prompt The prompt to send to the model
+ * @param options Additional options like temperature and maxTokens
+ * @returns The generated text
  */
-export function getAIModel(modelName?: string) {
-  // If using OpenRouter
+export async function generateAIText(
+  prompt: string, 
+  options: {
+    temperature?: number;
+    maxTokens?: number;
+  } = {}
+): Promise<string> {
+  console.log("generateAIText called, MODEL_PROVIDER:", env.MODEL_PROVIDER);
+  
   if (env.MODEL_PROVIDER === "openrouter") {
-    return openrouter({
-      model: modelName || "deepseek/deepseek-r1-zero:free",
-      apiKey: env.OPENROUTER_API_KEY,
-    })
+    console.log("Using OpenRouter for text generation");
+    try {
+      const result = await generateOpenRouterText(prompt, {
+        temperature: options.temperature,
+        maxTokens: options.maxTokens
+      });
+      console.log("OpenRouter response received successfully");
+      return result;
+    } catch (error) {
+      console.error("Error using OpenRouter, falling back to OpenAI:", error);
+      // Fall back to OpenAI if OpenRouter fails
+    }
   }
   
-  // Default to OpenAI
-  return openai(modelName || "gpt-3.5-turbo")
+  // Use OpenAI
+  console.log("Using OpenAI for text generation");
+  if (!env.OPENAI_API_KEY) {
+    throw new Error("OpenAI API key is not set. Please check your environment variables.");
+  }
+  
+  const { text } = await import("ai").then(ai => ai.generateText({
+    model: openai("gpt-3.5-turbo"),
+    prompt,
+    temperature: options.temperature || 0.7,
+    maxTokens: options.maxTokens || 2000,
+  }));
+  
+  console.log("OpenAI response received successfully");
+  return text;
 }
 
 /**
