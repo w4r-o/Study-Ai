@@ -83,7 +83,26 @@ interface QuizQuestion {
   options?: string[];
   answer: string;
   explanation?: string;
-  rubric?: string; // For short answer questions
+  rubric?: string;
+}
+
+interface QuizResults {
+  id: string;
+  quizId: string;
+  answers: {
+    [questionId: string]: {
+      score: number;
+      isCorrect: boolean;
+      feedback: string;
+    };
+  };
+  overall: {
+    score: number;
+    feedback: string;
+    reviewTopics: string[];
+    strengths: string[];
+  };
+  submittedAt: string;
 }
 
 interface QuizData {
@@ -94,6 +113,7 @@ interface QuizData {
   questions: QuizQuestion[];
   createdAt: number;
   totalQuestions: number;
+  results?: QuizResults;
 }
 
 // Helper function to escape LaTeX in JSON
@@ -229,10 +249,11 @@ export async function createQuiz(formData: FormData): Promise<string> {
     console.log("\nGenerating quiz with DeepSeek...");
     const fullNotesText = notesText.join("\n").substring(0, 3000);
     
+    console.log("Preparing quiz generation prompt...");
     const prompt = `
-    You are a mathematics teacher at York Region District School Board creating a Grade ${grade} test.
+    You are a Highschool teacher at York Region District School Board creating a Grade ${grade} test.
     
-    CRITICAL: You MUST generate questions according to this exact distribution:
+    CRITICAL: You MUST generate COMPLETELY NEW questions according to this exact distribution:
     1. Multiple Choice Questions: ${multipleChoice} questions
        - Focus on basic concept understanding and recall
        - Each must have exactly 4 options (A, B, C, D)
@@ -282,37 +303,25 @@ export async function createQuiz(formData: FormData): Promise<string> {
           ],
           "answer": "A) First option",
           "explanation": "Step-by-step explanation"
-        },
-        {
-          "id": "2",
-          "type": "shortAnswer",
-          "category": "Knowledge",
-          "text": "Knowledge question text",
-          "answer": "Expected answer points",
-          "rubric": "Clear grading criteria",
-          "explanation": "Detailed solution"
         }
       ]
+    }`;
+
+    console.log("Making quiz generation request...");
+    console.log("Prompt length:", prompt.length);
+    
+    let quizText;
+    try {
+      quizText = await generateText(prompt, {
+        temperature: 0.3,
+        maxTokens: 3000
+      });
+      console.log("Quiz generation response received!");
+      console.log("Response length:", quizText.length);
+    } catch (error) {
+      console.error("Error in quiz generation request:", error);
+      throw new Error("Failed to generate quiz questions. Please try again.");
     }
-
-    STRICT REQUIREMENTS:
-    1. Generate EXACTLY the specified number of questions for each category
-    2. For multiple choice questions:
-       - Each option MUST start with A), B), C), or D)
-       - Options MUST be unique (no duplicates)
-       - Answer MUST match one option exactly
-    3. For short answer questions:
-       - Include clear grading criteria
-       - Specify expected key points
-       - Match the question style to its category
-    4. Use actual mathematical symbols (≠, ≤, ≥, ∞, ∈, ℝ)
-    5. Questions MUST be based on the notes, unit, subtopic, topic, and grade and yrdsb curriculum. 
-    `;
-
-    let quizText = await generateText(prompt, {
-      temperature: 0.3,
-      maxTokens: 5000
-    });
 
     // Process quiz response
     console.log("\nProcessing quiz response...");
@@ -420,17 +429,19 @@ async function determineSubject(notesText: string): Promise<string> {
     Do not include any other text, formatting, or punctuation.
     
     Notes:
-    ${notesText.substring(0, 2000)}
+    ${notesText.substring(0, 1000)}
   `;
 
   try {
+    console.log("Making subject determination request...");
     const response = await generateText(subjectPrompt, {
       temperature: 0.3,
-      maxTokens: 100
+      maxTokens: 50
     });
     
+    console.log("Raw subject response:", response);
     const subject = response.replace(/['".,]/g, '').trim();
-    console.log("Determined subject:", subject);
+    console.log("Cleaned subject:", subject);
     
     if (!subject) {
       throw new Error("Could not determine subject from notes");
@@ -448,64 +459,38 @@ async function determineSubject(notesText: string): Promise<string> {
  */
 async function determineTopic(notesText: string, subject: string): Promise<string> {
   const topicPrompt = `
-    You are a teacher analyzing these ${subject} notes to determine the specific unit and topic.
+    You are a teacher analyzing these ${subject} notes.
+    Provide a concise topic classification in this exact format:
+    Unit: [Main area]
+    Topic: [Specific topic]
     
-    Format your response EXACTLY as:
-    ${subject}
-    Unit: [Main area of study]
-    Topic: [Specific topic within that unit]
-    Subtopic: [Specific concept being covered]
-    
-    Requirements:
-    1. Unit MUST be specific to the subject matter
-    2. Topic should be specific but standardized
-    3. Subtopic should detail the exact concepts covered
-    4. Use official terminology for the field
-    5. Be as specific as possible while remaining accurate
-    6. NEVER use "General" as a classification
-    
-    Example for Healthcare:
-    Healthcare
-    Unit: Physical Therapy
-    Topic: Neuromuscular Conditions
-    Subtopic: Treatment Approaches and Assessment
-    
-    Example for Mathematics:
-    Mathematics
+    Example:
     Unit: Functions
-    Topic: Exponential Functions
-    Subtopic: Growth and Decay Applications
+    Topic: Exponential Growth
     
-    Analyze these notes and respond ONLY in the format shown above:
-    
-    ${notesText.substring(0, 3000)}
+    Notes:
+    ${notesText.substring(0, 1000)}
   `;
 
   try {
+    console.log("Making topic determination request...");
     const response = await generateText(topicPrompt, {
       temperature: 0.3,
-      maxTokens: 3000
+      maxTokens: 200
     });
     
+    console.log("Raw topic response:", response);
     // Clean up response and extract components
     const cleanResponse = response.replace(/['"]/g, '').trim();
-    console.log("\nRaw topic determination:", cleanResponse);
+    console.log("\nCleaned topic response:", cleanResponse);
     
-    // Extract unit, topic, and subtopic using regex
+    // Extract unit and topic using regex
     const unitMatch = cleanResponse.match(/Unit:\s*([^\n]+)/);
     const topicMatch = cleanResponse.match(/Topic:\s*([^\n]+)/);
-    const subtopicMatch = cleanResponse.match(/Subtopic:\s*([^\n]+)/);
     
     const unit = unitMatch ? unitMatch[1].trim() : '';
     const topic = topicMatch ? topicMatch[1].trim() : '';
-    const subtopic = subtopicMatch ? subtopicMatch[1].trim() : '';
     
-    console.log("Extracted components:");
-    console.log("- Unit:", unit);
-    console.log("- Topic:", topic);
-    console.log("- Subtopic:", subtopic);
-    
-    // If we couldn't extract the components, try keyword extraction
     if (!unit || !topic) {
       console.log("\nFalling back to keyword extraction...");
       const keywords = extractTopicKeywords(notesText, subject);
@@ -516,15 +501,8 @@ async function determineTopic(notesText: string, subject: string): Promise<strin
       return keywords;
     }
     
-    // Combine components into a descriptive topic
-    let fullTopic = unit;
-    if (topic && topic !== unit) {
-      fullTopic += ` - ${topic}`;
-    }
-    if (subtopic && subtopic !== topic) {
-      fullTopic += ` (${subtopic})`;
-    }
-    
+    // Combine into final topic
+    const fullTopic = `${unit} - ${topic}`;
     console.log("Final topic:", fullTopic);
     return cleanupTopic(fullTopic);
   } catch (error) {
@@ -719,23 +697,211 @@ export async function getQuiz(id: string) {
 }
 
 /**
- * Submits quiz answers and generates results
- * @param quizId Quiz ID
- * @param answers User's answers
- * @returns The ID of the quiz result
+ * Evaluates all quiz answers together using AI
  */
-export async function submitQuizAnswers(quizId: string, answers: Record<string, string>) {
+async function evaluateQuizAnswers(quizId: string, answers: Record<string, any>, quiz: QuizData) {
+  console.log('\n=== Starting Answer Evaluation ===');
   try {
-    // Mock implementation for development
-    console.log("Mock quiz submission for ID:", quizId);
-    console.log("Answers:", answers);
+    // Check if answers object is empty
+    if (Object.keys(answers).length === 0) {
+      console.warn('No answers provided for evaluation');
+      return {
+        answers: quiz.questions.reduce((acc, q) => ({
+          ...acc,
+          [q.id]: {
+            score: 0,
+            isCorrect: false,
+            feedback: "No answer provided"
+          }
+        }), {}),
+        overall: {
+          score: 0,
+          feedback: "No answers were provided. Please attempt the questions to receive feedback.",
+          reviewTopics: ["All topics need to be reviewed"],
+          strengths: []
+        }
+      };
+    }
+
+    console.log('Preparing evaluation prompt...');
+    const prompt = `
+    You are an expert ${quiz.subject} teacher evaluating a student's quiz answers.
     
-    // Simple explanation generation with DeepSeek can go here in the future
+    Quiz Topic: ${quiz.topic}
+    Subject: ${quiz.subject}
+    Grade Level: ${quiz.grade}
     
-    return `mock-result-${Date.now()}`;
+    Review all answers together and evaluate them holistically. Consider:
+    1. Overall understanding of concepts
+    2. Consistency across answers
+    3. Use of proper terminology
+    4. Mathematical accuracy where applicable
+    5. Completeness of explanations
+    
+    Questions and Answers:
+    ${quiz.questions.map((q, i) => `
+    Question ${i + 1} (${q.id}): ${q.text}
+    Type: ${q.type}
+    Student's Answer: ${answers[q.id]?.text || 'No answer provided'}
+    Expected Answer: ${q.answer}
+    `).join('\n\n')}
+    
+    Provide a JSON response in this exact format:
+    {
+      "answers": {
+        "questionId": {
+          "score": number,
+          "isCorrect": boolean,
+          "feedback": "string"
+        }
+      },
+      "overall": {
+        "score": number,
+        "feedback": "string",
+        "reviewTopics": ["string"],
+        "strengths": ["string"]
+      }
+    }`;
+
+    console.log('Sending evaluation request...');
+    const response = await generateText(prompt, {
+      temperature: 0.3,
+      maxTokens: 2000,
+      responseFormat: "json"
+    });
+    console.log('Received evaluation response');
+
+    // Parse the response
+    let result;
+    try {
+      console.log('Parsing evaluation response...');
+      // Clean up the response
+      const cleanResponse = response.replace(/```json\n|\n```|```/g, '').trim();
+      result = JSON.parse(cleanResponse);
+      
+      // Validate the response structure
+      if (!result.answers || !result.overall) {
+        throw new Error("Invalid response structure");
+      }
+      console.log('Response parsed successfully');
+    } catch (error) {
+      console.error('Error parsing AI response:', error);
+      throw error;
+    }
+
+    // Create final results object
+    const quizResults = {
+      id: `result-${Date.now()}`,
+      quizId: quizId,
+      answers: result.answers,
+      overall: result.overall,
+      submittedAt: new Date().toISOString()
+    };
+
+    console.log('=== Answer Evaluation Complete ===\n');
+    return quizResults;
+
   } catch (error: any) {
-    console.error("Error submitting quiz:", error);
-    throw new Error(`Failed to submit quiz: ${error.message}`);
+    console.error('\n=== Answer Evaluation Failed ===');
+    console.error('Error details:', error);
+    
+    // Return a structured error response
+    return {
+      id: `result-${Date.now()}`,
+      quizId: quizId,
+      answers: quiz.questions.reduce((acc, q) => ({
+        ...acc,
+        [q.id]: {
+          score: 0,
+          isCorrect: false,
+          feedback: "Error evaluating answer"
+        }
+      }), {}),
+      overall: {
+        score: 0,
+        feedback: `Error evaluating answers: ${error.message || 'Unknown error'}. Please try again.`,
+        reviewTopics: ["Please review all topics"],
+        strengths: []
+      },
+      submittedAt: new Date().toISOString()
+    };
+  }
+}
+
+/**
+ * Submits quiz answers and generates results
+ */
+export async function submitQuizAnswers(quizId: string, answers: Record<string, any>) {
+  try {
+    console.log('\n=== Starting Quiz Submission ===');
+    console.log('Quiz ID:', quizId);
+    console.log('Answers received:', JSON.stringify(answers, null, 2));
+    
+    // Get quiz data
+    console.log('\nFetching quiz data...');
+    const quiz = quizStore[quizId];
+    if (!quiz) {
+      console.error('Quiz not found in store for ID:', quizId);
+      console.log('Available quiz IDs:', Object.keys(quizStore));
+      throw new Error('Quiz not found');
+    }
+    console.log('Quiz found:', {
+      title: quiz.title,
+      totalQuestions: quiz.questions.length,
+      questionsReceived: Object.keys(answers).length
+    });
+
+    // Validate answers format
+    console.log('\nValidating answers...');
+    if (!answers || typeof answers !== 'object') {
+      console.error('Invalid answers format:', answers);
+      throw new Error('Invalid answers format');
+    }
+
+    // Check if we have answers for each question
+    const missingAnswers = quiz.questions
+      .filter(q => !answers[q.id])
+      .map(q => q.id);
+    
+    if (missingAnswers.length > 0) {
+      console.warn('Missing answers for questions:', missingAnswers);
+    }
+
+    console.log('\nStarting answer evaluation...');
+    // Evaluate all answers together
+    const results = await evaluateQuizAnswers(quizId, answers, quiz);
+    console.log('Evaluation complete:', {
+      resultId: results.id,
+      overallScore: results.overall.score,
+      answersEvaluated: Object.keys(results.answers).length
+    });
+
+    // Store results in quiz
+    console.log('\nStoring results...');
+    quiz.results = results;
+    saveQuizData();
+    console.log('Results stored successfully');
+
+    console.log('=== Quiz Submission Complete ===\n');
+    return results;
+
+  } catch (error: any) {
+    console.error('\n=== Quiz Submission Failed ===');
+    console.error('Error details:', error);
+    
+    // Return a structured error response that matches QuizResults interface
+    return {
+      id: `result-${Date.now()}`,
+      quizId: quizId,
+      answers: {},
+      overall: {
+        score: 0,
+        feedback: `There was an error submitting your quiz: ${error.message || 'Unknown error'}. Please try again.`,
+        reviewTopics: ["Error occurred during submission"],
+        strengths: []
+      },
+      submittedAt: new Date().toISOString()
+    };
   }
 }
 

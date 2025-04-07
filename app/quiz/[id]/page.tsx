@@ -1,95 +1,120 @@
 "use client"
 
-import React, { useEffect, useState, useRef } from "react"
-import { getQuiz } from "@/lib/actions"
+import React, { useEffect, useState } from "react"
+import { getQuiz, submitQuizAnswers } from "@/lib/actions"
 import { use } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useTheme } from "next-themes"
-import { Moon, Sun, Home, Check, X, RotateCcw } from "lucide-react"
+import { Home, CheckCircle2, XCircle } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import 'katex/dist/katex.min.css'
-import katex from 'katex'
 import { Textarea } from "@/components/ui/textarea"
-import type { ReactElement } from 'react'
+import { Chatbot } from '@/components/chat-bot'
+import { ThemeToggle } from "@/components/theme-toggle"
+import { useRouter } from "next/navigation"
+import { useToast } from '@/components/ui/use-toast'
+import { Toaster } from '@/components/ui/toaster'
+
+// Function to format math expressions
+function formatMathText(text: string) {
+  if (!text) return null;
+  
+  try {
+    // Replace LaTeX math delimiters with appropriate HTML
+    text = text.replace(/\\\[(.*?)\\\]/g, '<div class="math-display">$1</div>');
+    text = text.replace(/\\\((.*?)\\\)|\$(.*?)\$/g, '<span class="math-inline">$1$2</span>');
+
+    return <div dangerouslySetInnerHTML={{ __html: text }} />;
+  } catch (error) {
+    console.error('Error formatting math text:', error);
+    return <div>{text}</div>;
+  }
+}
+
+// Function to render text with math expressions
+const renderText = (text: string) => {
+  return <div className="math-text">{formatMathText(text)}</div>;
+};
 
 interface Question {
-  id: string;
+  id: string
+  text: string
+  type: "multipleChoice" | "shortAnswer"
+  options?: string[]
+  answer: string
+  explanation?: string
+}
+
+interface Answer {
   text: string;
-  type: "multipleChoice" | "shortAnswer";
-  options?: string[];
-  answer: string;
-  explanation?: string;
-  rubric?: string;
+  score?: number;
+  correct?: boolean;
+  feedback?: string;
+}
+
+interface EvaluationResult {
+  score: number
+  correct: boolean
+  feedback: string
+}
+
+interface QuizResults {
+  id: string;
+  quizId: string;
+  answers: {
+    [questionId: string]: {
+      score: number;
+      isCorrect: boolean;
+      feedback: string;
+    };
+  };
+  overall: {
+    score: number;
+    feedback: string;
+    reviewTopics: string[];
+    strengths: string[];
+  };
+  submittedAt: string;
 }
 
 interface Quiz {
   title: string;
   subject: string;
   grade: string;
+  topic: string;
   questions: Question[];
+  results?: QuizResults;
 }
-
-// Function to render LaTeX
-function renderLatex(text: string) {
-  // First handle display math with \[ \]
-  text = text.replace(/\\\[(.*?)\\\]/g, (_, math) => {
-    try {
-      return katex.renderToString(math, { displayMode: true });
-    } catch (error) {
-      console.error('KaTeX display math error:', error);
-      return math;
-    }
-  });
-
-  // Then handle inline math with \( \) and $ $
-  text = text.replace(/\\\((.*?)\\\)|\$(.*?)\$/g, (_, math1, math2) => {
-    const math = math1 || math2;
-    try {
-      return katex.renderToString(math, { displayMode: false });
-    } catch (error) {
-      console.error('KaTeX inline math error:', error);
-      return math;
-    }
-  });
-
-  // Handle special cases like "depreciates by"
-  text = text.replace(/(\w+)by(\w+)/g, '$1 by $2');
-  
-  return <div dangerouslySetInnerHTML={{ __html: text }} />;
-}
-
-// Function to render text with LaTeX
-const renderText = (text: string): ReactElement => {
-  return <div className="math-text">{renderLatex(text)}</div>;
-};
 
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, Answer>>({});
   const [showResults, setShowResults] = useState(false);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const resolvedParams = use(params);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+  const { toast } = useToast();
+  const resolvedParams = use(params);
+  const quizId = resolvedParams.id;
 
   useEffect(() => {
     async function loadQuiz() {
       try {
         setLoading(true);
         setError(null);
-        const quizData = await getQuiz(resolvedParams.id);
+        const quizData = await getQuiz(quizId);
         console.log("Loaded quiz data:", quizData);
         
-        // Validate quiz data
         if (!quizData || !quizData.questions || !Array.isArray(quizData.questions) || quizData.questions.length === 0) {
           throw new Error("Invalid quiz data received");
         }
@@ -103,10 +128,105 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       }
     }
     loadQuiz();
-  }, [resolvedParams.id]);
+  }, [quizId]);
 
-  const handleAnswerSelect = (questionId: string, answer: string) => {
-    setSelectedAnswers(prev => ({ ...prev, [questionId]: answer }));
+  const ShortAnswerQuestion = ({ 
+    question, 
+    value, 
+    onChange 
+  }: { 
+    question: Question, 
+    value: string, 
+    onChange: (value: string) => void 
+  }) => {
+    const [localValue, setLocalValue] = useState(value);
+
+    // Update local value when prop value changes
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+
+    return (
+      <div className="space-y-4">
+        <div className="text-lg">{renderText(question.text)}</div>
+        <label>
+          <textarea
+            name="answer"
+            value={localValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            onBlur={() => onChange(localValue)} // Only trigger onChange when user finishes typing
+            rows={6}
+            cols={50}
+            className="w-full p-4 text-lg border rounded-lg bg-gray-800 border-gray-700 text-white"
+            placeholder="Type your answer here..."
+          />
+        </label>
+      </div>
+    );
+  };
+
+  const handleAnswerSelect = async (questionId: string, answer: Answer | string) => {
+    if (!quiz) return;
+
+    const question = quiz.questions.find(q => q.id === questionId);
+    if (!question) return;
+
+    // Convert string answer to Answer type
+    const answerObj = typeof answer === 'string' ? { text: answer } : answer;
+
+    // First, update the local state immediately for better UX
+    setSelectedAnswers(prev => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        text: answerObj.text
+      }
+    }));
+
+    // For multiple choice, check immediately
+    if (question.type === 'multipleChoice') {
+      try {
+        const response = await fetch('/api/check-answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            questionId,
+            studentAnswer: answerObj.text,
+            correctAnswer: question.answer,
+            questionType: question.type
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check answer');
+        }
+
+        const result = await response.json();
+        setSelectedAnswers(prev => ({
+          ...prev,
+          [questionId]: {
+            text: answerObj.text,
+            score: result.score || 0,
+            correct: result.correct || false,
+            feedback: result.feedback || 'No feedback available'
+          }
+        }));
+      } catch (error) {
+        console.error('Error checking answer:', error);
+        // Keep the answer text but don't update other fields yet
+      }
+    } else {
+      // For short answer questions, just store the text without checking
+      setSelectedAnswers(prev => ({
+        ...prev,
+        [questionId]: {
+          text: answerObj.text,
+          score: prev[questionId]?.score || 0,
+          correct: prev[questionId]?.correct || false,
+          feedback: prev[questionId]?.feedback || ''
+        }
+      }));
+    }
   };
 
   const goToNextQuestion = () => {
@@ -136,7 +256,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   const calculateScore = () => {
     if (!quiz) return 0;
     const correctAnswers = quiz.questions.filter(q => 
-      selectedAnswers[q.id] === q.answer
+      selectedAnswers[q.id] && selectedAnswers[q.id].correct
     ).length;
     return Math.round((correctAnswers / quiz.questions.length) * 100);
   };
@@ -147,6 +267,90 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     setSelectedAnswers({});
     setCurrentQuestion(0);
     setShowResults(false);
+  };
+
+  const handleSubmitQuiz = async () => {
+    if (!quiz) {
+      toast({
+        title: "Error",
+        description: "Quiz not found",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      console.log("Starting quiz submission...");
+      console.log("Quiz ID:", quizId);
+      console.log("Selected answers:", selectedAnswers);
+
+      // Format answers for submission
+      const formattedAnswers = Object.entries(selectedAnswers).reduce((acc, [id, answer]) => ({
+        ...acc,
+        [id]: {
+          text: answer.text,
+          score: answer.score,
+          correct: answer.correct,
+          feedback: answer.feedback
+        }
+      }), {});
+
+      console.log("Formatted answers:", formattedAnswers);
+
+      // Submit all answers to the server
+      const response = await fetch('/api/submit-quiz', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          quizId,
+          answers: formattedAnswers
+        })
+      });
+
+      console.log("Response status:", response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error('Failed to submit quiz: ' + errorText);
+      }
+
+      const results = await response.json();
+      console.log("Received results:", results);
+
+      // Update the quiz state with results
+      setQuiz((prev: Quiz | null) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          results: results
+        };
+      });
+
+      setShowResults(true);
+      setShowSubmitDialog(false);
+
+      // Show success message
+      toast({
+        title: "Quiz Submitted!",
+        description: `Your score: ${results.overall.score}%`,
+        duration: 5000
+      });
+
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to submit quiz. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -204,146 +408,159 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     );
   }
 
-  if (showResults) {
-    const score = calculateScore();
+  if (showResults && quiz?.results) {
     return (
       <div className="container mx-auto py-8 px-4 relative min-h-screen">
-        <Card className="max-w-4xl mx-auto mb-8">
+        <Card className="max-w-4xl mx-auto">
           <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>{quiz.title} - Results</CardTitle>
-              <span className="text-xl font-bold">Score: {score}%</span>
-            </div>
+            <CardTitle>{quiz?.title}</CardTitle>
+            <CardDescription>
+              {quiz?.subject} - Grade {quiz?.grade}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-8">
-              {quiz.questions.map((question, index) => {
-                const isMultipleChoice = question.type === "multipleChoice";
-                const isCorrect = isMultipleChoice ? 
-                  selectedAnswers[question.id] === question.answer :
-                  // For short answer, we'll need AI evaluation
-                  false; // This will be replaced with AI evaluation
-
-                return (
-                  <div key={question.id} className="border-b pb-6 last:border-0">
-                    <div className="flex items-start gap-4">
-                      {isMultipleChoice ? (
-                        isCorrect ? (
-                          <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
+              {/* Overall Results */}
+              <div className="p-6 bg-muted rounded-lg">
+                <h3 className="text-xl font-semibold mb-4">Quiz Results</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">Overall Score:</span>
+                    <span className="text-3xl font-bold text-primary">
+                      {quiz.results.overall.score}%
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Feedback:</h4>
+                    <p className="text-base">{quiz.results.overall.feedback}</p>
+                  </div>
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-red-500 dark:text-red-400">Topics to Review:</h4>
+                      <ul className="list-disc list-inside text-base space-y-1">
+                        {quiz.results.overall.reviewTopics.length > 0 ? (
+                          quiz.results.overall.reviewTopics.map((topic, i) => (
+                            <li key={i}>{renderText(topic)}</li>
+                          ))
                         ) : (
-                          <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                        )
+                          <li>Keep practicing the concepts you found challenging</li>
+                        )}
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-green-500 dark:text-green-400">Strengths:</h4>
+                      <ul className="list-disc list-inside text-base space-y-1">
+                        {quiz.results.overall.strengths.length > 0 ? (
+                          quiz.results.overall.strengths.map((strength, i) => (
+                            <li key={i}>{renderText(strength)}</li>
+                          ))
+                        ) : (
+                          <li>Keep practicing to build your understanding!</li>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Individual Questions */}
+              {quiz?.questions.map((question, index) => (
+                <div key={question.id} className="border-b pb-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="text-2xl">
+                      {selectedAnswers[question.id]?.correct ? (
+                        <CheckCircle2 className="text-green-500 h-6 w-6" />
                       ) : (
-                        <div className="w-6 h-6 mt-1 flex-shrink-0" /> // Placeholder for AI evaluation
+                        <XCircle className="text-red-500 h-6 w-6" />
                       )}
-                      <div className="flex-grow">
-                        <h3 className="text-lg font-medium mb-2">
-                          {index + 1}. {renderText(question.text)}
-                        </h3>
-                        <div className="space-y-2">
-                          {isMultipleChoice ? (
-                            <div className="space-y-1">
-                              <p className="text-sm font-medium">Options:</p>
-                              {question.options?.map((option, idx) => (
-                                <p key={idx} className="text-sm pl-4 flex items-center gap-2">
-                                  {selectedAnswers[question.id] === option && (
-                                    <span className="text-sm text-muted-foreground">→ </span>
-                                  )}
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="text-lg font-medium mb-2">
+                        {index + 1}. {renderText(question.text)}
+                      </h3>
+                      <div className="space-y-2">
+                        {/* Question content */}
+                        {question.type === 'multipleChoice' ? (
+                          <div className="space-y-1">
+                            {question.options?.map((option, idx) => (
+                              <div key={idx} className="text-sm pl-4 flex items-center gap-2">
+                                {selectedAnswers[question.id]?.text === option && (
+                                  selectedAnswers[question.id]?.correct ? (
+                                    <CheckCircle2 className="text-green-500 h-4 w-4" />
+                                  ) : (
+                                    <XCircle className="text-red-500 h-4 w-4" />
+                                  )
+                                )}
+                                <span className="math-text">
                                   {renderText(option)}
-                                  {showResults && question.answer === option && (
-                                    <span className="text-sm text-muted-foreground ml-2">(Correct Answer)</span>
-                                  )}
-                                </p>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <div className="mt-2 p-4 bg-muted rounded-lg">
-                                <p className="text-sm font-medium mb-2">Your Answer:</p>
-                                <p className="text-sm whitespace-pre-wrap">{selectedAnswers[question.id]}</p>
-                                <p className="text-sm font-medium mt-4 mb-2">Expected Answer:</p>
-                                <p className="text-sm whitespace-pre-wrap">{renderText(question.answer)}</p>
-                                {question.rubric && (
-                                  <>
-                                    <p className="text-sm font-medium mt-4 mb-2">Grading Rubric:</p>
-                                    <p className="text-sm whitespace-pre-wrap">{renderText(question.rubric)}</p>
-                                  </>
+                                </span>
+                                {question.answer === option && (
+                                  <span className="text-sm text-green-500 font-medium ml-2">
+                                    (Correct Answer)
+                                  </span>
                                 )}
                               </div>
-                            </div>
-                          )}
-                          {question.explanation && (
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
                             <div className="mt-2 p-4 bg-muted rounded-lg">
-                              <p className="text-sm font-medium mb-1">Explanation:</p>
-                              <p className="text-sm">{renderText(question.explanation)}</p>
+                              <div className="text-sm font-medium mb-2">Your Answer:</div>
+                              <div className="text-sm whitespace-pre-wrap">
+                                {selectedAnswers[question.id]?.text}
+                              </div>
+                              <div className="text-sm font-medium mt-4 mb-2">Expected Answer:</div>
+                              <div className="text-sm whitespace-pre-wrap">
+                                {renderText(question.answer)}
+                              </div>
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
+                        
+                        {/* Feedback */}
+                        {selectedAnswers[question.id]?.feedback && (
+                          <div className="mt-2 text-sm">
+                            <span className="font-medium">Feedback: </span>
+                            {selectedAnswers[question.id].feedback}
+                          </div>
+                        )}
+                        
+                        {/* Explanation */}
+                        {question.explanation && (
+                          <div className="mt-2 p-4 bg-muted rounded-lg">
+                            <div className="text-sm font-medium mb-1">Explanation:</div>
+                            <div className="text-sm">{renderText(question.explanation)}</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
-          <Button onClick={handleTryAgain} variant="outline">
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Try Again
-          </Button>
-          <Button asChild>
-            <Link href="/">
-              <Home className="w-4 h-4 mr-2" />
-              Return Home
-            </Link>
-          </Button>
-        </div>
+        {/* Chatbot */}
+        {showResults && <Chatbot quizId={quizId} />}
 
         {/* Theme toggle */}
-        <div className="fixed bottom-4 right-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-        </div>
+        <ThemeToggle className="fixed bottom-4 left-4" />
+
+        {/* Return Home button */}
+        <Button
+          variant="outline"
+          onClick={() => router.push('/')}
+          className="fixed bottom-4 right-4"
+        >
+          Return Home
+        </Button>
       </div>
     );
   }
 
   const currentQuestionData = quiz.questions[currentQuestion];
   const progress = (currentQuestion + 1) / quiz.questions.length * 100;
-
-  const ShortAnswerQuestion = ({ 
-    question, 
-    value, 
-    onChange 
-  }: { 
-    question: Question, 
-    value: string, 
-    onChange: (value: string) => void 
-  }) => {
-    return (
-      <div className="space-y-4">
-        <div className="text-lg">{renderLatex(question.text)}</div>
-        <label>
-          <textarea
-            name="answer"
-            defaultValue={value}
-            onBlur={(e) => onChange(e.target.value)}
-            rows={6}
-            cols={50}
-            className="w-full p-4 text-lg border rounded-lg bg-gray-800 border-gray-700 text-white"
-            placeholder="Type your answer here..."
-          />
-        </label>
-      </div>
-    );
-  };
 
   return (
     <div className="container mx-auto py-8 px-4 relative min-h-screen">
@@ -365,8 +582,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                   {renderText(currentQuestionData.text)}
                 </div>
                 <RadioGroup
-                  value={selectedAnswers[currentQuestionData.id] || ""}
-                  onValueChange={(value) => handleAnswerSelect(currentQuestionData.id, value)}
+                  value={selectedAnswers[currentQuestionData.id] && selectedAnswers[currentQuestionData.id].text || ""}
+                  onValueChange={(value) => handleAnswerSelect(currentQuestionData.id, { text: value } as Answer)}
                   className="space-y-4"
                 >
                   {currentQuestionData.options?.map((option, index) => (
@@ -389,8 +606,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             ) : (
               <ShortAnswerQuestion
                 question={currentQuestionData}
-                value={selectedAnswers[currentQuestionData.id] || ""}
-                onChange={(value) => handleAnswerSelect(currentQuestionData.id, value)}
+                value={selectedAnswers[currentQuestionData.id] && selectedAnswers[currentQuestionData.id].text || ""}
+                onChange={(value) => handleAnswerSelect(currentQuestionData.id, { text: value } as Answer)}
               />
             )}
             <div className="flex justify-between pt-6">
@@ -402,8 +619,12 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 Previous
               </Button>
               {currentQuestion === quiz.questions.length - 1 ? (
-                <Button onClick={handleSubmit} variant="default">
-                  Submit Quiz
+                <Button 
+                  onClick={handleSubmit} 
+                  variant="default"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Quiz"}
                 </Button>
               ) : (
                 <Button onClick={goToNextQuestion}>
@@ -416,15 +637,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       </Card>
 
       {/* Theme toggle */}
-      <div className="fixed bottom-4 right-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        >
-          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-        </Button>
-      </div>
+      <ThemeToggle className="fixed bottom-4 left-4" />
 
       {/* Home button */}
       <div className="fixed bottom-4 left-4">
@@ -448,11 +661,11 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              setShowSubmitDialog(false);
-              setShowResults(true);
-            }}>
-              Submit Anyway
+            <AlertDialogAction 
+              onClick={handleSubmitQuiz}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Anyway"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -475,6 +688,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Toaster />
     </div>
   );
 }

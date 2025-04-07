@@ -7,7 +7,7 @@
  */
 const config = {
   apiKey: process.env.OPENROUTER_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY,
-  model: process.env.MODEL_PROVIDER || "deepseek/deepseek-r1-zero:free",
+  model: "deepseek/deepseek-chat-v3-0324:free",
   referrer: process.env.OPENROUTER_REFERRER || "http://localhost:3005",
   site: process.env.OPENROUTER_SITE || "Study AI App"
 };
@@ -23,6 +23,9 @@ interface OpenRouterRequest {
   messages: OpenRouterMessage[];
   temperature?: number;
   max_tokens?: number;
+  response_format?: {
+    type: "text" | "json_object";
+  };
 }
 
 interface OpenRouterMessage {
@@ -62,19 +65,23 @@ interface Quiz {
 }
 
 /**
- * Generate text using DeepSeek via OpenRouter API
- * @param prompt The prompt to send to the model
- * @param options Additional options for the request
- * @returns The generated text
+ * Generate text using DeepSeek via OpenRouter API with retry functionality
  */
 export async function generateText(
   prompt: string,
   options: {
     temperature?: number;
     maxTokens?: number;
+    responseFormat?: "text" | "json";
+    maxRetries?: number;
   } = {}
 ): Promise<string> {
-  const { temperature = 0.7, maxTokens = 3000 } = options;
+  const { 
+    temperature = 0.7, 
+    maxTokens = 3000, 
+    responseFormat = "text",
+    maxRetries = 3 
+  } = options;
   
   console.log("\n=== Starting OpenRouter API Request ===");
   console.log("Configuration:");
@@ -82,154 +89,133 @@ export async function generateText(
   console.log("- Model:", config.model);
   console.log("- Referrer:", config.referrer);
   console.log("- Site:", config.site);
-  
+  console.log("- Max Tokens:", maxTokens);
+  console.log("- Max Retries:", maxRetries);
+
   if (!config.apiKey) {
     throw new Error("OpenRouter API key not configured. Please check your environment variables.");
   }
 
-  try {
-    const requestBody: OpenRouterRequest = {
-      model: config.model,
-      messages: [
-        { 
-          role: "system", 
-          content: prompt.includes("determine the academic subject") ?
-            // Subject determination prompt
-            `You are an expert teacher analyzing educational content.
-            Your task is to determine the primary academic subject of the provided text.
-            
-            RULES:
-            1. Choose ONLY ONE subject from: Mathematics, Physics, Chemistry, Biology, History, English, Geography, Computer Science, Healthcare
-            2. Respond with ONLY the subject name - no other text
-            3. Look for subject-specific terminology and concepts
-            4. Consider the overall context and focus
-            5. If the content is about medical or health topics, choose Healthcare
-            
-            Analyze this content:
-            ${prompt.replace(/determine the academic subject/i, '').trim()}` :
-            prompt.includes("determine the specific unit and topic") ?
-            // Topic determination prompt
-            `You are an expert teacher analyzing educational content.
-            Your task is to determine the specific unit, topic, and subtopic being covered.
-            
-            RULES:
-            1. Use only information directly present in the text
-            2. Be as specific as possible while remaining accurate
-            3. Never use generic terms like "General" or "Basic"
-            4. Use proper terminology for the field
-            5. Consider the depth and focus of the content
-            
-            Format your response EXACTLY as:
-            Unit: [Main area of study]
-            Topic: [Specific topic within that unit]
-            Subtopic: [Specific concept being covered]
-            
-            Example for Healthcare:
-            Unit: Physical Therapy
-            Topic: Neuromuscular Conditions
-            Subtopic: Treatment Approaches and Assessment
-            
-            Analyze this content:
-            ${prompt.replace(/determine the specific unit and topic/i, '').trim()}` :
-            // Quiz generation prompt
-            `You are a teacher creating a quiz. ${prompt}`
+  // Prepare request body
+  const requestBody: OpenRouterRequest = {
+    model: config.model,
+    messages: [
+      { 
+        role: "system", 
+        content: `You are a helpful AI teacher. ${prompt}`
+      }
+    ],
+    temperature: temperature,
+    max_tokens: maxTokens,
+    response_format: {
+      type: responseFormat === "json" ? "json_object" : "text"
+    }
+  };
+
+  // Retry with exponential backoff
+  let retryCount = 0;
+  let lastError: Error | null = null;
+
+  while (retryCount <= maxRetries) {
+    try {
+      console.log(`Sending request to OpenRouter API... (Attempt ${retryCount + 1}/${maxRetries + 1})`);
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${config.apiKey}`,
+          "HTTP-Referer": config.referrer,
+          "X-Title": config.site
         },
-        { 
-          role: "user", 
-          content: prompt
-        }
-      ],
-      temperature: temperature,
-      max_tokens: maxTokens
-    };
-    
-    console.log("Sending request to OpenRouter API...");
-    
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${config.apiKey}`,
-        "HTTP-Referer": config.referrer,
-        "X-Title": config.site,
-        "User-Agent": "Study AI App/1.0.0",
-        "OR-ORGANIZATION": "personal",
-        "OR-SITE": config.referrer,
-        "OR-APP-NAME": "Study AI App",
-        "OR-VERSION": "1.0.0"
-      },
-      body: JSON.stringify(requestBody)
-    });
+        body: JSON.stringify(requestBody)
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenRouter API error response:", errorText);
-      throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log("OpenRouter API response received");
-
-    if (!data.choices?.[0]?.message?.content) {
-      throw new Error("Invalid response format from OpenRouter API");
-    }
-
-    const rawContent = data.choices[0].message.content.trim();
-    console.log("\nRaw response content:", rawContent);
-
-    // Handle different types of responses
-    if (prompt.includes("determine the academic subject")) {
-      // For subject determination, return the single word response
-      return rawContent.split(/[\n\r]+/)[0].trim();
-    } 
-    else if (prompt.includes("determine the specific unit and topic")) {
-      // For topic determination, parse the structured response
-      const lines: string[] = rawContent.split(/[\n\r]+/).map((line: string) => line.trim()).filter(Boolean);
-      
-      const unit = lines.find((l: string) => l.startsWith('Unit:'))?.replace('Unit:', '').trim();
-      const topic = lines.find((l: string) => l.startsWith('Topic:'))?.replace('Topic:', '').trim();
-      const subtopic = lines.find((l: string) => l.startsWith('Subtopic:'))?.replace('Subtopic:', '').trim();
-      
-      if (!unit || !topic) {
-        throw new Error("Missing required topic determination fields");
-      }
-      
-      return `Unit: ${unit}\nTopic: ${topic}${subtopic ? `\nSubtopic: ${subtopic}` : ''}`;
-    }
-    else {
-      // For quiz generation, expect and validate JSON
-      try {
-        const startIndex = rawContent.indexOf('{');
-        const endIndex = rawContent.lastIndexOf('}');
+      // Handle rate limiting (429) with retry
+      if (response.status === 429) {
+        // Extract retry-after header if available, otherwise use exponential backoff
+        const retryAfter = response.headers.get('retry-after') 
+          ? parseInt(response.headers.get('retry-after') || '1') 
+          : Math.pow(2, retryCount);
         
-        if (startIndex === -1 || endIndex === -1) {
-          throw new Error("No valid JSON structure found in response");
+        const waitTime = retryAfter * 1000; // convert to milliseconds
+        console.warn(`Rate limited by OpenRouter. Retrying in ${waitTime/1000} seconds...`);
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        retryCount++;
+        continue;
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`OpenRouter API error response (${response.status}):`, errorText);
+        
+        // For other non-OK responses, retry with backoff
+        if (retryCount < maxRetries) {
+          const waitTime = Math.pow(2, retryCount) * 1000;
+          console.warn(`Request failed with status ${response.status}. Retrying in ${waitTime/1000} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          retryCount++;
+          continue;
         }
+        
+        throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
+      }
 
-        const jsonContent = rawContent.slice(startIndex, endIndex + 1);
-        const parsed = JSON.parse(jsonContent);
+      const data: OpenRouterResponse = await response.json();
+      console.log("OpenRouter API response received successfully");
 
-        if (!parsed.questions?.length) {
-          throw new Error("Invalid quiz structure - missing questions array");
+      if (!data.choices?.[0]?.message?.content) {
+        console.error("Invalid response format:", data);
+        throw new Error("Invalid response format from OpenRouter API");
+      }
+
+      const content = data.choices[0].message.content.trim();
+      
+      if (responseFormat === "json") {
+        try {
+          // Extract JSON from the response
+          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) {
+            throw new Error("No JSON object found in response");
+          }
+          return jsonMatch[0];
+        } catch (error) {
+          console.error("Error parsing JSON response:", error);
+          throw new Error("Failed to parse JSON response");
         }
+      }
 
-        return jsonContent;
-      } catch (error) {
-        console.error("Failed to parse quiz JSON:", error);
-        throw new Error("Failed to generate valid quiz structure");
+      return content;
+    } catch (error: any) {
+      lastError = error;
+      
+      // Only retry if we haven't hit the max retries yet
+      if (retryCount < maxRetries) {
+        const waitTime = Math.pow(2, retryCount) * 1000;
+        console.warn(`Error: ${error.message}. Retrying in ${waitTime/1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        retryCount++;
+      } else {
+        console.error("Max retries reached. Giving up.");
+        break;
       }
     }
-  } catch (error) {
-    console.error("Error in generateText:", error);
-    throw error;
   }
+
+  // If we've exhausted retries and still have an error, throw it
+  if (lastError) {
+    throw lastError;
+  }
+
+  // This should never happen as we either return a result or throw an error above
+  throw new Error("Unknown error occurred during API request");
 }
 
 /**
  * Check if DeepSeek AI service is properly configured
- * @returns True if DeepSeek is configured, false otherwise
  */
 export function isAIConfigured(): boolean {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  return !!apiKey && apiKey.startsWith("sk-or-");
+  return !!config.apiKey && config.apiKey.startsWith("sk-or-");
 } 
