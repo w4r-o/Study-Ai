@@ -41,19 +41,19 @@ export function PastMaterials() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const data = await getPastQuizzes()
-        setQuizzes(data)
-      } catch (error) {
-        console.error("Error fetching past quizzes:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchQuizzes()
-  }, [])
+    setLoading(true);
+    
+    getPastQuizzes()
+      .then((data) => {
+        setQuizzes(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching past quizzes:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   if (loading) {
     return (
@@ -124,11 +124,11 @@ export function PastMaterials() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button asChild variant="outline">
-              <Link href={`/results/${quiz.id}`}>{quiz.score !== undefined ? "View Results" : "Continue Quiz"}</Link>
+              <Link href={`/results/${quiz.id}`}>View Results</Link>
             </Button>
             <Button asChild>
               <Link href={`/quiz/${quiz.id}`}>
-                {quiz.score !== undefined ? "Retry Quiz" : "Start Quiz"}
+                Start Quiz
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

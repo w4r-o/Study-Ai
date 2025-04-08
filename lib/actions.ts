@@ -28,6 +28,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser } from "@/lib/server-auth"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
 import { generateText, isAIConfigured } from "@/lib/openrouter-api"
+import { QuizResult, QuizQuestion as QuizQuestionType } from "./types"
 
 // Maximum file size in bytes (20MB)
 const MAX_FILE_SIZE = 20 * 1024 * 1024
@@ -45,18 +46,24 @@ let pastQuizzesStore: {
 }[] = [];
 
 // Load quiz data from file if it exists
-try {
-  const fs = require('fs');
-  const path = require('path');
-  const dataPath = path.join(process.cwd(), '.quiz-data.json');
-  
-  if (fs.existsSync(dataPath)) {
-    const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-    quizStore = data.quizzes || {};
-    pastQuizzesStore = data.pastQuizzes || [];
+function loadQuizData() {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const dataPath = path.join(process.cwd(), '.quiz-data.json');
+    
+    if (fs.existsSync(dataPath)) {
+      const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+      quizStore = data.quizzes || {};
+      pastQuizzesStore = data.pastQuizzes || [];
+      console.log('Loaded quiz data:', {
+        quizCount: Object.keys(quizStore).length,
+        pastQuizCount: pastQuizzesStore.length
+      });
+    }
+  } catch (error) {
+    console.error('Error loading quiz data:', error);
   }
-} catch (error) {
-  console.error('Error loading quiz data:', error);
 }
 
 // Save quiz data to file
@@ -70,10 +77,18 @@ function saveQuizData() {
       quizzes: quizStore,
       pastQuizzes: pastQuizzesStore
     }, null, 2));
+    
+    console.log('Saved quiz data:', {
+      quizCount: Object.keys(quizStore).length,
+      pastQuizCount: pastQuizzesStore.length
+    });
   } catch (error) {
     console.error('Error saving quiz data:', error);
   }
 }
+
+// Initialize quiz data on module load
+loadQuizData();
 
 interface QuizQuestion {
   id: string;
@@ -94,6 +109,7 @@ interface QuizResults {
       score: number;
       isCorrect: boolean;
       feedback: string;
+      userAnswer: string;
     };
   };
   overall: {
@@ -175,10 +191,6 @@ export async function createQuiz(formData: FormData): Promise<string> {
     console.log("\n=== Starting Quiz Generation ===");
     console.log("Timestamp:", new Date().toISOString());
     
-    // Clear previous quiz data
-    clearQuizStore();
-    console.log("Cleared previous quiz data");
-    
     // Get and validate form data
     const notesFiles = formData.getAll("notes") as File[];
     const grade = formData.get("grade")?.toString() || "11";
@@ -223,16 +235,23 @@ export async function createQuiz(formData: FormData): Promise<string> {
       try {
         console.log(`\nProcessing file: ${file.name}`);
         const text = await extractTextFromPDF(file);
+        if (!text || text.trim().length === 0) {
+          throw new Error("No text could be extracted from the PDF. Please ensure the PDF contains readable text and try again.");
+        }
         totalCharacters += text.length;
         console.log(`- Extracted ${text.length} characters`);
         notesText.push(text);
       } catch (error) {
         console.error(`Error processing ${file.name}:`, error);
-        throw new Error(`Failed to process ${file.name}. Please ensure it's a valid PDF.`);
+        throw new Error(`Failed to process ${file.name}. ${error instanceof Error ? error.message : 'Please ensure it\'s a valid PDF with readable text.'}`);
       }
     }
     
     console.log(`\nTotal characters extracted: ${totalCharacters}`);
+    
+    if (totalCharacters === 0) {
+      throw new Error("No text could be extracted from any of the uploaded files. Please ensure your PDFs contain readable text and try again.");
+    }
 
     // Determine subject from notes content
     console.log("\nDetermining subject...");
@@ -425,8 +444,16 @@ export async function createQuiz(formData: FormData): Promise<string> {
 async function determineSubject(notesText: string): Promise<string> {
   const subjectPrompt = `
     Based on these notes, determine the academic subject.
-    Respond with ONLY ONE of these subjects: Mathematics, Physics, Chemistry, Biology, History, English, Geography, Computer Science, Healthcare
-    Do not include any other text, formatting, or punctuation.
+    You MUST respond with ONLY ONE of these exact words (no other text or punctuation):
+    Mathematics
+    Physics
+    Chemistry
+    Biology
+    History
+    English
+    Geography
+    Computer Science
+    Healthcare
     
     Notes:
     ${notesText.substring(0, 1000)}
@@ -435,19 +462,39 @@ async function determineSubject(notesText: string): Promise<string> {
   try {
     console.log("Making subject determination request...");
     const response = await generateText(subjectPrompt, {
-      temperature: 0.3,
+      temperature: 0.1, // Lower temperature for more consistent responses
       maxTokens: 50
     });
     
     console.log("Raw subject response:", response);
-    const subject = response.replace(/['".,]/g, '').trim();
+    
+    // Clean up the response - remove quotes, periods, newlines and extra whitespace
+    const subject = response.replace(/['".,\n\r]/g, '').trim();
     console.log("Cleaned subject:", subject);
     
-    if (!subject) {
-      throw new Error("Could not determine subject from notes");
+    // Validate that we got one of the expected subjects
+    const validSubjects = [
+      'Mathematics',
+      'Physics',
+      'Chemistry',
+      'Biology',
+      'History',
+      'English',
+      'Geography',
+      'Computer Science',
+      'Healthcare'
+    ];
+    
+    const matchedSubject = validSubjects.find(
+      valid => valid.toLowerCase() === subject.toLowerCase()
+    );
+    
+    if (!matchedSubject) {
+      console.error("Invalid subject returned:", subject);
+      throw new Error("Could not determine a valid subject from notes");
     }
     
-    return subject;
+    return matchedSubject;
   } catch (error) {
     console.error("Error determining subject:", error);
     throw error;
@@ -656,10 +703,14 @@ export async function getQuiz(id: string) {
   console.log("Getting quiz with ID:", id);
   
   try {
-    // Get quiz from memory store
+    // Reload quiz data to ensure we have the latest
+    loadQuizData();
+    
+    // Get quiz from store
     const quiz = quizStore[id];
     if (!quiz) {
       console.error("Quiz not found in store for ID:", id);
+      console.log("Available quiz IDs:", Object.keys(quizStore));
       throw new Error("Quiz not found");
     }
     
@@ -685,8 +736,7 @@ export async function getQuiz(id: string) {
       title: quiz.title,
       topic: quiz.topic,
       createdAt: new Date(quiz.createdAt).toISOString(),
-      questionCount: quiz.questions.length,
-      firstQuestion: quiz.questions[0]
+      questionCount: quiz.questions.length
     });
     
     return quiz;
@@ -699,157 +749,124 @@ export async function getQuiz(id: string) {
 /**
  * Evaluates all quiz answers together using AI
  */
-async function evaluateQuizAnswers(quizId: string, answers: Record<string, any>, quiz: QuizData) {
-  console.log('\n=== Starting Answer Evaluation ===');
+async function evaluateQuizAnswers(quizId: string, answers: Record<string, any>, quiz: QuizData): Promise<QuizResults> {
   try {
-    // Check if answers object is empty
-    if (Object.keys(answers).length === 0) {
-      console.warn('No answers provided for evaluation');
-      return {
-        answers: quiz.questions.reduce((acc, q) => ({
-          ...acc,
-          [q.id]: {
-            score: 0,
-            isCorrect: false,
-            feedback: "No answer provided"
-          }
-        }), {}),
-        overall: {
-          score: 0,
-          feedback: "No answers were provided. Please attempt the questions to receive feedback.",
-          reviewTopics: ["All topics need to be reviewed"],
-          strengths: []
-        }
-      };
-    }
-
-    console.log('Preparing evaluation prompt...');
-    const prompt = `
-    You are an expert ${quiz.subject} teacher evaluating a student's quiz answers.
-    
-    Quiz Topic: ${quiz.topic}
-    Subject: ${quiz.subject}
-    Grade Level: ${quiz.grade}
-    
-    Review all answers together and evaluate them holistically. Consider:
-    1. Overall understanding of concepts
-    2. Consistency across answers
-    3. Use of proper terminology
-    4. Mathematical accuracy where applicable
-    5. Completeness of explanations
-    
-    Questions and Answers:
-    ${quiz.questions.map((q, i) => `
-    Question ${i + 1} (${q.id}): ${q.text}
-    Type: ${q.type}
-    Student's Answer: ${answers[q.id]?.text || 'No answer provided'}
-    Expected Answer: ${q.answer}
-    `).join('\n\n')}
-    
-    Provide a JSON response in this exact format:
-    {
-      "answers": {
-        "questionId": {
-          "score": number,
-          "isCorrect": boolean,
-          "feedback": "string"
-        }
-      },
-      "overall": {
-        "score": number,
-        "feedback": "string",
-        "reviewTopics": ["string"],
-        "strengths": ["string"]
-      }
-    }`;
-
-    console.log('Sending evaluation request...');
-    const response = await generateText(prompt, {
-      temperature: 0.3,
-      maxTokens: 2000,
-      responseFormat: "json"
-    });
-    console.log('Received evaluation response');
-
-    // Parse the response
-    let result;
-    try {
-      console.log('Parsing evaluation response...');
-      // Clean up the response
-      const cleanResponse = response.replace(/```json\n|\n```|```/g, '').trim();
-      result = JSON.parse(cleanResponse);
-      
-      // Validate the response structure
-      if (!result.answers || !result.overall) {
-        throw new Error("Invalid response structure");
-      }
-      console.log('Response parsed successfully');
-    } catch (error) {
-      console.error('Error parsing AI response:', error);
-      throw error;
-    }
-
-    // Create final results object
-    const quizResults = {
+    console.log('\nEvaluating quiz answers...');
+    const results: QuizResults = {
       id: `result-${Date.now()}`,
       quizId: quizId,
-      answers: result.answers,
-      overall: result.overall,
-      submittedAt: new Date().toISOString()
-    };
-
-    console.log('=== Answer Evaluation Complete ===\n');
-    return quizResults;
-
-  } catch (error: any) {
-    console.error('\n=== Answer Evaluation Failed ===');
-    console.error('Error details:', error);
-    
-    // Return a structured error response
-    return {
-      id: `result-${Date.now()}`,
-      quizId: quizId,
-      answers: quiz.questions.reduce((acc, q) => ({
-        ...acc,
-        [q.id]: {
-          score: 0,
-          isCorrect: false,
-          feedback: "Error evaluating answer"
-        }
-      }), {}),
+      answers: {},
       overall: {
         score: 0,
-        feedback: `Error evaluating answers: ${error.message || 'Unknown error'}. Please try again.`,
-        reviewTopics: ["Please review all topics"],
+        feedback: '',
+        reviewTopics: [],
         strengths: []
       },
       submittedAt: new Date().toISOString()
     };
+
+    // Evaluate each answer
+    for (const question of quiz.questions) {
+      const answer = answers[question.id];
+      
+      // Handle missing or empty answers
+      if (!answer || answer.trim() === '') {
+        results.answers[question.id] = {
+          isCorrect: false,
+          feedback: 'No answer provided',
+          score: 0,
+          userAnswer: ''
+        };
+        continue;
+      }
+
+      // Check answer based on type
+      if (question.type === 'multipleChoice') {
+        const isCorrect = answer === question.answer;
+        results.answers[question.id] = {
+          isCorrect,
+          feedback: isCorrect ? 'Correct!' : `Incorrect. The correct answer is: ${question.answer}`,
+          score: isCorrect ? 1 : 0,
+          userAnswer: answer
+        };
+      } else {
+        // For short answer questions, use AI evaluation
+        const evaluation = await checkAnswer(question.id, answer);
+        results.answers[question.id] = {
+          isCorrect: evaluation.isCorrect,
+          feedback: evaluation.feedback,
+          score: evaluation.score,
+          userAnswer: answer
+        };
+      }
+    }
+
+    // Calculate overall score
+    const totalQuestions = quiz.questions.length;
+    const totalScore = Object.values(results.answers).reduce((sum, answer) => sum + answer.score, 0);
+    results.overall.score = Math.round((totalScore / totalQuestions) * 100);
+
+    // Generate overall feedback
+    results.overall.feedback = generateOverallFeedback(results);
+    results.overall.reviewTopics = identifyReviewTopics(results, quiz);
+    results.overall.strengths = identifyStrengths(results, quiz);
+
+    console.log('Evaluation complete:', {
+      totalQuestions,
+      totalScore,
+      overallScore: results.overall.score
+    });
+
+    return results;
+  } catch (error) {
+    console.error('Error evaluating answers:', error);
+    throw error;
   }
+}
+
+function generateOverallFeedback(results: QuizResults): string {
+  const score = results.overall.score;
+  if (score >= 90) return 'Excellent work! You have a strong understanding of the material.';
+  if (score >= 70) return 'Good job! You have a solid grasp of most concepts.';
+  if (score >= 50) return 'You have a basic understanding, but there are areas for improvement.';
+  return 'You may want to review the material and try again.';
+}
+
+function identifyReviewTopics(results: QuizResults, quiz: QuizData): string[] {
+  const reviewTopics: string[] = [];
+  for (const [questionId, answer] of Object.entries(results.answers)) {
+    if (!answer.isCorrect) {
+      const question = quiz.questions.find(q => q.id === questionId);
+      if (question) {
+        reviewTopics.push(question.text || 'General concepts');
+      }
+    }
+  }
+  return [...new Set(reviewTopics)]; // Remove duplicates
+}
+
+function identifyStrengths(results: QuizResults, quiz: QuizData): string[] {
+  const strengths: string[] = [];
+  for (const [questionId, answer] of Object.entries(results.answers)) {
+    if (answer.isCorrect) {
+      const question = quiz.questions.find(q => q.id === questionId);
+      if (question) {
+        strengths.push(question.text || 'General concepts');
+      }
+    }
+  }
+  return [...new Set(strengths)]; // Remove duplicates
 }
 
 /**
  * Submits quiz answers and generates results
  */
-export async function submitQuizAnswers(quizId: string, answers: Record<string, any>) {
+export async function submitQuizAnswers(quizId: string, answers: { [key: string]: string }): Promise<QuizResults> {
   try {
-    console.log('\n=== Starting Quiz Submission ===');
-    console.log('Quiz ID:', quizId);
-    console.log('Answers received:', JSON.stringify(answers, null, 2));
-    
-    // Get quiz data
-    console.log('\nFetching quiz data...');
     const quiz = quizStore[quizId];
     if (!quiz) {
-      console.error('Quiz not found in store for ID:', quizId);
-      console.log('Available quiz IDs:', Object.keys(quizStore));
-      throw new Error('Quiz not found');
+      throw new Error("Quiz not found");
     }
-    console.log('Quiz found:', {
-      title: quiz.title,
-      totalQuestions: quiz.questions.length,
-      questionsReceived: Object.keys(answers).length
-    });
 
     // Validate answers format
     console.log('\nValidating answers...');
@@ -858,13 +875,17 @@ export async function submitQuizAnswers(quizId: string, answers: Record<string, 
       throw new Error('Invalid answers format');
     }
 
-    // Check if we have answers for each question
+    // Fill in missing answers with empty strings and log them
     const missingAnswers = quiz.questions
       .filter(q => !answers[q.id])
       .map(q => q.id);
     
     if (missingAnswers.length > 0) {
       console.warn('Missing answers for questions:', missingAnswers);
+      // Fill in missing answers with empty strings
+      missingAnswers.forEach(questionId => {
+        answers[questionId] = "";
+      });
     }
 
     console.log('\nStarting answer evaluation...');
@@ -876,32 +897,14 @@ export async function submitQuizAnswers(quizId: string, answers: Record<string, 
       answersEvaluated: Object.keys(results.answers).length
     });
 
-    // Store results in quiz
-    console.log('\nStoring results...');
+    // Save the results
     quiz.results = results;
     saveQuizData();
-    console.log('Results stored successfully');
 
-    console.log('=== Quiz Submission Complete ===\n');
     return results;
-
   } catch (error: any) {
-    console.error('\n=== Quiz Submission Failed ===');
-    console.error('Error details:', error);
-    
-    // Return a structured error response that matches QuizResults interface
-    return {
-      id: `result-${Date.now()}`,
-      quizId: quizId,
-      answers: {},
-      overall: {
-        score: 0,
-        feedback: `There was an error submitting your quiz: ${error.message || 'Unknown error'}. Please try again.`,
-        reviewTopics: ["Error occurred during submission"],
-        strengths: []
-      },
-      submittedAt: new Date().toISOString()
-    };
+    console.error("Error submitting quiz answers:", error);
+    throw new Error(`Failed to submit quiz answers: ${error.message}`);
   }
 }
 
@@ -910,24 +913,41 @@ export async function submitQuizAnswers(quizId: string, answers: Record<string, 
  * @param resultId Result ID
  * @returns The quiz result data
  */
-export async function getQuizResults(resultId: string) {
-  try {
-    // Mock implementation for development
-    console.log("Mock getting quiz results for ID:", resultId);
-    return {
-      id: resultId,
-      quizId: "mock-quiz-id",
-      title: "Mock Quiz",
-      subject: "Mathematics",
-      grade: "11",
-      score: 8,
-      totalQuestions: 10,
-      questions: [],
-    };
-  } catch (error: any) {
-    console.error("Error getting quiz results:", error);
-    throw new Error(`Failed to get quiz results: ${error.message}`);
+export async function getQuizResults(resultId: string): Promise<QuizResult> {
+  const quiz = quizStore[resultId];
+  if (!quiz || !quiz.results) {
+    throw new Error("Quiz results not found");
   }
+
+  const questions = quiz.questions.map(q => ({
+    id: q.id,
+    text: q.text,
+    type: (q.type === "multipleChoice" ? "multipleChoice" : 
+           q.category === "Knowledge" ? "knowledge" :
+           q.category === "Thinking" ? "thinking" :
+           q.category === "Application" ? "application" :
+           "communication") as QuizQuestionType["type"],
+    options: q.options,
+    correctAnswer: q.answer,
+    userAnswer: quiz.results?.answers[q.id]?.userAnswer || "",
+    isCorrect: quiz.results?.answers[q.id]?.isCorrect || false,
+    explanation: q.explanation || ""
+  }));
+
+  return {
+    id: quiz.results.id,
+    quizId: resultId,
+    title: quiz.title,
+    subject: quiz.subject,
+    grade: quiz.grade,
+    score: quiz.results.overall.score,
+    totalQuestions: quiz.totalQuestions,
+    questions: questions,
+    feedback: quiz.results.overall.feedback,
+    strengths: quiz.results.overall.strengths,
+    areasForImprovement: quiz.results.overall.reviewTopics,
+    createdAt: new Date(quiz.createdAt).toISOString()
+  };
 }
 
 /**
@@ -940,5 +960,108 @@ export async function getPastQuizzes() {
   } catch (error: any) {
     console.error("Error getting past quizzes:", error);
     throw new Error(`Failed to get past quizzes: ${error.message}`);
+  }
+}
+
+async function checkAnswer(questionId: string, answer: string): Promise<{ isCorrect: boolean; feedback: string; score: number }> {
+  try {
+    console.log(`Checking answer for question ${questionId}...`);
+    
+    // Get the question data
+    const quiz = await getQuiz(questionId.split('-')[0]); // Extract quizId from questionId
+    const question = quiz.questions.find(q => q.id === questionId);
+    
+    if (!question) {
+      throw new Error(`Question ${questionId} not found`);
+    }
+
+    // Construct prompt for AI evaluation
+    const prompt = `
+    You are an expert ${quiz.subject} teacher evaluating a student's answer.
+    
+    Question: ${question.text}
+    Expected Answer: ${question.answer}
+    Student's Answer: ${answer}
+    
+    Evaluate the answer and provide a JSON response in this format:
+    {
+      "isCorrect": boolean,
+      "feedback": "string explaining why the answer is correct or incorrect",
+      "score": number between 0 and 1
+    }`;
+
+    // Get AI evaluation
+    const response = await generateText(prompt, {
+      temperature: 0.3,
+      maxTokens: 500,
+      responseFormat: "json"
+    });
+
+    // Parse the response
+    const cleanResponse = response.replace(/```json\n|\n```|```/g, '').trim();
+    const evaluation = JSON.parse(cleanResponse);
+
+    // Validate the response
+    if (typeof evaluation.isCorrect !== 'boolean' || 
+        typeof evaluation.feedback !== 'string' || 
+        typeof evaluation.score !== 'number') {
+      throw new Error('Invalid evaluation response format');
+    }
+
+    return evaluation;
+  } catch (error) {
+    console.error('Error checking answer:', error);
+    // Return a default evaluation in case of error
+    return {
+      isCorrect: false,
+      feedback: 'Error evaluating answer. Please try again.',
+      score: 0
+    };
+  }
+}
+
+export async function checkAnswerAction(questionId: string, studentAnswer: string, correctAnswer: string, questionType: string) {
+  try {
+    console.log(`Checking answer for question ${questionId}...`);
+    
+    if (questionType === 'multipleChoice') {
+      const isCorrect = studentAnswer === correctAnswer;
+      return {
+        score: isCorrect ? 1 : 0,
+        correct: isCorrect,
+        feedback: isCorrect ? 'Correct!' : 'Incorrect. Try again!'
+      };
+    } else {
+      // For short answer questions, use AI evaluation
+      const prompt = `
+      You are an expert teacher evaluating a student's answer.
+      
+      Question: ${questionId}
+      Expected Answer: ${correctAnswer}
+      Student's Answer: ${studentAnswer}
+      
+      Evaluate the answer and provide a JSON response in this format:
+      {
+        "score": number between 0 and 1,
+        "correct": boolean,
+        "feedback": "string explaining why the answer is correct or incorrect"
+      }`;
+
+      const response = await generateText(prompt, {
+        temperature: 0.3,
+        maxTokens: 500,
+        responseFormat: "json"
+      });
+
+      const cleanResponse = response.replace(/```json\n|\n```|```/g, '').trim();
+      return JSON.parse(cleanResponse);
+    }
+  } catch (error) {
+    console.error('Error checking answer:', error);
+    return {
+      score: 0,
+      correct: false,
+      feedback: 'Error evaluating answer. Please try again.'
+    };
   }
 }

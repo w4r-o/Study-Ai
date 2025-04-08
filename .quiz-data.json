@@ -1,9 +1,9 @@
 {
   "quizzes": {
-    "quiz-1743827791093": {
-      "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
+    "quiz-1744130425175": {
+      "title": "Grade 11 Physical Therapy - Neuromuscular Conditions Quiz",
       "subject": "Healthcare",
-      "grade": "10",
+      "grade": "11",
       "topic": "Physical Therapy - Neuromuscular Conditions",
       "questions": [
         {
@@ -13,7 +13,7 @@
           "text": "Which of the following is a common neuromuscular condition where physical therapists play an essential role?",
           "options": [
             "A) Multiple Sclerosis (MS)",
-            "B) Type 2 Diabetes",
+            "B) Diabetes Mellitus",
             "C) Hypertension",
             "D) Asthma"
           ],
@@ -22,81 +22,1919 @@
         },
         {
           "id": "2",
-          "type": "shortAnswer",
+          "type": "knowledge",
           "category": "Knowledge",
-          "text": "Define the term 'Spasticity' as it relates to neuromuscular conditions.",
-          "answer": "Spasticity is a condition characterized by stiff or rigid muscles and an inability to control those muscles, often due to damage to the nerve pathways in the brain or spinal cord.",
-          "rubric": "1 point for defining spasticity, 1 point for mentioning its relation to nerve pathway damage.",
-          "explanation": "Spasticity is a common symptom in neuromuscular conditions like Multiple Sclerosis or Spinal Cord Injury, where the muscles become overly active and stiff due to disrupted signals from the nervous system."
+          "text": "Define the term 'Spasticity' in the context of neuromuscular conditions.",
+          "answer": "Spasticity is a condition characterized by abnormal muscle tightness and stiffness due to prolonged muscle contraction, often seen in neuromuscular disorders like stroke or spinal cord injuries.",
+          "explanation": "Spasticity results from damage to the motor pathways in the central nervous system, leading to hyperexcitability of the stretch reflexes and involuntary muscle contractions."
         },
         {
           "id": "3",
-          "type": "shortAnswer",
-          "category": "Knowledge",
-          "text": "What is the primary role of a physical therapist in managing patients with neuromuscular disorders?",
-          "answer": "The primary role is to help patients improve mobility, manage symptoms, and enhance quality of life through exercises, stretches, and other therapeutic interventions.",
-          "rubric": "1 point for mentioning mobility improvement, 1 point for symptom management, and 1 point for therapeutic interventions.",
-          "explanation": "Physical therapists work with patients to develop personalized treatment plans that address their specific neuromuscular challenges, focusing on functional independence and pain reduction."
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Explain how the Brunnstrom Approach is used in physical therapy for stroke patients.",
+          "answer": "The Brunnstrom Approach is a therapeutic method that leverages synergistic movement patterns to help stroke patients regain motor control. It involves guiding patients through stages of recovery, from flaccidity to voluntary movement, by using reflexes and synergies.",
+          "explanation": "This approach recognizes that stroke patients often progress through predictable stages of motor recovery and uses these stages to tailor therapy, encouraging the use of reflexive movements before advancing to voluntary control."
         },
         {
           "id": "4",
-          "type": "shortAnswer",
+          "type": "thinking",
           "category": "Thinking",
-          "text": "Compare and contrast the roles of a physical therapist in treating a patient with Parkinson's Disease versus a patient with a Spinal Cord Injury.",
-          "answer": "For Parkinson's Disease, the therapist focuses on improving balance, coordination, and reducing bradykinesia. For Spinal Cord Injury, the focus is on regaining motor control, strength, and possibly learning to use assistive devices. Both aim to improve quality of life but address different symptoms.",
-          "rubric": "1 point for each condition's focus (balance/coordination vs. motor control/strength), 1 point for mentioning quality of life, and 1 point for contrasting the approaches.",
-          "explanation": "Parkinson's Disease and Spinal Cord Injury require different therapeutic approaches due to their distinct symptoms and progression, but both benefit from physical therapy to enhance functional abilities."
+          "text": "Compare and contrast hypertonia and hypotonia in neuromuscular conditions.",
+          "answer": "Hypertonia is characterized by increased muscle tone and stiffness, often seen in conditions like cerebral palsy or stroke. Hypotonia, on the other hand, involves decreased muscle tone and floppiness, commonly observed in disorders like Down syndrome or muscular dystrophy.",
+          "explanation": "Hypertonia results from overactive muscle contractions due to CNS damage, while hypotonia arises from underactive muscle responses, often due to peripheral nerve or muscle dysfunction."
         },
         {
           "id": "5",
-          "type": "shortAnswer",
+          "type": "application",
           "category": "Application",
-          "text": "A patient with ALS (Amyotrophic Lateral Sclerosis) is experiencing muscle weakness. Describe two physical therapy interventions that could help this patient.",
-          "answer": "1) Gentle range-of-motion exercises to maintain joint flexibility. 2) Strength training with light resistance to slow muscle atrophy.",
-          "rubric": "1 point for each valid intervention (e.g., range-of-motion exercises, strength training).",
-          "explanation": "ALS leads to progressive muscle weakness, so physical therapy aims to preserve function and delay complications through tailored exercises."
+          "text": "A patient with Parkinson's disease is experiencing bradykinesia. Describe two physical therapy interventions that could help improve their movement.",
+          "answer": "1. Locomotor training: Using treadmill exercises with body-weight support to encourage rhythmic stepping and improve gait. 2. Cueing strategies: Using visual or auditory cues (e.g., lines on the floor or metronome beats) to help initiate and maintain movement.",
+          "explanation": "These interventions address the slow movement (bradykinesia) characteristic of Parkinson's by providing external stimuli to overcome motor planning deficits and promote fluid motion."
         },
         {
           "id": "6",
-          "type": "shortAnswer",
+          "type": "application",
           "category": "Application",
-          "text": "How might Constraint-Induced Movement Therapy (CIMT) benefit a stroke patient with hemiparesis?",
-          "answer": "CIMT encourages the use of the affected limb by restraining the unaffected limb, promoting neuroplasticity and improving motor function.",
-          "rubric": "1 point for mentioning restraint of the unaffected limb, 1 point for promoting neuroplasticity, and 1 point for improving motor function.",
-          "explanation": "CIMT leverages the brain's ability to rewire itself, helping stroke patients regain movement in affected limbs through repetitive practice."
+          "text": "How might constraint-induced movement therapy (CIMT) benefit a patient recovering from a stroke that affected their dominant arm?",
+          "answer": "CIMT would involve restraining the unaffected arm, forcing the patient to use the affected arm for daily tasks. This promotes neuroplasticity and functional recovery by intensively training the impaired limb.",
+          "explanation": "CIMT works by overcoming 'learned non-use' of the affected limb and encouraging the brain to rewire itself through repetitive, task-specific practice."
         },
         {
           "id": "7",
-          "type": "shortAnswer",
+          "type": "communication",
           "category": "Communication",
-          "text": "Explain why neuroplasticity is important in physical therapy for neuromuscular conditions.",
-          "answer": "Neuroplasticity allows the brain to adapt and form new neural connections, enabling patients to regain lost functions or compensate for impairments through therapy.",
-          "rubric": "1 point for defining neuroplasticity, 1 point for linking it to functional recovery, and 1 point for mentioning compensation.",
-          "explanation": "Neuroplasticity is the foundation of rehabilitation, as it enables the nervous system to recover or adapt after injury, making therapy effective."
+          "text": "Justify why a physical therapist might use proprioceptive neuromuscular facilitation (PNF) techniques for a patient with spinal cord injury.",
+          "answer": "PNF techniques are used to enhance strength, flexibility, and coordination by stimulating proprioceptors in muscles and joints. For spinal cord injury patients, PNF can help retrain neural pathways and improve functional movements like rolling or sitting.",
+          "explanation": "PNF leverages the body's natural reflexes and patterns of movement to maximize recovery, making it particularly effective for patients with neurological damage."
         },
         {
           "id": "8",
-          "type": "shortAnswer",
+          "type": "communication",
           "category": "Communication",
-          "text": "Justify the use of the Brunnstrom Approach in stroke rehabilitation.",
-          "answer": "The Brunnstrom Approach leverages synergistic movement patterns and spasticity to facilitate recovery, aligning with the natural progression of stroke recovery stages.",
-          "rubric": "1 point for mentioning synergistic movements, 1 point for using spasticity, and 1 point for aligning with recovery stages.",
-          "explanation": "This approach recognizes that patients often progress through predictable stages post-stroke, and therapy should adapt to these stages to maximize recovery."
+          "text": "Describe the role of neuroplasticity in the recovery of a patient with a neuromuscular condition like ALS.",
+          "answer": "Neuroplasticity allows the brain to reorganize itself by forming new neural connections. In ALS, physical therapy can harness neuroplasticity to compensate for motor neuron loss by training alternative pathways to maintain function for as long as possible.",
+          "explanation": "Although ALS is progressive, targeted exercises can optimize remaining neural capacity by reinforcing adaptive movements and delaying functional decline."
         }
       ],
-      "createdAt": 1743827791093,
+      "createdAt": 1744130425175,
       "totalQuestions": 8
-    }
-  },
-  "pastQuizzes": [
-    {
-      "id": "quiz-1743827791093",
+    },
+    "quiz-1744131485642": {
       "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
       "subject": "Healthcare",
       "grade": "10",
       "topic": "Physical Therapy - Neuromuscular Conditions",
-      "createdAt": "2025-04-05T04:36:31.094Z",
+      "questions": [
+        {
+          "id": "1",
+          "text": "What is the primary role of a physical therapist in managing patients with neuromuscular disorders?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) To prescribe medication",
+            "B) To improve motor function and mobility",
+            "C) To perform surgical interventions",
+            "D) To diagnose neurological conditions"
+          ],
+          "answer": "B) To improve motor function and mobility",
+          "explanation": "Physical therapists focus on enhancing motor function, mobility, and quality of life through therapeutic exercises and interventions, rather than prescribing medication or performing surgeries."
+        },
+        {
+          "id": "2",
+          "text": "Which of the following is a common neuromuscular condition treated by physical therapists?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Diabetes",
+            "B) Multiple Sclerosis (MS)",
+            "C) Hypertension",
+            "D) Asthma"
+          ],
+          "answer": "B) Multiple Sclerosis (MS)",
+          "explanation": "Multiple Sclerosis (MS) is a neuromuscular disorder that affects the central nervous system, and physical therapists play a key role in managing symptoms like muscle weakness and spasticity."
+        },
+        {
+          "id": "3",
+          "text": "What does the term 'spasticity' refer to in neuromuscular conditions?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Loss of muscle tone",
+            "B) Increased muscle stiffness and involuntary spasms",
+            "C) Complete paralysis of muscles",
+            "D) Abnormal nerve conduction"
+          ],
+          "answer": "B) Increased muscle stiffness and involuntary spasms",
+          "explanation": "Spasticity is a condition characterized by tight or stiff muscles and involuntary muscle spasms, often seen in neuromuscular disorders like cerebral palsy or spinal cord injuries."
+        },
+        {
+          "id": "4",
+          "text": "Which therapy approach focuses on using sensory stimuli to promote motor recovery?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Constraint-Induced Movement Therapy",
+            "B) Proprioceptive Neuromuscular Facilitation",
+            "C) Brunnstrom Approach",
+            "D) Locomotor Training"
+          ],
+          "answer": "B) Proprioceptive Neuromuscular Facilitation",
+          "explanation": "Proprioceptive Neuromuscular Facilitation (PNF) uses sensory stimuli like stretching and resistance to improve motor function and coordination."
+        },
+        {
+          "id": "5",
+          "text": "What is 'bradykinesia' a symptom of?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Stroke",
+            "B) Parkinson’s Disease",
+            "C) Amyotrophic Lateral Sclerosis (ALS)",
+            "D) Multiple Sclerosis (MS)"
+          ],
+          "answer": "B) Parkinson’s Disease",
+          "explanation": "Bradykinesia, or slowness of movement, is a hallmark symptom of Parkinson’s Disease, a progressive neuromuscular disorder."
+        },
+        {
+          "id": "6",
+          "text": "Define 'neuroplasticity' in the context of neuromuscular rehabilitation.",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "options": [],
+          "answer": "Neuroplasticity is the brain's ability to reorganize itself by forming new neural connections, allowing for recovery of function after injury or in response to therapy.",
+          "explanation": "Neuroplasticity is crucial in rehabilitation as it enables the brain to adapt and compensate for damage, facilitating recovery in patients with neuromuscular conditions."
+        },
+        {
+          "id": "7",
+          "text": "A patient with a spinal cord injury has limited mobility in their lower limbs. Describe two physical therapy interventions that could help improve their condition.",
+          "type": "thinking",
+          "category": "Thinking",
+          "options": [],
+          "answer": "1) Locomotor Training: Uses treadmill exercises with body-weight support to retrain walking patterns. 2) Strength Training: Focuses on improving muscle strength in unaffected areas to compensate for lost function.",
+          "explanation": "These interventions aim to enhance mobility and independence by leveraging the patient's remaining abilities and promoting neuroplasticity."
+        },
+        {
+          "id": "8",
+          "text": "A stroke patient has difficulty with balance and coordination. How might a physical therapist design a real-world activity to address these issues?",
+          "type": "application",
+          "category": "Application",
+          "options": [],
+          "answer": "The therapist could design a task like standing on one leg while reaching for objects on a shelf, which mimics daily activities and improves balance and coordination.",
+          "explanation": "This activity combines functional movement with balance challenges, helping the patient regain skills needed for everyday life."
+        },
+        {
+          "id": "9",
+          "text": "Explain why Constraint-Induced Movement Therapy (CIMT) is effective for stroke patients with unilateral weakness.",
+          "type": "communication",
+          "category": "Communication",
+          "options": [],
+          "answer": "CIMT is effective because it forces the use of the affected limb by restraining the unaffected one, promoting neuroplasticity and functional recovery through intensive practice.",
+          "explanation": "By limiting the use of the stronger limb, CIMT encourages the brain to rewire and improve control over the weakened limb, leading to better long-term outcomes."
+        }
+      ],
+      "createdAt": 1744131485642,
+      "totalQuestions": 9,
+      "results": {
+        "id": "result-1744131558985",
+        "quizId": "quiz-1744131485642",
+        "answers": {
+          "1": {
+            "isCorrect": true,
+            "feedback": "Correct!",
+            "score": 1,
+            "userAnswer": "B) To improve motor function and mobility"
+          },
+          "2": {
+            "isCorrect": true,
+            "feedback": "Correct!",
+            "score": 1,
+            "userAnswer": "B) Multiple Sclerosis (MS)"
+          },
+          "3": {
+            "isCorrect": true,
+            "feedback": "Correct!",
+            "score": 1,
+            "userAnswer": "B) Increased muscle stiffness and involuntary spasms"
+          },
+          "4": {
+            "isCorrect": false,
+            "feedback": "Incorrect. The correct answer is: B) Proprioceptive Neuromuscular Facilitation",
+            "score": 0,
+            "userAnswer": "D) Locomotor Training"
+          },
+          "5": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "6": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "7": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "8": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "9": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          }
+        },
+        "overall": {
+          "score": 33,
+          "feedback": "You may want to review the material and try again.",
+          "reviewTopics": [
+            "Which therapy approach focuses on using sensory stimuli to promote motor recovery?",
+            "What is 'bradykinesia' a symptom of?",
+            "Define 'neuroplasticity' in the context of neuromuscular rehabilitation.",
+            "A patient with a spinal cord injury has limited mobility in their lower limbs. Describe two physical therapy interventions that could help improve their condition.",
+            "A stroke patient has difficulty with balance and coordination. How might a physical therapist design a real-world activity to address these issues?",
+            "Explain why Constraint-Induced Movement Therapy (CIMT) is effective for stroke patients with unilateral weakness."
+          ],
+          "strengths": [
+            "What is the primary role of a physical therapist in managing patients with neuromuscular disorders?",
+            "Which of the following is a common neuromuscular condition treated by physical therapists?",
+            "What does the term 'spasticity' refer to in neuromuscular conditions?"
+          ]
+        },
+        "submittedAt": "2025-04-08T16:59:18.985Z"
+      }
+    },
+    "quiz-1744131828922": {
+      "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "10",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the primary role of a physical therapist in managing patients with neuromuscular disorders?",
+          "options": [
+            "A) To prescribe medication",
+            "B) To improve motor function and mobility",
+            "C) To perform surgical procedures",
+            "D) To diagnose neurological conditions"
+          ],
+          "answer": "B) To improve motor function and mobility",
+          "explanation": "Physical therapists focus on enhancing motor function, mobility, and quality of life through therapeutic exercises and interventions, rather than prescribing medication or performing surgeries."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is a common neuromuscular condition treated by physical therapists?",
+          "options": [
+            "A) Diabetes",
+            "B) Multiple Sclerosis (MS)",
+            "C) Hypertension",
+            "D) Asthma"
+          ],
+          "answer": "B) Multiple Sclerosis (MS)",
+          "explanation": "Multiple Sclerosis is a neuromuscular disorder that affects the central nervous system, and physical therapists play a key role in managing symptoms like muscle weakness and spasticity."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What does the term 'spasticity' refer to in neuromuscular conditions?",
+          "options": [
+            "A) Loss of muscle tone",
+            "B) Increased muscle stiffness and involuntary contractions",
+            "C) Complete paralysis of muscles",
+            "D) Abnormal sensation in the limbs"
+          ],
+          "answer": "B) Increased muscle stiffness and involuntary contractions",
+          "explanation": "Spasticity is a condition characterized by tight or stiff muscles and an inability to control those muscles, often seen in conditions like cerebral palsy or after a stroke."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which therapy approach focuses on using sensory cues to improve motor function?",
+          "options": [
+            "A) Constraint-Induced Movement Therapy",
+            "B) Proprioceptive Neuromuscular Facilitation",
+            "C) Locomotor Training",
+            "D) Brunnstrom Approach"
+          ],
+          "answer": "B) Proprioceptive Neuromuscular Facilitation",
+          "explanation": "Proprioceptive Neuromuscular Facilitation (PNF) uses sensory cues like stretching and resistance to enhance motor learning and functional movement."
+        },
+        {
+          "id": "5",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is 'neuroplasticity' in the context of neuromuscular rehabilitation?",
+          "options": [
+            "A) The hardening of neural tissues",
+            "B) The brain's ability to reorganize and form new neural connections",
+            "C) The degeneration of motor neurons",
+            "D) The surgical repair of nerves"
+          ],
+          "answer": "B) The brain's ability to reorganize and form new neural connections",
+          "explanation": "Neuroplasticity refers to the brain's capacity to adapt and rewire itself, which is crucial for recovery in neuromuscular conditions through therapies like motor learning exercises."
+        },
+        {
+          "id": "6",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define 'bradykinesia' and name a condition where it is commonly observed.",
+          "answer": "Bradykinesia refers to slowness of movement. It is commonly observed in Parkinson's Disease.",
+          "explanation": "Bradykinesia is a hallmark symptom of Parkinson's Disease, caused by the degeneration of dopamine-producing neurons in the brain."
+        },
+        {
+          "id": "7",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the purpose of electromyography (EMG) in diagnosing neuromuscular conditions?",
+          "answer": "EMG measures the electrical activity of muscles to assess nerve and muscle function.",
+          "explanation": "EMG helps diagnose conditions like ALS or carpal tunnel syndrome by detecting abnormal electrical patterns in muscles or nerves."
+        },
+        {
+          "id": "8",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "List two key goals of physical therapy for a patient with spinal cord injury.",
+          "answer": "1) Improve mobility and independence. 2) Prevent secondary complications like muscle atrophy or pressure sores.",
+          "explanation": "Physical therapy post-spinal cord injury focuses on functional recovery and minimizing long-term disabilities."
+        },
+        {
+          "id": "9",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Compare the Brunnstrom Approach and Constraint-Induced Movement Therapy in stroke rehabilitation.",
+          "answer": "The Brunnstrom Approach uses synergistic movement patterns to regain function, while Constraint-Induced Movement Therapy restricts the unaffected limb to force use of the affected limb.",
+          "explanation": "Brunnstrom leverages natural movement synergies, whereas CIMT promotes neuroplasticity by intensive practice of the impaired limb."
+        },
+        {
+          "id": "10",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Explain how locomotor training benefits a patient with multiple sclerosis.",
+          "answer": "Locomotor training improves gait and balance by repetitive practice of walking, often with body-weight support, to reinforce neural pathways.",
+          "explanation": "This therapy counters MS-related mobility deficits by stimulating motor learning and neuroplasticity."
+        },
+        {
+          "id": "11",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Why might a physical therapist use proprioceptive neuromuscular facilitation (PNF) for a patient with hypotonia?",
+          "answer": "PNF enhances muscle tone and coordination through resistance and stretching, which is beneficial for hypotonia (low muscle tone).",
+          "explanation": "PNF techniques stimulate sensory receptors to improve muscle response and functional movement in hypotonic patients."
+        },
+        {
+          "id": "12",
+          "type": "application",
+          "category": "Application",
+          "text": "A patient with Parkinson's Disease has rigidity and balance issues. Propose two physical therapy interventions to address these problems.",
+          "answer": "1) Rhythmic auditory cues (e.g., music or metronome) to improve gait. 2) Balance training exercises like weight-shifting activities.",
+          "explanation": "Auditory cues help overcome bradykinesia, while balance exercises reduce fall risk by strengthening postural control."
+        },
+        {
+          "id": "13",
+          "type": "application",
+          "category": "Application",
+          "text": "Describe how a physical therapist would modify treatment for a stroke patient with spasticity versus one with flaccid paralysis.",
+          "answer": "For spasticity: Use stretching and splinting to reduce stiffness. For flaccid paralysis: Focus on electrical stimulation and passive range-of-motion exercises to prevent atrophy.",
+          "explanation": "Interventions are tailored to the specific motor impairment—spasticity requires tone reduction, while flaccidity needs muscle activation."
+        },
+        {
+          "id": "14",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Justify the importance of patient education in managing a chronic neuromuscular condition like ALS.",
+          "answer": "Education empowers patients to understand disease progression, use adaptive equipment, and perform home exercises, improving quality of life and independence.",
+          "explanation": "Knowledgeable patients can better participate in their care, slowing functional decline and reducing caregiver burden."
+        },
+        {
+          "id": "15",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why a multidisciplinary team is essential for treating spinal cord injuries.",
+          "answer": "A team (e.g., PTs, OTs, psychologists) addresses diverse needs—physical rehab, emotional support, and daily living skills—for holistic recovery.",
+          "explanation": "Spinal cord injuries impact multiple systems, requiring coordinated care to optimize outcomes."
+        }
+      ],
+      "createdAt": 1744131828922,
+      "totalQuestions": 15
+    },
+    "quiz-1744131934440": {
+      "title": "Grade 10 Exponential Functions - Exponential Growth And Decay Problems Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Exponential Functions - Exponential Growth And Decay Problems",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following represents an exponential decay function?",
+          "options": [
+            "A) f(x) = 100(1.05)^x",
+            "B) f(x) = 200(0.95)^x",
+            "C) f(x) = 50(1.10)^x",
+            "D) f(x) = 300(1.02)^x"
+          ],
+          "answer": "B) f(x) = 200(0.95)^x",
+          "explanation": "An exponential decay function has a base (b) between 0 and 1. Here, 0.95 is less than 1, indicating decay."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "A bacteria culture doubles every 3 hours. If the initial population is 500, what is the population after 9 hours?",
+          "options": [
+            "A) 1000",
+            "B) 2000",
+            "C) 4000",
+            "D) 8000"
+          ],
+          "answer": "C) 4000",
+          "explanation": "The population doubles every 3 hours. After 9 hours (3 intervals), the population is 500 * 2^3 = 4000."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the initial value (a) in the exponential function f(x) = 250(1.08)^x?",
+          "options": [
+            "A) 250",
+            "B) 1.08",
+            "C) 0.08",
+            "D) x"
+          ],
+          "answer": "A) 250",
+          "explanation": "In the general form f(x) = a(b)^x, 'a' represents the initial value, which is 250 in this case."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "If a car depreciates by 20% per year, what is the decay rate (b) in the exponential function?",
+          "options": [
+            "A) 0.20",
+            "B) 0.80",
+            "C) 1.20",
+            "D) 0.02"
+          ],
+          "answer": "B) 0.80",
+          "explanation": "For decay, b = 1 - r, where r is the decay rate. Here, r = 0.20, so b = 1 - 0.20 = 0.80."
+        },
+        {
+          "id": "5",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which scenario is best modeled by an exponential growth function?",
+          "options": [
+            "A) A car losing value over time",
+            "B) A radioactive substance decaying",
+            "C) A bank account earning compound interest",
+            "D) A cup of coffee cooling down"
+          ],
+          "answer": "C) A bank account earning compound interest",
+          "explanation": "Compound interest grows at a rate proportional to the current amount, which is characteristic of exponential growth."
+        },
+        {
+          "id": "6",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define the term 'exponential decay'.",
+          "answer": "Exponential decay refers to a process where a quantity decreases at a rate proportional to its current value, modeled by a function of the form f(x) = a(b)^x, where 0 < b < 1.",
+          "explanation": "Exponential decay describes situations where the quantity reduces over time by a consistent percentage rate."
+        },
+        {
+          "id": "7",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Write the general form of an exponential growth function.",
+          "answer": "The general form is f(x) = a(b)^x, where a > 0, b > 1, and r is the growth rate per period (b = 1 + r).",
+          "explanation": "This form represents situations where the quantity grows by a fixed percentage over equal intervals."
+        },
+        {
+          "id": "8",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What does the variable 'x' represent in the exponential function f(x) = a(b)^x?",
+          "answer": "The variable 'x' represents the number of time periods.",
+          "explanation": "In exponential functions, 'x' is typically the independent variable indicating the number of growth or decay periods."
+        },
+        {
+          "id": "9",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A town's population of 10,000 grows by 3% annually. Write the function that models this growth and find the population after 5 years.",
+          "answer": "The function is f(x) = 10000(1.03)^x. After 5 years, the population is approximately 11,593.",
+          "explanation": "1. Calculate growth rate: b = 1 + 0.03 = 1.03. 2. Plug into formula: f(5) = 10000(1.03)^5 ≈ 11593."
+        },
+        {
+          "id": "10",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A medication in the bloodstream decays by 25% every hour. If the initial dose is 200 mg, how much remains after 4 hours?",
+          "answer": "Approximately 63.28 mg remains after 4 hours.",
+          "explanation": "1. Decay rate: b = 1 - 0.25 = 0.75. 2. Function: f(x) = 200(0.75)^x. 3. f(4) = 200(0.75)^4 ≈ 63.28 mg."
+        },
+        {
+          "id": "11",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "An investment doubles every 8 years. If you invest $5,000 today, what will it be worth in 24 years?",
+          "answer": "The investment will be worth $40,000 in 24 years.",
+          "explanation": "1. Doubling period is 8 years. 2. Number of periods in 24 years: 24/8 = 3. 3. Final amount: 5000 * 2^3 = 40000."
+        },
+        {
+          "id": "12",
+          "type": "application",
+          "category": "Application",
+          "text": "A scientist observes that a bacteria culture grows from 1,000 to 4,000 in 2 hours. Assuming exponential growth, what is the hourly growth rate?",
+          "answer": "The hourly growth rate is 100% (or b = 2).",
+          "explanation": "1. Use the formula 4000 = 1000(b)^2. 2. Solve for b: b^2 = 4 → b = 2. 3. Growth rate r = b - 1 = 1 (100%)."
+        },
+        {
+          "id": "13",
+          "type": "application",
+          "category": "Application",
+          "text": "A car worth $30,000 depreciates by 12% each year. When will its value drop below $10,000?",
+          "answer": "It will drop below $10,000 after approximately 9.6 years.",
+          "explanation": "1. Decay rate: b = 1 - 0.12 = 0.88. 2. Solve 10000 = 30000(0.88)^x for x. 3. x ≈ log(1/3)/log(0.88) ≈ 9.6 years."
+        },
+        {
+          "id": "14",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why compound interest is an example of exponential growth.",
+          "answer": "Compound interest is exponential growth because the interest earned each period is added to the principal, causing the investment to grow by a fixed percentage of the current amount, not just the original amount.",
+          "explanation": "This creates a snowball effect where the growth rate is applied to an increasingly larger base, characteristic of exponential functions."
+        },
+        {
+          "id": "15",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe how you would determine the half-life of a radioactive substance given its decay function.",
+          "answer": "To find the half-life, set the decay function equal to half the initial amount and solve for the time variable. For f(x) = a(b)^x, solve 0.5a = a(b)^x for x, which gives the half-life.",
+          "explanation": "The half-life is the time it takes for the substance to reduce to half its initial mass, found by solving the exponential equation at 50% decay."
+        }
+      ],
+      "createdAt": 1744131934440,
+      "totalQuestions": 15
+    },
+    "quiz-1744132109173": {
+      "title": "Grade 10 Trigonometry - Similar Triangles Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Trigonometry - Similar Triangles",
+      "questions": [
+        {
+          "id": "1",
+          "text": "If two triangles are similar, which of the following must be true?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Corresponding angles are equal",
+            "B) Corresponding sides are equal",
+            "C) Both corresponding angles and sides are equal",
+            "D) Only one pair of corresponding angles is equal"
+          ],
+          "answer": "A) Corresponding angles are equal",
+          "explanation": "Similar triangles have corresponding angles that are equal and corresponding sides that are proportional, not necessarily equal."
+        },
+        {
+          "id": "2",
+          "text": "In the triangles ABC and DEF, if angle A = angle D and angle B = angle E, what can you conclude?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Triangle ABC is congruent to triangle DEF",
+            "B) Triangle ABC is similar to triangle DEF",
+            "C) Triangle ABC is neither similar nor congruent to triangle DEF",
+            "D) Only sides AB and DE are proportional"
+          ],
+          "answer": "B) Triangle ABC is similar to triangle DEF",
+          "explanation": "If two angles of one triangle are equal to two angles of another triangle, the triangles are similar by the Angle-Angle (AA) similarity criterion."
+        },
+        {
+          "id": "3",
+          "text": "What is the ratio of the corresponding sides of two similar triangles called?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) Scale factor",
+            "B) Proportional factor",
+            "C) Similarity ratio",
+            "D) Congruency ratio"
+          ],
+          "answer": "A) Scale factor",
+          "explanation": "The ratio of the lengths of corresponding sides of two similar triangles is called the scale factor."
+        },
+        {
+          "id": "4",
+          "text": "If triangle ABC ~ triangle DEF and AB = 6 cm, DE = 9 cm, what is the scale factor from triangle ABC to triangle DEF?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) 1.5",
+            "B) 0.67",
+            "C) 2",
+            "D) 3"
+          ],
+          "answer": "A) 1.5",
+          "explanation": "The scale factor is the ratio of the corresponding sides of the second triangle to the first, which is 9/6 = 1.5."
+        },
+        {
+          "id": "5",
+          "text": "Define similar triangles.",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "options": [],
+          "answer": "Similar triangles are triangles that have the same shape but not necessarily the same size. Their corresponding angles are equal, and their corresponding sides are proportional.",
+          "explanation": "Similarity in triangles means that all corresponding angles are equal and all corresponding sides are in the same ratio."
+        },
+        {
+          "id": "6",
+          "text": "Given triangle ABC ~ triangle DEF, AB = 8 cm, BC = 10 cm, AC = 12 cm, and DE = 12 cm. Find the lengths of DF and EF.",
+          "type": "thinking",
+          "category": "Thinking",
+          "options": [],
+          "answer": "DF = 18 cm, EF = 15 cm",
+          "explanation": "First, find the scale factor: DE/AB = 12/8 = 1.5. Then, DF = AC * 1.5 = 12 * 1.5 = 18 cm. EF = BC * 1.5 = 10 * 1.5 = 15 cm."
+        },
+        {
+          "id": "7",
+          "text": "A flagpole casts a shadow that is 15 meters long. At the same time, a 1.8-meter tall person casts a shadow that is 3 meters long. How tall is the flagpole?",
+          "type": "application",
+          "category": "Application",
+          "options": [],
+          "answer": "9 meters",
+          "explanation": "The triangles formed by the flagpole and its shadow and the person and their shadow are similar. The ratio of the person's height to their shadow is 1.8/3 = 0.6. Therefore, the flagpole's height is 15 * 0.6 = 9 meters."
+        },
+        {
+          "id": "8",
+          "text": "Explain why all equilateral triangles are similar to each other.",
+          "type": "communication",
+          "category": "Communication",
+          "options": [],
+          "answer": "All equilateral triangles have three angles each measuring 60 degrees, so their corresponding angles are equal. Additionally, all sides in an equilateral triangle are equal, so the ratio of corresponding sides is always the same (any constant ratio). Therefore, by the AA and SSS similarity criteria, all equilateral triangles are similar.",
+          "explanation": "Equilateral triangles meet the criteria for similarity because their angles are equal and their sides are in proportion (since all sides are equal, any ratio of corresponding sides will be constant)."
+        }
+      ],
+      "createdAt": 1744132109173,
+      "totalQuestions": 8,
+      "results": {
+        "id": "result-1744132124533",
+        "quizId": "quiz-1744132109173",
+        "answers": {
+          "1": {
+            "isCorrect": false,
+            "feedback": "Incorrect. The correct answer is: A) Corresponding angles are equal",
+            "score": 0,
+            "userAnswer": "C) Both corresponding angles and sides are equal"
+          },
+          "2": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "3": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "4": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "5": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "6": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "7": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "8": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          }
+        },
+        "overall": {
+          "score": 0,
+          "feedback": "You may want to review the material and try again.",
+          "reviewTopics": [
+            "If two triangles are similar, which of the following must be true?",
+            "In the triangles ABC and DEF, if angle A = angle D and angle B = angle E, what can you conclude?",
+            "What is the ratio of the corresponding sides of two similar triangles called?",
+            "If triangle ABC ~ triangle DEF and AB = 6 cm, DE = 9 cm, what is the scale factor from triangle ABC to triangle DEF?",
+            "Define similar triangles.",
+            "Given triangle ABC ~ triangle DEF, AB = 8 cm, BC = 10 cm, AC = 12 cm, and DE = 12 cm. Find the lengths of DF and EF.",
+            "A flagpole casts a shadow that is 15 meters long. At the same time, a 1.8-meter tall person casts a shadow that is 3 meters long. How tall is the flagpole?",
+            "Explain why all equilateral triangles are similar to each other."
+          ],
+          "strengths": []
+        },
+        "submittedAt": "2025-04-08T17:08:44.533Z"
+      }
+    },
+    "quiz-1744132665496": {
+      "title": "Grade 11 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "11",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is a common neuromuscular condition where physical therapists play an essential role?",
+          "options": [
+            "A) Amyotrophic Lateral Sclerosis (ALS)",
+            "B) Diabetes Mellitus",
+            "C) Hypertension",
+            "D) Osteoporosis"
+          ],
+          "answer": "A) Amyotrophic Lateral Sclerosis (ALS)",
+          "explanation": "Amyotrophic Lateral Sclerosis (ALS) is a neuromuscular disorder that affects motor neurons, leading to muscle weakness and atrophy. Physical therapists play a crucial role in managing symptoms and improving quality of life for patients with ALS."
+        },
+        {
+          "id": "2",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Explain how the Brunnstrom Approach might be used in the rehabilitation of a stroke patient.",
+          "answer": "The Brunnstrom Approach is a therapeutic method used in stroke rehabilitation that leverages the patient's synergistic movement patterns to regain motor control. It involves stages of recovery from flaccidity to voluntary movement, using reflexes and spasticity as part of the treatment process to facilitate motor relearning.",
+          "explanation": "The Brunnstrom Approach recognizes that stroke recovery often follows a predictable sequence. Therapists use this approach to guide patients through stages of recovery, starting with basic reflexes and gradually progressing to more voluntary and coordinated movements."
+        },
+        {
+          "id": "3",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe the role of neuroplasticity in physical therapy for patients with Parkinson's disease. Justify your answer with examples.",
+          "answer": "Neuroplasticity refers to the brain's ability to reorganize itself by forming new neural connections. In Parkinson's disease, physical therapy leverages neuroplasticity to help patients develop compensatory movement strategies. For example, repetitive exercises like rhythmic auditory stimulation can help improve gait by reinforcing new neural pathways.",
+          "explanation": "Neuroplasticity is crucial in Parkinson's rehabilitation because it allows the brain to adapt to the loss of dopamine-producing neurons. Therapists use targeted exercises to promote the development of alternative pathways, enhancing motor function and slowing disease progression."
+        }
+      ],
+      "createdAt": 1744132665496,
+      "totalQuestions": 3
+    },
+    "quiz-1744134685619": {
+      "title": "Grade 10 Forces - Gravitational Force And Apparent Weight Quiz",
+      "subject": "Physics",
+      "grade": "10",
+      "topic": "Forces - Gravitational Force And Apparent Weight",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the difference between mass and weight?",
+          "options": [
+            "A) Mass is the amount of matter in an object, while weight is the force of gravity acting on that mass.",
+            "B) Mass and weight are the same and can be used interchangeably.",
+            "C) Mass is the force of gravity acting on an object, while weight is the amount of matter in the object.",
+            "D) Mass depends on the location of the object, while weight is constant everywhere."
+          ],
+          "answer": "A) Mass is the amount of matter in an object, while weight is the force of gravity acting on that mass.",
+          "explanation": "Mass is an intrinsic property of an object and does not change with location, whereas weight is the gravitational force acting on the mass and can vary depending on the gravitational field strength."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is apparent weight?",
+          "options": [
+            "A) The gravitational force acting on an object.",
+            "B) The normal force exerted by a surface on an object.",
+            "C) The mass of the object multiplied by the acceleration due to gravity.",
+            "D) The force of air resistance acting on a falling object."
+          ],
+          "answer": "B) The normal force exerted by a surface on an object.",
+          "explanation": "Apparent weight is the normal force experienced by an object, which can change depending on the motion of the object, such as in an accelerating elevator."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "When an elevator accelerates upwards, what happens to the apparent weight of a person inside?",
+          "options": [
+            "A) It decreases.",
+            "B) It remains the same.",
+            "C) It increases.",
+            "D) It becomes zero."
+          ],
+          "answer": "C) It increases.",
+          "explanation": "When the elevator accelerates upwards, the normal force (apparent weight) increases because the net force must be upwards to cause the acceleration."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following factors does NOT affect the force of air resistance on a falling object?",
+          "options": [
+            "A) The speed of the object.",
+            "B) The cross-sectional area of the object.",
+            "C) The mass of the object.",
+            "D) The shape of the object."
+          ],
+          "answer": "C) The mass of the object.",
+          "explanation": "Air resistance depends on the speed, cross-sectional area, and shape of the object, but not directly on its mass."
+        },
+        {
+          "id": "5",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What happens to the net force on a skydiver as her speed increases?",
+          "options": [
+            "A) It increases.",
+            "B) It decreases.",
+            "C) It remains constant.",
+            "D) It becomes zero."
+          ],
+          "answer": "B) It decreases.",
+          "explanation": "As the skydiver's speed increases, air resistance increases, which reduces the net force acting on her."
+        },
+        {
+          "id": "6",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define true weight.",
+          "answer": "True weight is the downward force exerted on an object by the Earth's gravity, calculated as the mass of the object multiplied by the acceleration due to gravity (Fg = mg).",
+          "explanation": "True weight is solely due to the gravitational pull of the Earth and does not depend on the motion of the object."
+        },
+        {
+          "id": "7",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Write the equation for the normal force (apparent weight) when an elevator is accelerating upwards.",
+          "answer": "FN = mg + ma",
+          "explanation": "When the elevator accelerates upwards, the normal force is greater than the true weight, and the equation accounts for the additional force due to the acceleration."
+        },
+        {
+          "id": "8",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the condition for terminal velocity?",
+          "answer": "Terminal velocity occurs when the force of air resistance equals the force of gravity, resulting in zero net force and no further acceleration.",
+          "explanation": "At terminal velocity, the skydiver stops accelerating and falls at a constant speed because the upward air resistance balances the downward gravitational force."
+        },
+        {
+          "id": "9",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A 60 kg person is standing in an elevator that is accelerating upwards at 2 m/s². Calculate the apparent weight of the person.",
+          "answer": "FN = mg + ma = (60 kg)(9.8 m/s²) + (60 kg)(2 m/s²) = 588 N + 120 N = 708 N",
+          "explanation": "The apparent weight is the normal force, which is the sum of the gravitational force and the force due to the upward acceleration."
+        },
+        {
+          "id": "10",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Explain why astronauts appear weightless in the International Space Station (ISS).",
+          "answer": "Astronauts appear weightless because both the ISS and the astronauts are in free fall around the Earth at the same rate, so there is no normal force acting on them, making their apparent weight zero.",
+          "explanation": "The sensation of weightlessness occurs because the astronauts and the ISS are continuously falling towards Earth but also moving forward fast enough to miss it, resulting in a state of perpetual free fall."
+        },
+        {
+          "id": "11",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A skydiver reaches terminal velocity. Describe the forces acting on the skydiver and why the skydiver no longer accelerates.",
+          "answer": "At terminal velocity, the force of gravity (Fg) pulling the skydiver down is equal in magnitude to the force of air resistance (Fair) pushing up. The net force is zero, so there is no acceleration.",
+          "explanation": "When the forces are balanced, the skydiver's velocity remains constant, and they no longer accelerate."
+        },
+        {
+          "id": "12",
+          "type": "application",
+          "category": "Application",
+          "text": "A person stands on a bathroom scale in an elevator. The scale reads 700 N when the elevator is at rest. What will the scale read if the elevator accelerates upwards at 3 m/s²? (Assume g = 9.8 m/s²)",
+          "answer": "First, find the mass: m = Fg / g = 700 N / 9.8 m/s² ≈ 71.43 kg. Then, calculate the new normal force: FN = mg + ma = (71.43 kg)(9.8 m/s²) + (71.43 kg)(3 m/s²) ≈ 700 N + 214.29 N = 914.29 N.",
+          "explanation": "The scale reads the normal force, which increases when the elevator accelerates upwards due to the additional force required to accelerate the person."
+        },
+        {
+          "id": "13",
+          "type": "application",
+          "category": "Application",
+          "text": "A parachutist with a mass of 80 kg is falling at terminal velocity. Calculate the force of air resistance acting on the parachutist.",
+          "answer": "At terminal velocity, Fair = Fg = mg = (80 kg)(9.8 m/s²) = 784 N.",
+          "explanation": "Since the net force is zero at terminal velocity, the air resistance must exactly balance the gravitational force."
+        },
+        {
+          "id": "14",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why a person feels lighter when an elevator accelerates downwards.",
+          "answer": "When the elevator accelerates downwards, the normal force (apparent weight) decreases because the net force must be downwards to cause the acceleration. The person feels lighter because the floor is not pushing up on them as strongly as when the elevator is at rest or moving at constant velocity.",
+          "explanation": "The sensation of weight is due to the normal force, which decreases when the elevator accelerates downwards, making the person feel lighter."
+        },
+        {
+          "id": "15",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe how the cross-sectional area of a falling object affects the air resistance it experiences.",
+          "answer": "A larger cross-sectional area increases the air resistance because more air particles collide with the object, creating a greater opposing force. Conversely, a smaller cross-sectional area reduces air resistance because fewer air particles interact with the object.",
+          "explanation": "The greater the surface area exposed to the oncoming air, the more air resistance the object will experience, slowing it down more effectively."
+        }
+      ],
+      "createdAt": 1744134685619,
+      "totalQuestions": 15
+    },
+    "quiz-1744134945567": {
+      "title": "Grade 11 Trigonometry - Similar Triangles Quiz",
+      "subject": "Mathematics",
+      "grade": "11",
+      "topic": "Trigonometry - Similar Triangles",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "If two triangles are similar, which of the following must be true?",
+          "options": [
+            "A) All corresponding angles are equal",
+            "B) All corresponding sides are equal",
+            "C) Both A and B",
+            "D) None of the above"
+          ],
+          "answer": "A) All corresponding angles are equal",
+          "explanation": "Similar triangles have corresponding angles equal and corresponding sides proportional, not necessarily equal."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "In a right-angled triangle, if sin θ = 0.6, what is cos θ?",
+          "options": [
+            "A) 0.4",
+            "B) 0.6",
+            "C) 0.8",
+            "D) 1.0"
+          ],
+          "answer": "C) 0.8",
+          "explanation": "Using the Pythagorean identity, sin²θ + cos²θ = 1. If sin θ = 0.6, then cos θ = √(1 - 0.36) = √0.64 = 0.8."
+        },
+        {
+          "id": "3",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define similar triangles.",
+          "answer": "Similar triangles are triangles that have the same shape but not necessarily the same size. Their corresponding angles are equal, and their corresponding sides are proportional.",
+          "explanation": "Similarity in triangles is determined by angle equality and side proportionality."
+        },
+        {
+          "id": "4",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the Sine Law formula?",
+          "answer": "The Sine Law formula is: sin A / a = sin B / b = sin C / c.",
+          "explanation": "The Sine Law relates the sides of a triangle to the sines of their opposite angles."
+        },
+        {
+          "id": "5",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What are the primary trigonometric ratios?",
+          "answer": "The primary trigonometric ratios are sine (sin), cosine (cos), and tangent (tan), defined as sin θ = opposite/hypotenuse, cos θ = adjacent/hypotenuse, and tan θ = opposite/adjacent.",
+          "explanation": "These ratios relate the angles of a right triangle to the lengths of its sides."
+        },
+        {
+          "id": "6",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Given ∆ABC ~ ∆DEF, AB = 5 cm, BC = 7 cm, and DE = 10 cm, find EF.",
+          "answer": "EF = 14 cm",
+          "explanation": "Since the triangles are similar, the sides are proportional. AB/DE = BC/EF ⇒ 5/10 = 7/EF ⇒ EF = (7 * 10)/5 = 14 cm."
+        },
+        {
+          "id": "7",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "In a right-angled triangle, if the angle of elevation is 30° and the adjacent side is 8 m, find the length of the hypotenuse.",
+          "answer": "Hypotenuse = 16 m",
+          "explanation": "Using cosine: cos 30° = adjacent/hypotenuse ⇒ √3/2 = 8/hypotenuse ⇒ hypotenuse = 8 * 2/√3 ≈ 16 m."
+        },
+        {
+          "id": "8",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Prove that if a line is parallel to one side of a triangle and intersects the other two sides, it forms similar triangles.",
+          "answer": "By the Basic Proportionality Theorem, if a line is parallel to one side of a triangle and intersects the other two sides, it divides those sides proportionally, resulting in similar triangles by AA (Angle-Angle) similarity criterion.",
+          "explanation": "The parallel line creates corresponding angles equal, and the sides are proportional, proving similarity."
+        },
+        {
+          "id": "9",
+          "type": "application",
+          "category": "Application",
+          "text": "A ladder leans against a wall making a 60° angle with the ground. If the ladder is 10 m long, how high up the wall does it reach?",
+          "answer": "The ladder reaches 5√3 m up the wall.",
+          "explanation": "Using sine: sin 60° = opposite/hypotenuse ⇒ √3/2 = height/10 ⇒ height = 10 * √3/2 = 5√3 m."
+        },
+        {
+          "id": "10",
+          "type": "application",
+          "category": "Application",
+          "text": "From a point 50 m away from a tower, the angle of elevation to the top is 45°. Find the height of the tower.",
+          "answer": "The height of the tower is 50 m.",
+          "explanation": "Using tangent: tan 45° = height/distance ⇒ 1 = height/50 ⇒ height = 50 m."
+        },
+        {
+          "id": "11",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why the Sine Law cannot be used to solve a triangle if only the three sides are known.",
+          "answer": "The Sine Law requires at least one angle-side pair to establish a ratio. If only the sides are known, there is no angle information to use in the ratio sin A / a = sin B / b = sin C / c.",
+          "explanation": "The Sine Law is dependent on knowing at least one angle to relate it to its opposite side."
+        },
+        {
+          "id": "12",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe how you would use the concept of similar triangles to measure the height of a tree without climbing it.",
+          "answer": "You can measure the shadow of the tree and compare it to the shadow of a known height (e.g., a meter stick) at the same time. Since the triangles formed by the objects and their shadows are similar, the ratio of the heights equals the ratio of the shadows.",
+          "explanation": "Similar triangles allow indirect measurement by comparing proportional sides."
+        }
+      ],
+      "createdAt": 1744134945567,
+      "totalQuestions": 12
+    },
+    "quiz-1744135410008": {
+      "title": "Grade 10 Exponential Functions - Exponential Growth And Decay Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Exponential Functions - Exponential Growth And Decay",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following represents the general form of an exponential decay function?",
+          "options": [
+            "A) f(x) = a(1 + r)^x",
+            "B) f(x) = a(1 - r)^x",
+            "C) f(x) = a + r^x",
+            "D) f(x) = a - r^x"
+          ],
+          "answer": "B) f(x) = a(1 - r)^x",
+          "explanation": "Exponential decay occurs when a quantity decreases at a rate proportional to its current value. The general form is f(x) = a(1 - r)^x, where 'a' is the initial value and 'r' is the decay rate."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "A bacteria culture doubles every 3 hours. If the initial population is 500, what is the population after 12 hours?",
+          "options": [
+            "A) 2000",
+            "B) 4000",
+            "C) 8000",
+            "D) 16000"
+          ],
+          "answer": "C) 8000",
+          "explanation": "Since the bacteria doubles every 3 hours, in 12 hours it will double 4 times (12/3 = 4). Starting from 500, after 4 doublings: 500 * 2^4 = 500 * 16 = 8000."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the value of 'b' in the exponential growth function f(x) = a(b)^x if the growth rate is 8%?",
+          "options": [
+            "A) 0.08",
+            "B) 0.92",
+            "C) 1.08",
+            "D) 1.8"
+          ],
+          "answer": "C) 1.08",
+          "explanation": "For exponential growth, b = 1 + r, where r is the growth rate. Here, r = 8% = 0.08, so b = 1 + 0.08 = 1.08."
+        },
+        {
+          "id": "4",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define the term 'half-life' in the context of exponential decay.",
+          "answer": "Half-life is the time it takes for a quantity to reduce to half of its initial value in exponential decay.",
+          "explanation": "In exponential decay, the half-life is a constant time period during which the quantity decreases by half. It is independent of the initial amount."
+        },
+        {
+          "id": "5",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Write the general formula for exponential growth and identify each variable.",
+          "answer": "The general formula is f(x) = a(b)^x, where 'a' is the initial value, 'b' is the growth factor (b = 1 + r, with 'r' being the growth rate), and 'x' is the number of time periods.",
+          "explanation": "This formula models situations where a quantity grows by a fixed percentage over equal time intervals."
+        },
+        {
+          "id": "6",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the decay factor 'b' if a quantity decreases by 20% each time period?",
+          "answer": "The decay factor b = 0.8.",
+          "explanation": "For exponential decay, b = 1 - r, where r is the decay rate. Here, r = 20% = 0.2, so b = 1 - 0.2 = 0.8."
+        },
+        {
+          "id": "7",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A town's population grows exponentially from 10,000 to 40,000 in 10 years. What is the annual growth rate?",
+          "answer": "The annual growth rate is approximately 14.87%.",
+          "explanation": "Using the formula f(x) = a(b)^x, where f(x) = 40,000, a = 10,000, and x = 10: 40,000 = 10,000(b)^10 → b^10 = 4 → b = 4^(1/10) ≈ 1.1487. Thus, r = b - 1 ≈ 0.1487 or 14.87%."
+        },
+        {
+          "id": "8",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A car depreciates by 12% each year. How many years will it take for the car to be worth less than half its original value?",
+          "answer": "It will take approximately 5.42 years.",
+          "explanation": "Using the decay formula f(x) = a(0.88)^x, set f(x) = 0.5a: 0.5a = a(0.88)^x → 0.5 = (0.88)^x. Taking the natural logarithm: ln(0.5) = x ln(0.88) → x ≈ ln(0.5)/ln(0.88) ≈ 5.42 years."
+        },
+        {
+          "id": "9",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A radioactive substance has a half-life of 5 days. If you start with 200 mg, how much will remain after 15 days?",
+          "answer": "25 mg will remain after 15 days.",
+          "explanation": "After each half-life (5 days), the substance halves. In 15 days, there are 15/5 = 3 half-lives. So, 200 mg → 100 mg → 50 mg → 25 mg after 3 half-lives."
+        },
+        {
+          "id": "10",
+          "type": "application",
+          "category": "Application",
+          "text": "An investment grows at 7% compounded annually. If you invest $5,000 today, what will be the value of the investment after 8 years?",
+          "answer": "The value will be approximately $8,579.46.",
+          "explanation": "Using the growth formula f(x) = a(1 + r)^x: f(8) = 5000(1.07)^8 ≈ 5000 * 1.7159 ≈ $8,579.46."
+        },
+        {
+          "id": "11",
+          "type": "application",
+          "category": "Application",
+          "text": "A lake's fish population is declining at 10% per year due to pollution. If there are currently 50,000 fish, how many fish will there be in 6 years?",
+          "answer": "There will be approximately 26,244 fish.",
+          "explanation": "Using the decay formula f(x) = a(1 - r)^x: f(6) = 50,000(0.90)^6 ≈ 50,000 * 0.531441 ≈ 26,244 fish."
+        },
+        {
+          "id": "12",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why the function f(x) = 1000(0.95)^x models exponential decay and describe a real-world scenario it could represent.",
+          "answer": "The function f(x) = 1000(0.95)^x models exponential decay because the base (0.95) is between 0 and 1, indicating a 5% decrease per time period. A real-world scenario could be the depreciation of a car's value by 5% each year.",
+          "explanation": "Exponential decay functions have a base 'b' where 0 < b < 1. Here, b = 0.95, so the quantity decreases by 5% each period. This could apply to any scenario with consistent percentage decrease over time."
+        },
+        {
+          "id": "13",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe the steps you would take to determine how long it takes for a population growing at 3% annually to triple in size.",
+          "answer": "1. Use the growth formula f(x) = a(1.03)^x. 2. Set f(x) = 3a (triple the initial population). 3. Solve 3a = a(1.03)^x → 3 = (1.03)^x. 4. Take the natural logarithm: ln(3) = x ln(1.03). 5. Solve for x: x = ln(3)/ln(1.03) ≈ 36.62 years.",
+          "explanation": "To find the time for a quantity to triple, set up the exponential growth equation and solve for 'x' using logarithms to isolate the exponent."
+        }
+      ],
+      "createdAt": 1744135410008,
+      "totalQuestions": 13
+    },
+    "quiz-1744136023212": {
+      "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "10",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the primary role of a physical therapist in managing patients with neuromuscular disorders?",
+          "options": [
+            "A) To prescribe medication",
+            "B) To improve motor function and mobility",
+            "C) To perform surgical procedures",
+            "D) To diagnose neurological conditions"
+          ],
+          "answer": "B) To improve motor function and mobility",
+          "explanation": "The primary role of a physical therapist is to help patients improve their motor function and mobility through therapeutic exercises and interventions."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is a common neuromuscular condition that physical therapists help manage?",
+          "options": [
+            "A) Diabetes",
+            "B) Hypertension",
+            "C) Multiple Sclerosis (MS)",
+            "D) Asthma"
+          ],
+          "answer": "C) Multiple Sclerosis (MS)",
+          "explanation": "Multiple Sclerosis (MS) is a neuromuscular condition where physical therapists play an essential role in managing symptoms and improving quality of life."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What does the term 'spasticity' refer to in neuromuscular conditions?",
+          "options": [
+            "A) Increased muscle tone causing stiffness",
+            "B) Decreased muscle tone causing weakness",
+            "C) Loss of sensation in limbs",
+            "D) Inability to speak"
+          ],
+          "answer": "A) Increased muscle tone causing stiffness",
+          "explanation": "Spasticity refers to increased muscle tone, which can cause stiffness and interfere with movement."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which diagnostic tool is commonly used to assess neuromuscular conditions?",
+          "options": [
+            "A) Blood pressure monitor",
+            "B) MRI (Magnetic Resonance Imaging)",
+            "C) Thermometer",
+            "D) Stethoscope"
+          ],
+          "answer": "B) MRI (Magnetic Resonance Imaging)",
+          "explanation": "MRI is a diagnostic tool used to visualize the brain and spinal cord, helping to identify neuromuscular conditions."
+        },
+        {
+          "id": "5",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the Brunnstrom Approach used for in physical therapy?",
+          "options": [
+            "A) To measure blood sugar levels",
+            "B) To assess and treat motor recovery after stroke",
+            "C) To diagnose heart conditions",
+            "D) To treat respiratory infections"
+          ],
+          "answer": "B) To assess and treat motor recovery after stroke",
+          "explanation": "The Brunnstrom Approach is a therapeutic method used to assess and improve motor recovery in patients who have had a stroke."
+        },
+        {
+          "id": "6",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which condition is characterized by the degeneration of motor neurons?",
+          "options": [
+            "A) Parkinson's Disease",
+            "B) Amyotrophic Lateral Sclerosis (ALS)",
+            "C) Multiple Sclerosis (MS)",
+            "D) Stroke"
+          ],
+          "answer": "B) Amyotrophic Lateral Sclerosis (ALS)",
+          "explanation": "ALS is a progressive neurodegenerative disease that affects motor neurons, leading to muscle weakness and loss of mobility."
+        },
+        {
+          "id": "7",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define the term 'neuroplasticity' in the context of neuromuscular conditions.",
+          "answer": "Neuroplasticity refers to the brain's ability to reorganize itself by forming new neural connections, which is crucial for recovery after injury or disease.",
+          "explanation": "Neuroplasticity allows the brain to adapt and compensate for damage, playing a key role in rehabilitation."
+        },
+        {
+          "id": "8",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Explain how constraint-induced movement therapy (CIMT) can benefit a stroke patient with limited use of one arm.",
+          "answer": "CIMT involves restricting the unaffected arm to force the use of the affected arm, promoting neuroplasticity and improving motor function.",
+          "explanation": "By limiting the use of the unaffected arm, CIMT encourages the brain to rewire and regain control over the affected limb."
+        },
+        {
+          "id": "9",
+          "type": "application",
+          "category": "Application",
+          "text": "A patient with Parkinson's Disease experiences bradykinesia (slowness of movement). Describe two physical therapy interventions that could help improve their mobility.",
+          "answer": "1. Gait training to improve walking speed and coordination. 2. Resistance exercises to strengthen muscles and enhance movement control.",
+          "explanation": "These interventions address the slowness of movement by improving strength, coordination, and overall mobility."
+        },
+        {
+          "id": "10",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Why is it important for a physical therapist to understand a patient's specific neuromuscular condition before designing a treatment plan?",
+          "answer": "Understanding the specific condition allows the therapist to tailor interventions to the patient's unique needs, ensuring effective and safe rehabilitation.",
+          "explanation": "Each neuromuscular condition presents different challenges, so personalized treatment plans are essential for optimal recovery."
+        }
+      ],
+      "createdAt": 1744136023212,
+      "totalQuestions": 10
+    },
+    "quiz-1744137755396": {
+      "title": "Grade 12 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "12",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the primary role of a physical therapist in managing patients with neuromuscular disorders?",
+          "options": [
+            "A) To diagnose the specific neuromuscular condition",
+            "B) To improve motor function and quality of life through therapeutic interventions",
+            "C) To prescribe medication for symptom management",
+            "D) To perform surgical procedures to correct neuromuscular issues"
+          ],
+          "answer": "B) To improve motor function and quality of life through therapeutic interventions",
+          "explanation": "Physical therapists focus on improving motor function, mobility, and overall quality of life through exercises, stretches, and other therapeutic interventions, rather than diagnosing, prescribing medication, or performing surgeries."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is a common neuromuscular condition where physical therapists play an essential role?",
+          "options": [
+            "A) Hypertension",
+            "B) Multiple Sclerosis (MS)",
+            "C) Type 2 Diabetes",
+            "D) Asthma"
+          ],
+          "answer": "B) Multiple Sclerosis (MS)",
+          "explanation": "Multiple Sclerosis (MS) is a neuromuscular condition that affects the central nervous system, and physical therapists help manage symptoms like muscle weakness, spasticity, and balance issues."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What does the term 'spasticity' refer to in neuromuscular conditions?",
+          "options": [
+            "A) A decrease in muscle tone",
+            "B) A sudden, involuntary muscle contraction",
+            "C) A state of muscle stiffness and tightness",
+            "D) A complete loss of muscle function"
+          ],
+          "answer": "C) A state of muscle stiffness and tightness",
+          "explanation": "Spasticity is a condition characterized by stiff or tight muscles and an inability to control those muscles, often seen in neuromuscular disorders like cerebral palsy or after a stroke."
+        },
+        {
+          "id": "4",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Compare and contrast the roles of a physical therapist in treating a patient with Parkinson's disease versus a patient with a spinal cord injury.",
+          "answer": "For Parkinson's disease, the physical therapist focuses on improving balance, gait, and coordination, and may use techniques like rhythmic auditory stimulation to help with movement. For a spinal cord injury, the therapist focuses on maximizing mobility, strength, and independence, often using assistive devices and locomotor training. Both aim to improve quality of life, but the specific interventions differ based on the condition's nature.",
+          "explanation": "Parkinson's disease primarily affects movement and coordination, while spinal cord injuries often result in partial or complete loss of motor function. The therapist tailors their approach to address the unique challenges of each condition."
+        },
+        {
+          "id": "5",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why neuroplasticity is an important concept in physical therapy for neuromuscular conditions.",
+          "answer": "Neuroplasticity is the brain's ability to reorganize itself by forming new neural connections. In physical therapy, this concept is crucial because it means that with targeted exercises and repetitive practice, patients can regain or improve lost functions. Therapists design interventions that leverage neuroplasticity to help patients recover motor skills and adapt to their conditions.",
+          "explanation": "Understanding neuroplasticity allows therapists to create effective rehabilitation programs that encourage the brain to compensate for injury or disease, leading to better patient outcomes."
+        }
+      ],
+      "createdAt": 1744137755396,
+      "totalQuestions": 5
+    },
+    "quiz-1744139230950": {
+      "title": "Grade 10 Mechanics - Newton’s Laws Of Motion Quiz",
+      "subject": "Physics",
+      "grade": "10",
+      "topic": "Mechanics - Newton’s Laws Of Motion",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "According to Newton's First Law of Motion, an object will remain at rest or in uniform motion unless acted upon by an external force. This is also known as:",
+          "options": [
+            "A) The Law of Inertia",
+            "B) The Law of Acceleration",
+            "C) The Law of Action-Reaction",
+            "D) The Law of Gravity"
+          ],
+          "answer": "A) The Law of Inertia",
+          "explanation": "Newton's First Law states that an object will remain at rest or in uniform motion unless acted upon by an external force. This property is called inertia."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "If a net force of 50 N is applied to an object with a mass of 10 kg, what is the acceleration of the object?",
+          "options": [
+            "A) 0.2 m/s²",
+            "B) 5 m/s²",
+            "C) 50 m/s²",
+            "D) 500 m/s²"
+          ],
+          "answer": "B) 5 m/s²",
+          "explanation": "Using Newton's Second Law, F = ma, so a = F/m = 50 N / 10 kg = 5 m/s²."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following best illustrates Newton's Third Law of Motion?",
+          "options": [
+            "A) A book resting on a table",
+            "B) A rocket launching into space",
+            "C) A car accelerating on a highway",
+            "D) A ball rolling down a hill"
+          ],
+          "answer": "B) A rocket launching into space",
+          "explanation": "Newton's Third Law states that for every action, there is an equal and opposite reaction. A rocket pushes exhaust gases downward, and the gases push the rocket upward."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the net force acting on an object if two forces of 30 N [E] and 20 N [W] are applied to it?",
+          "options": [
+            "A) 10 N [E]",
+            "B) 10 N [W]",
+            "C) 50 N [E]",
+            "D) 50 N [W]"
+          ],
+          "answer": "A) 10 N [E]",
+          "explanation": "The net force is calculated by subtracting the opposing forces: 30 N [E] - 20 N [W] = 10 N [E]."
+        },
+        {
+          "id": "5",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "A 5 kg object is accelerating at 4 m/s². What is the net force acting on the object?",
+          "options": [
+            "A) 1.25 N",
+            "B) 9 N",
+            "C) 20 N",
+            "D) 25 N"
+          ],
+          "answer": "C) 20 N",
+          "explanation": "Using Newton's Second Law, F = ma = 5 kg * 4 m/s² = 20 N."
+        },
+        {
+          "id": "6",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define Newton's Second Law of Motion.",
+          "answer": "Newton's Second Law states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass (F = ma).",
+          "explanation": "This law quantifies how force affects the motion of an object, linking force, mass, and acceleration."
+        },
+        {
+          "id": "7",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the formula for calculating net force when multiple forces act on an object?",
+          "answer": "The net force is the vector sum of all individual forces acting on the object (F_net = ΣF).",
+          "explanation": "Net force accounts for both the magnitude and direction of all forces."
+        },
+        {
+          "id": "8",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the term for the force that opposes the motion of two surfaces sliding past each other?",
+          "answer": "Friction.",
+          "explanation": "Friction is a resistive force that acts opposite to the direction of motion."
+        },
+        {
+          "id": "9",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A 10 kg box is pushed with a force of 30 N. If the coefficient of kinetic friction between the box and the floor is 0.2, calculate the acceleration of the box.",
+          "answer": "First, calculate the frictional force: F_friction = μ * F_normal = 0.2 * (10 kg * 9.8 m/s²) = 19.6 N. Net force = 30 N - 19.6 N = 10.4 N. Acceleration = F_net / m = 10.4 N / 10 kg = 1.04 m/s².",
+          "explanation": "The net force is the applied force minus friction, and acceleration is found using F = ma."
+        },
+        {
+          "id": "10",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Two blocks of masses 4 kg and 6 kg are connected by a rope and pulled with a force of 20 N on a frictionless surface. Calculate the tension in the rope.",
+          "answer": "First, find the acceleration of the system: a = F / (m1 + m2) = 20 N / 10 kg = 2 m/s². Then, tension in the rope is the force needed to accelerate the 6 kg block: T = m2 * a = 6 kg * 2 m/s² = 12 N.",
+          "explanation": "The tension is the force required to accelerate the second block at the same rate as the system."
+        },
+        {
+          "id": "11",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A car of mass 1000 kg accelerates from rest to 20 m/s in 10 seconds. Calculate the net force acting on the car.",
+          "answer": "First, find acceleration: a = (v_f - v_i) / t = (20 m/s - 0) / 10 s = 2 m/s². Then, F = ma = 1000 kg * 2 m/s² = 2000 N.",
+          "explanation": "Net force is calculated using the car's mass and its acceleration."
+        },
+        {
+          "id": "12",
+          "type": "application",
+          "category": "Application",
+          "text": "A cyclist is riding at a constant speed of 5 m/s. Explain, using Newton's laws, why the cyclist must continue to pedal to maintain this speed.",
+          "answer": "According to Newton's First Law, the cyclist would continue moving at a constant speed if no net force acted on them. However, friction and air resistance act opposite to the motion, so the cyclist must pedal to apply a forward force that balances these resistive forces, maintaining zero net force and constant speed.",
+          "explanation": "Balancing forces ensures no acceleration, allowing constant velocity."
+        },
+        {
+          "id": "13",
+          "type": "application",
+          "category": "Application",
+          "text": "A 50 kg crate is being pulled across a warehouse floor with a force of 200 N at an angle of 30° above the horizontal. If the coefficient of kinetic friction is 0.3, calculate the acceleration of the crate.",
+          "answer": "First, resolve the force into horizontal (F_x = 200 N * cos(30°) ≈ 173.2 N) and vertical (F_y = 200 N * sin(30°) = 100 N) components. Normal force = mg - F_y = (50 kg * 9.8 m/s²) - 100 N = 390 N. Friction = μ * F_normal = 0.3 * 390 N = 117 N. Net force = 173.2 N - 117 N = 56.2 N. Acceleration = F_net / m = 56.2 N / 50 kg ≈ 1.12 m/s².",
+          "explanation": "The net horizontal force after accounting for friction determines the acceleration."
+        },
+        {
+          "id": "14",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why a passenger in a car lurches forward when the car suddenly brakes. Use Newton's laws in your explanation.",
+          "answer": "According to Newton's First Law (inertia), the passenger tends to remain in their state of motion (moving forward) when the car brakes. The car decelerates due to the braking force, but the passenger's body continues moving forward until acted upon by a force (e.g., the seatbelt or dashboard).",
+          "explanation": "Inertia explains the passenger's tendency to maintain their original motion."
+        },
+        {
+          "id": "15",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe how Newton's Third Law applies to a person walking on the ground.",
+          "answer": "When walking, the person exerts a backward force on the ground (action), and the ground exerts an equal and opposite forward force on the person (reaction). This reaction force propels the person forward.",
+          "explanation": "The interaction between the foot and the ground illustrates action-reaction pairs."
+        }
+      ],
+      "createdAt": 1744139230950,
+      "totalQuestions": 15
+    },
+    "quiz-1744141719616": {
+      "title": "Grade 10 Forces - Gravitational Force And Apparent Weight Quiz",
+      "subject": "Physics",
+      "grade": "10",
+      "topic": "Forces - Gravitational Force And Apparent Weight",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the difference between mass and weight?",
+          "options": [
+            "A) Mass is the amount of matter in an object, while weight is the force of gravity acting on that mass.",
+            "B) Mass and weight are the same thing.",
+            "C) Mass is the force of gravity acting on an object, while weight is the amount of matter in an object.",
+            "D) Mass depends on the location of the object, while weight does not."
+          ],
+          "answer": "A) Mass is the amount of matter in an object, while weight is the force of gravity acting on that mass.",
+          "explanation": "Mass is an intrinsic property of an object and does not change with location, whereas weight is the gravitational force acting on the mass and can vary depending on the gravitational field strength."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is apparent weight?",
+          "options": [
+            "A) The force of gravity acting on an object.",
+            "B) The normal force exerted by a surface on an object.",
+            "C) The mass of an object multiplied by the acceleration due to gravity.",
+            "D) The weight of an object in outer space."
+          ],
+          "answer": "B) The normal force exerted by a surface on an object.",
+          "explanation": "Apparent weight is the normal force experienced by an object, which can change depending on the motion of the object or the surface it is on."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "When an elevator accelerates upwards, what happens to the apparent weight of a person inside?",
+          "options": [
+            "A) It decreases.",
+            "B) It remains the same.",
+            "C) It increases.",
+            "D) It becomes zero."
+          ],
+          "answer": "C) It increases.",
+          "explanation": "When the elevator accelerates upwards, the normal force (apparent weight) increases because it must counteract both gravity and the upward acceleration."
+        },
+        {
+          "id": "4",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What happens to the apparent weight of a person in an elevator when it is in free fall?",
+          "options": [
+            "A) It increases.",
+            "B) It decreases to zero.",
+            "C) It remains the same.",
+            "D) It fluctuates randomly."
+          ],
+          "answer": "B) It decreases to zero.",
+          "explanation": "In free fall, both the person and the elevator are accelerating downward at the same rate, so the normal force (apparent weight) becomes zero."
+        },
+        {
+          "id": "5",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following factors does NOT affect the force of air resistance on a falling object?",
+          "options": [
+            "A) The cross-sectional area of the object.",
+            "B) The speed of the object.",
+            "C) The mass of the object.",
+            "D) The shape of the object."
+          ],
+          "answer": "C) The mass of the object.",
+          "explanation": "Air resistance depends on the cross-sectional area, speed, and shape of the object, but not directly on its mass."
+        },
+        {
+          "id": "6",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define true weight.",
+          "answer": "True weight is the downward force exerted on an object by the Earth's gravity, calculated as the mass of the object multiplied by the acceleration due to gravity (Fg = mg).",
+          "explanation": "True weight is a measure of the gravitational force acting on an object and is independent of the object's motion or the presence of other forces."
+        },
+        {
+          "id": "7",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Write the equation for the normal force (apparent weight) when an elevator is accelerating upwards.",
+          "answer": "FN = mg + ma",
+          "explanation": "When the elevator accelerates upwards, the normal force must counteract both the gravitational force (mg) and provide the additional force for the upward acceleration (ma)."
+        },
+        {
+          "id": "8",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "What is the condition for terminal velocity in a falling object?",
+          "answer": "Terminal velocity occurs when the force of air resistance equals the gravitational force (Fg = Fair), resulting in zero net force and no further acceleration.",
+          "explanation": "At terminal velocity, the object falls at a constant speed because the upward air resistance balances the downward gravitational force."
+        },
+        {
+          "id": "9",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A 60 kg person is standing in an elevator that is accelerating upwards at 2 m/s². Calculate the apparent weight of the person.",
+          "answer": "FN = mg + ma = (60 kg)(9.8 m/s²) + (60 kg)(2 m/s²) = 588 N + 120 N = 708 N",
+          "explanation": "The apparent weight is the normal force, which is the sum of the gravitational force (mg) and the force due to the upward acceleration (ma)."
+        },
+        {
+          "id": "10",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Explain why astronauts in the International Space Station appear weightless.",
+          "answer": "Astronauts appear weightless because both they and the space station are in free fall around the Earth at the same rate. Since there is no normal force acting on them, their apparent weight is zero.",
+          "explanation": "The sensation of weightlessness occurs because the astronauts and their surroundings are accelerating equally under gravity, resulting in no relative force between them."
+        },
+        {
+          "id": "11",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A skydiver reaches terminal velocity. Describe the forces acting on the skydiver and why the skydiver no longer accelerates.",
+          "answer": "At terminal velocity, the force of gravity (Fg) pulling the skydiver down is equal to the force of air resistance (Fair) pushing up. Since the net force is zero, the skydiver no longer accelerates and falls at a constant speed.",
+          "explanation": "Terminal velocity is reached when the upward air resistance balances the downward gravitational force, resulting in no net force and no acceleration."
+        },
+        {
+          "id": "12",
+          "type": "application",
+          "category": "Application",
+          "text": "A 70 kg person is in an elevator that is accelerating downward at 3 m/s². Calculate the apparent weight of the person.",
+          "answer": "FN = mg - ma = (70 kg)(9.8 m/s²) - (70 kg)(3 m/s²) = 686 N - 210 N = 476 N",
+          "explanation": "The apparent weight is the normal force, which is the gravitational force (mg) minus the force due to the downward acceleration (ma)."
+        },
+        {
+          "id": "13",
+          "type": "application",
+          "category": "Application",
+          "text": "A parachutist with a mass of 80 kg is falling at terminal velocity. Calculate the force of air resistance acting on the parachutist.",
+          "answer": "At terminal velocity, Fair = Fg = mg = (80 kg)(9.8 m/s²) = 784 N",
+          "explanation": "Since the parachutist is at terminal velocity, the air resistance must equal the gravitational force to result in zero net force."
+        },
+        {
+          "id": "14",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why a person feels heavier when an elevator accelerates upwards.",
+          "answer": "When the elevator accelerates upwards, the floor must exert a greater normal force to both support the person's weight and provide the upward acceleration. This increased normal force is felt as an increase in apparent weight.",
+          "explanation": "The sensation of increased weight is due to the greater upward force (normal force) required to accelerate the person upwards along with the elevator."
+        },
+        {
+          "id": "15",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe how the cross-sectional area of a falling object affects the air resistance it experiences.",
+          "answer": "A larger cross-sectional area increases the air resistance because more air particles collide with the object as it falls. This creates a greater upward force opposing the motion of the object.",
+          "explanation": "Air resistance is directly influenced by the cross-sectional area; a larger area means more air molecules are displaced, resulting in a higher resistive force."
+        }
+      ],
+      "createdAt": 1744141719616,
+      "totalQuestions": 15
+    },
+    "quiz-1744141866319": {
+      "title": "Grade 11 Exponential Functions - Exponential Growth And Decay Quiz",
+      "subject": "Mathematics",
+      "grade": "11",
+      "topic": "Exponential Functions - Exponential Growth And Decay",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following represents the general form of an exponential decay function?",
+          "options": [
+            "A) f(x) = a(1 + r)^x",
+            "B) f(x) = a(1 - r)^x",
+            "C) f(x) = a + r^x",
+            "D) f(x) = a - r^x"
+          ],
+          "answer": "B) f(x) = a(1 - r)^x",
+          "explanation": "Exponential decay functions are represented by f(x) = a(1 - r)^x, where 'a' is the initial value and 'r' is the decay rate."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "A bacteria culture doubles every 3 hours. If the initial population is 500, what is the population after 12 hours?",
+          "options": [
+            "A) 2000",
+            "B) 4000",
+            "C) 8000",
+            "D) 16000"
+          ],
+          "answer": "C) 8000",
+          "explanation": "Since the bacteria doubles every 3 hours, after 12 hours (which is 4 doubling periods), the population will be 500 * 2^4 = 500 * 16 = 8000."
+        },
+        {
+          "id": "3",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define the term 'half-life' in the context of exponential decay.",
+          "answer": "Half-life is the time required for a quantity to reduce to half of its initial value in exponential decay.",
+          "explanation": "Half-life is a key concept in exponential decay, describing how long it takes for a substance to decrease by half its original amount."
+        },
+        {
+          "id": "4",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "A town's population grows exponentially at a rate of 3% per year. If the current population is 50,000, how long will it take for the population to reach 100,000? Show your steps.",
+          "answer": "Approximately 23.1 years",
+          "explanation": "Using the formula f(x) = a(1 + r)^x, set 100,000 = 50,000(1.03)^x. Divide both sides by 50,000 to get 2 = 1.03^x. Take the natural logarithm of both sides: ln(2) = x ln(1.03). Solve for x: x = ln(2)/ln(1.03) ≈ 23.1 years."
+        },
+        {
+          "id": "5",
+          "type": "application",
+          "category": "Application",
+          "text": "A car depreciates in value by 12% each year. If the car was purchased for $25,000, what will its value be after 5 years? Round to the nearest dollar.",
+          "answer": "$13,181",
+          "explanation": "Using the decay formula f(x) = a(1 - r)^x, the value after 5 years is 25,000(0.88)^5 ≈ 25,000 * 0.527 ≈ $13,181."
+        },
+        {
+          "id": "6",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why the function f(x) = 200(0.85)^x represents exponential decay.",
+          "answer": "The function represents exponential decay because the base (0.85) is between 0 and 1, indicating that the quantity decreases by 15% each period.",
+          "explanation": "In exponential functions, if the base 'b' is 0 < b < 1, the function models decay. Here, 0.85 means the quantity decreases by 15% (since 1 - 0.15 = 0.85) each time period."
+        },
+        {
+          "id": "7",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe a real-world scenario that could be modeled by the exponential growth function f(x) = 1000(1.08)^x.",
+          "answer": "This function could model a savings account with an initial deposit of $1000 growing at an annual interest rate of 8%.",
+          "explanation": "The initial value is $1000, and the base 1.08 indicates an 8% growth rate per year, typical of compound interest in savings accounts."
+        }
+      ],
+      "createdAt": 1744141866320,
+      "totalQuestions": 7
+    }
+  },
+  "pastQuizzes": [
+    {
+      "id": "quiz-1744130425175",
+      "title": "Grade 11 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "11",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "createdAt": "2025-04-08T16:40:25.175Z",
       "totalQuestions": 8
+    },
+    {
+      "id": "quiz-1744131485642",
+      "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "10",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "createdAt": "2025-04-08T16:58:05.642Z",
+      "totalQuestions": 9
+    },
+    {
+      "id": "quiz-1744131828922",
+      "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "10",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "createdAt": "2025-04-08T17:03:48.922Z",
+      "totalQuestions": 15
+    },
+    {
+      "id": "quiz-1744131934440",
+      "title": "Grade 10 Exponential Functions - Exponential Growth And Decay Problems Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Exponential Functions - Exponential Growth And Decay Problems",
+      "createdAt": "2025-04-08T17:05:34.440Z",
+      "totalQuestions": 15
+    },
+    {
+      "id": "quiz-1744132109173",
+      "title": "Grade 10 Trigonometry - Similar Triangles Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Trigonometry - Similar Triangles",
+      "createdAt": "2025-04-08T17:08:29.173Z",
+      "totalQuestions": 8
+    },
+    {
+      "id": "quiz-1744132665496",
+      "title": "Grade 11 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "11",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "createdAt": "2025-04-08T17:17:45.496Z",
+      "totalQuestions": 3
+    },
+    {
+      "id": "quiz-1744134685619",
+      "title": "Grade 10 Forces - Gravitational Force And Apparent Weight Quiz",
+      "subject": "Physics",
+      "grade": "10",
+      "topic": "Forces - Gravitational Force And Apparent Weight",
+      "createdAt": "2025-04-08T17:51:25.619Z",
+      "totalQuestions": 15
+    },
+    {
+      "id": "quiz-1744134945567",
+      "title": "Grade 11 Trigonometry - Similar Triangles Quiz",
+      "subject": "Mathematics",
+      "grade": "11",
+      "topic": "Trigonometry - Similar Triangles",
+      "createdAt": "2025-04-08T17:55:45.567Z",
+      "totalQuestions": 12
+    },
+    {
+      "id": "quiz-1744135410008",
+      "title": "Grade 10 Exponential Functions - Exponential Growth And Decay Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Exponential Functions - Exponential Growth And Decay",
+      "createdAt": "2025-04-08T18:03:30.008Z",
+      "totalQuestions": 13
+    },
+    {
+      "id": "quiz-1744136023212",
+      "title": "Grade 10 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "10",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "createdAt": "2025-04-08T18:13:43.213Z",
+      "totalQuestions": 10
+    },
+    {
+      "id": "quiz-1744137755396",
+      "title": "Grade 12 Physical Therapy - Neuromuscular Conditions Quiz",
+      "subject": "Healthcare",
+      "grade": "12",
+      "topic": "Physical Therapy - Neuromuscular Conditions",
+      "createdAt": "2025-04-08T18:42:35.396Z",
+      "totalQuestions": 5
+    },
+    {
+      "id": "quiz-1744139230950",
+      "title": "Grade 10 Mechanics - Newton’s Laws Of Motion Quiz",
+      "subject": "Physics",
+      "grade": "10",
+      "topic": "Mechanics - Newton’s Laws Of Motion",
+      "createdAt": "2025-04-08T19:07:10.950Z",
+      "totalQuestions": 15
+    },
+    {
+      "id": "quiz-1744141719616",
+      "title": "Grade 10 Forces - Gravitational Force And Apparent Weight Quiz",
+      "subject": "Physics",
+      "grade": "10",
+      "topic": "Forces - Gravitational Force And Apparent Weight",
+      "createdAt": "2025-04-08T19:48:39.616Z",
+      "totalQuestions": 15
+    },
+    {
+      "id": "quiz-1744141866319",
+      "title": "Grade 11 Exponential Functions - Exponential Growth And Decay Quiz",
+      "subject": "Mathematics",
+      "grade": "11",
+      "topic": "Exponential Functions - Exponential Growth And Decay",
+      "createdAt": "2025-04-08T19:51:06.320Z",
+      "totalQuestions": 7
     }
   ]
 }
