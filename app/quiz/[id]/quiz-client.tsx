@@ -149,23 +149,22 @@ export function QuizClient({ initialQuiz, quizId }: QuizClientProps) {
       }
     }));
 
-    if (question.type === 'multipleChoice') {
-      checkAnswerAction(questionId, answerObj.text, question.answer, question.type)
-        .then(result => {
-          setSelectedAnswers(prev => ({
-            ...prev,
-            [questionId]: {
-              text: answerObj.text,
-              score: result.score || 0,
-              correct: result.correct || false,
-              feedback: result.feedback || 'No feedback available'
-            }
-          }));
-        })
-        .catch(error => {
-          console.error('Error checking answer:', error);
-        });
-    }
+    // Check answers immediately for both multiple choice and short answer questions
+    checkAnswerAction(questionId, answerObj.text, question.answer, question.type, question.text)
+      .then(result => {
+        setSelectedAnswers(prev => ({
+          ...prev,
+          [questionId]: {
+            text: answerObj.text,
+            score: result.score || 0,
+            correct: result.correct || false,
+            feedback: result.feedback || 'No feedback available'
+          }
+        }));
+      })
+      .catch(error => {
+        console.error('Error checking answer:', error);
+      });
   };
 
   const goToNextQuestion = () => {

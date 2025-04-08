@@ -32,9 +32,9 @@ function formatFeedback(text: string): string {
 
 export async function POST(request: Request) {
   try {
-    const { questionId, studentAnswer, correctAnswer, questionType } = await request.json();
+    const { questionId, questionText, studentAnswer, correctAnswer, questionType } = await request.json();
 
-    if (!questionId || !studentAnswer || !correctAnswer || !questionType) {
+    if (!questionId || !studentAnswer || !correctAnswer || !questionType || !questionText) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -55,17 +55,16 @@ export async function POST(request: Request) {
 
     // For short answer questions, use AI evaluation
     const prompt = `
-    You are a physics teacher evaluating a student's answer.
-    
-    Question: ${questionId}
+    You are a YRDSB teacher evaluating a student's answer. Review the student's answer below and assess their understanding of the concept. Focus on the key ideas rather than an exact word-for-word match with the correct answer. Evaluate whether the response demonstrates a reasonable grasp of the topic, and provide constructive feedback if there are misunderstandings or missing elements.
+
+    Question: ${questionText}
     Student's Answer: ${studentAnswer}
-    Correct Answer: ${correctAnswer}
+    Expected Answer: ${correctAnswer}
     
     Evaluate the student's answer based on these criteria:
-    1. Core concept understanding
-    2. Use of proper terminology
-    3. Completeness of explanation
-    4. Mathematical accuracy (if applicable)
+    1. Semantic understanding - Does the answer demonstrate understanding of the core concept, even if using different wording?
+    2. Key points - Are the main ideas present, even if expressed differently?
+    3. Accuracy - Is the information factually correct?
     
     Provide a JSON response in this exact format:
     {
@@ -75,20 +74,46 @@ export async function POST(request: Request) {
     }
     
     Guidelines:
-    - Score 1.0: Perfect answer with all key points
-    - Score 0.8-0.9: Minor omissions or imprecise terminology
-    - Score 0.6-0.7: Missing some key points but shows understanding
-    - Score 0.4-0.5: Partial understanding with significant gaps
-    - Score 0.0-0.3: Major misconceptions or missing key concepts
+    - Score 1.0: Shows clear understanding of the concept, even if worded differently
+    - Score 0.8-0.9: Good understanding with minor gaps or slightly imprecise explanation
+    - Score 0.6-0.7: Basic understanding present but could be more complete
+    - Score 0.4-0.5: Some understanding but significant gaps
+    - Score 0.0-0.3: Major misunderstandings or incorrect concepts
     
-    Be lenient with minor omissions (like missing μ symbol) if the core concept is understood.
+    Focus on whether they understand the concept rather than exact wording matches.
+    Be lenient with variations in terminology if the core understanding is demonstrated.
+    Consider synonyms and alternative valid ways of expressing the same concept.
+
+    Important: Your response MUST be valid JSON. Do not include any markdown formatting or code blocks.
     `;
 
-    const result = await generateText(prompt, {
-      temperature: 0.3,
-      maxTokens: 1000,
-      responseFormat: "json"
-    });
+    let result;
+    try {
+      result = await generateText(prompt, {
+        temperature: 0.3,
+        maxTokens: 1000,
+        responseFormat: "json"
+      });
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      // Fallback to more lenient text matching if AI fails
+      const normalizedStudent = studentAnswer.trim().toLowerCase();
+      const normalizedCorrect = correctAnswer.trim().toLowerCase();
+      const isExactMatch = normalizedStudent === normalizedCorrect;
+      const containsKeywords = normalizedCorrect.split(' ').some((word: string) => 
+        word.length > 3 && normalizedStudent.includes(word)
+      );
+
+      return NextResponse.json({
+        score: isExactMatch ? 1 : (containsKeywords ? 0.5 : 0),
+        correct: isExactMatch,
+        feedback: isExactMatch 
+          ? "Correct! Well done!" 
+          : (containsKeywords 
+              ? "Partially correct. Your answer contains some key elements but could be more complete." 
+              : "Incorrect. Please review the material and try again.")
+      });
+    }
 
     // Clean up the response to ensure it's valid JSON
     const cleanResult = result.replace(/```json\n|\n```|```/g, '').trim();
@@ -103,14 +128,26 @@ export async function POST(request: Request) {
       return NextResponse.json(response);
     } catch (parseError) {
       console.error('Error parsing AI response:', parseError);
-      // Fallback to basic text matching if AI evaluation fails
-      const isCorrect = studentAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+      // Log the raw response for debugging
+      console.error('Raw AI response:', result);
+      console.error('Cleaned response:', cleanResult);
+      
+      // Fallback to more lenient text matching
+      const normalizedStudent = studentAnswer.trim().toLowerCase();
+      const normalizedCorrect = correctAnswer.trim().toLowerCase();
+      const isExactMatch = normalizedStudent === normalizedCorrect;
+      const containsKeywords = normalizedCorrect.split(' ').some((word: string) => 
+        word.length > 3 && normalizedStudent.includes(word)
+      );
+
       return NextResponse.json({
-        score: isCorrect ? 1 : 0,
-        correct: isCorrect,
-        feedback: isCorrect 
+        score: isExactMatch ? 1 : (containsKeywords ? 0.5 : 0),
+        correct: isExactMatch,
+        feedback: isExactMatch 
           ? "Correct! Well done!" 
-          : "Incorrect. Please review the material and try again."
+          : (containsKeywords 
+              ? "Partially correct. Your answer contains some key elements but could be more complete." 
+              : "Incorrect. Please review the material and try again.")
       });
     }
   } catch (error: any) {

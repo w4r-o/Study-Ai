@@ -272,7 +272,7 @@ export async function createQuiz(formData: FormData): Promise<string> {
     const prompt = `
     You are a Highschool teacher at York Region District School Board creating a Grade ${grade} test.
     
-    CRITICAL: You MUST generate COMPLETELY NEW questions according to this exact distribution:
+    CRITICAL: You MUST generate COMPLETELY NEW NEVER MADE BEFORE questions according to this exact distribution:
     1. Multiple Choice Questions: ${multipleChoice} questions
        - Focus on basic concept understanding and recall
        - Each must have exactly 4 options (A, B, C, D)
@@ -889,13 +889,72 @@ export async function submitQuizAnswers(quizId: string, answers: { [key: string]
     }
 
     console.log('\nStarting answer evaluation...');
-    // Evaluate all answers together
-    const results = await evaluateQuizAnswers(quizId, answers, quiz);
-    console.log('Evaluation complete:', {
-      resultId: results.id,
+    
+    // Initialize results structure
+    const results: QuizResults = {
+      id: `result-${Date.now()}`,
+      quizId: quizId,
+      answers: {},
+      overall: {
+        score: 0,
+        feedback: '',
+        reviewTopics: [],
+        strengths: []
+      },
+      submittedAt: new Date().toISOString()
+    };
+
+    // Evaluate each answer
+    for (const question of quiz.questions) {
+      const answer = answers[question.id];
+      
+      if (!answer || answer.trim() === '') {
+        results.answers[question.id] = {
+          isCorrect: false,
+          feedback: 'No answer provided',
+          score: 0,
+          userAnswer: ''
+        };
+        continue;
+      }
+
+      // Check answer based on type
+      if (question.type === 'multipleChoice') {
+        const isCorrect = answer === question.answer;
+        results.answers[question.id] = {
+          isCorrect,
+          feedback: isCorrect ? 'Correct!' : `Incorrect. The correct answer is: ${question.answer}`,
+          score: isCorrect ? 1 : 0,
+          userAnswer: answer
+        };
+      } else {
+        // For short answer questions, use AI evaluation
+        const evaluation = await checkAnswerAction(question.id, answer, question.answer, question.type, question.text);
+        results.answers[question.id] = {
+          isCorrect: evaluation.correct,
+          feedback: evaluation.feedback,
+          score: evaluation.score,
+          userAnswer: answer
+        };
+      }
+    }
+
+    // Calculate overall score
+    const totalQuestions = quiz.questions.length;
+    const totalScore = Object.values(results.answers).reduce((sum, answer) => sum + answer.score, 0);
+    results.overall.score = Math.round((totalScore / totalQuestions) * 100);
+
+    console.log('Score calculation:', {
+      totalQuestions,
+      totalScore,
       overallScore: results.overall.score,
-      answersEvaluated: Object.keys(results.answers).length
+      individualScores: Object.entries(results.answers).map(([id, ans]) => ({ id, score: ans.score }))
     });
+
+    // Generate overall feedback
+    results.overall.feedback = generateOverallFeedback(results);
+    results.overall.reviewTopics = identifyReviewTopics(results, quiz);
+    results.overall.strengths = identifyStrengths(results, quiz);
 
     // Save the results
     quiz.results = results;
@@ -1020,7 +1079,13 @@ async function checkAnswer(questionId: string, answer: string): Promise<{ isCorr
   }
 }
 
-export async function checkAnswerAction(questionId: string, studentAnswer: string, correctAnswer: string, questionType: string) {
+export async function checkAnswerAction(
+  questionId: string, 
+  studentAnswer: string, 
+  correctAnswer: string, 
+  questionType: string,
+  questionText: string
+) {
   try {
     console.log(`Checking answer for question ${questionId}...`);
     
@@ -1036,7 +1101,7 @@ export async function checkAnswerAction(questionId: string, studentAnswer: strin
       const prompt = `
       You are an expert teacher evaluating a student's answer.
       
-      Question: ${questionId}
+      Question: ${questionText}
       Expected Answer: ${correctAnswer}
       Student's Answer: ${studentAnswer}
       

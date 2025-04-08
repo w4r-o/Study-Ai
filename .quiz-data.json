@@ -1807,6 +1807,588 @@
       ],
       "createdAt": 1744141866320,
       "totalQuestions": 7
+    },
+    "quiz-1744142859999": {
+      "title": "Grade 10 Trigonometry - Similar Triangles Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Trigonometry - Similar Triangles",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "If two triangles are similar, which of the following must be true?",
+          "options": [
+            "A) Corresponding angles are equal and corresponding sides are proportional",
+            "B) Corresponding angles are proportional and corresponding sides are equal",
+            "C) Both corresponding angles and sides are equal",
+            "D) Both corresponding angles and sides are proportional"
+          ],
+          "answer": "A) Corresponding angles are equal and corresponding sides are proportional",
+          "explanation": "Similar triangles have corresponding angles that are equal and corresponding sides that are proportional. This is the definition of similar triangles."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "In a right-angled triangle, if the opposite side to angle θ is 6 and the hypotenuse is 10, what is sin θ?",
+          "options": [
+            "A) 0.6",
+            "B) 0.8",
+            "C) 1.666",
+            "D) 0.4"
+          ],
+          "answer": "A) 0.6",
+          "explanation": "sin θ is calculated as opposite/hypotenuse. Therefore, sin θ = 6/10 = 0.6."
+        },
+        {
+          "id": "3",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define the term 'angle of elevation'.",
+          "answer": "The angle of elevation is the angle between the horizontal and the line of sight when looking up at an object.",
+          "explanation": "The angle of elevation is used to describe the angle from the horizontal upwards to an object. It is commonly used in problems involving heights and distances."
+        },
+        {
+          "id": "4",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Given that ∆ABC ~ ∆DEF, AB = 8 cm, BC = 12 cm, and DE = 4 cm, find the length of EF. Show your steps.",
+          "answer": "6 cm",
+          "explanation": "Since ∆ABC ~ ∆DEF, the corresponding sides are proportional. Therefore, AB/DE = BC/EF. Plugging in the known values: 8/4 = 12/EF. Solving for EF: 2 = 12/EF → EF = 12/2 = 6 cm."
+        }
+      ],
+      "createdAt": 1744142859999,
+      "totalQuestions": 4
+    },
+    "quiz-1744143889243": {
+      "title": "Grade 10 Algebraic Expressions - Common Factoring Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Algebraic Expressions - Common Factoring",
+      "questions": [
+        {
+          "id": "1",
+          "text": "What is the greatest common factor (GCF) of the expression 12x^3 - 18x^2?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) 6x",
+            "B) 6x^2",
+            "C) 12x^3",
+            "D) 18x^2"
+          ],
+          "answer": "B) 6x^2",
+          "explanation": "The GCF of the coefficients 12 and 18 is 6. The GCF of the variables x^3 and x^2 is x^2. Therefore, the GCF of the entire expression is 6x^2."
+        },
+        {
+          "id": "2",
+          "text": "Define what it means to factor an algebraic expression.",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "options": [],
+          "answer": "Factoring an algebraic expression means breaking it down into simpler expressions (factors) that, when multiplied together, give the original expression.",
+          "explanation": "Factoring is the reverse process of expanding. For example, factoring 6x - 2 gives 2(3x - 1), where 2 and (3x - 1) are the factors."
+        },
+        {
+          "id": "3",
+          "text": "Factor the trinomial x^2 - 5x + 6 completely.",
+          "type": "thinking",
+          "category": "Thinking",
+          "options": [],
+          "answer": "(x - 2)(x - 3)",
+          "explanation": "To factor x^2 - 5x + 6, find two numbers that multiply to 6 (the constant term) and add to -5 (the coefficient of the middle term). The numbers -2 and -3 satisfy these conditions, so the factored form is (x - 2)(x - 3)."
+        },
+        {
+          "id": "4",
+          "text": "A rectangle has an area represented by the expression 2x^2 + 10x. If the width of the rectangle is 2x, what is the length of the rectangle?",
+          "type": "application",
+          "category": "Application",
+          "options": [],
+          "answer": "x + 5",
+          "explanation": "The area of a rectangle is given by length × width. Since the area is 2x^2 + 10x and the width is 2x, the length can be found by dividing the area by the width: (2x^2 + 10x) / 2x = x + 5."
+        },
+        {
+          "id": "5",
+          "text": "Explain the steps you would take to factor the expression 3x^2 + 9x - 12 completely.",
+          "type": "communication",
+          "category": "Communication",
+          "options": [],
+          "answer": "First, factor out the GCF, which is 3. This gives 3(x^2 + 3x - 4). Then, factor the trinomial inside the parentheses by finding two numbers that multiply to -4 and add to 3. The numbers 4 and -1 satisfy these conditions, so the fully factored form is 3(x + 4)(x - 1).",
+          "explanation": "The process involves two main steps: 1) Factoring out the GCF from all terms, and 2) Factoring the resulting quadratic expression by finding two numbers that meet the required product and sum conditions."
+        }
+      ],
+      "createdAt": 1744143889243,
+      "totalQuestions": 5,
+      "results": {
+        "id": "result-1744144089131",
+        "quizId": "quiz-1744143889243",
+        "answers": {
+          "1": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "2": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "3": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "4": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          },
+          "5": {
+            "isCorrect": false,
+            "feedback": "No answer provided",
+            "score": 0,
+            "userAnswer": ""
+          }
+        },
+        "overall": {
+          "score": 0,
+          "feedback": "You may want to review the material and try again.",
+          "reviewTopics": [
+            "What is the greatest common factor (GCF) of the expression 12x^3 - 18x^2?",
+            "Define what it means to factor an algebraic expression.",
+            "Factor the trinomial x^2 - 5x + 6 completely.",
+            "A rectangle has an area represented by the expression 2x^2 + 10x. If the width of the rectangle is 2x, what is the length of the rectangle?",
+            "Explain the steps you would take to factor the expression 3x^2 + 9x - 12 completely."
+          ],
+          "strengths": []
+        },
+        "submittedAt": "2025-04-08T20:28:09.131Z"
+      }
+    },
+    "quiz-1744144586612": {
+      "title": "Grade 10 Algebraic Expressions - Common Factoring Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Algebraic Expressions - Common Factoring",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the greatest common factor (GCF) of the expression 12x³y² - 18x²y⁴?",
+          "options": [
+            "A) 6x²y²",
+            "B) 3x³y⁴",
+            "C) 12x²y²",
+            "D) 18x³y⁴"
+          ],
+          "answer": "A) 6x²y²",
+          "explanation": "The GCF of 12 and 18 is 6. The lowest power of x common to both terms is x², and the lowest power of y common to both terms is y²."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is the fully factored form of the expression 5x⁴ - 10x² + 15x?",
+          "options": [
+            "A) 5x(x³ - 2x + 3)",
+            "B) 5(x⁴ - 2x² + 3x)",
+            "C) x(5x³ - 10x + 15)",
+            "D) 5x(x³ - 10x² + 15x)"
+          ],
+          "answer": "A) 5x(x³ - 2x + 3)",
+          "explanation": "The GCF of all terms is 5x. Factoring out 5x from each term gives 5x(x³ - 2x + 3)."
+        },
+        {
+          "id": "3",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define what it means to 'factor by grouping' and provide an example where it might be used.",
+          "answer": "Factoring by grouping involves grouping terms in pairs that have a common factor, factoring out the GCF from each pair, and then factoring out the common binomial. An example is the expression 2x² + 8x + 3x + 12, which can be grouped as (2x² + 8x) + (3x + 12), factored to 2x(x + 4) + 3(x + 4), and then factored further to (x + 4)(2x + 3).",
+          "explanation": "Factoring by grouping is useful when an expression has four or more terms. The key is to group terms so that each group has a common factor, leading to a common binomial factor."
+        },
+        {
+          "id": "4",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Factor the trinomial x² - 11xy + 24y² completely. Show each step of your process.",
+          "answer": "(x - 3y)(x - 8y)",
+          "explanation": "To factor x² - 11xy + 24y², find two numbers that multiply to 24 (the coefficient of y²) and add to -11 (the coefficient of xy). The numbers are -3 and -8. Thus, the factored form is (x - 3y)(x - 8y)."
+        },
+        {
+          "id": "5",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Factor the expression 6x³ + 33x² + 45x completely. Show all steps.",
+          "answer": "3x(2x + 3)(x + 5)",
+          "explanation": "First, factor out the GCF, which is 3x: 3x(2x² + 11x + 15). Then, factor the trinomial inside the parentheses. Find two numbers that multiply to 30 (2 * 15) and add to 11. The numbers are 5 and 6. Rewrite the middle term: 3x(2x² + 6x + 5x + 15). Factor by grouping: 3x[2x(x + 3) + 5(x + 3)] = 3x(x + 3)(2x + 5)."
+        },
+        {
+          "id": "6",
+          "type": "application",
+          "category": "Application",
+          "text": "A rectangular garden has an area represented by the expression x² - 13x + 42. Determine the algebraic expressions for the length and width of the garden, assuming they are binomials with integer coefficients.",
+          "answer": "(x - 6)(x - 7)",
+          "explanation": "To find the length and width, factor the area expression x² - 13x + 42. Find two numbers that multiply to 42 and add to -13. The numbers are -6 and -7. Thus, the factored form is (x - 6)(x - 7), so the length and width are (x - 6) and (x - 7)."
+        },
+        {
+          "id": "7",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why the expression x² + 9 cannot be factored using real numbers.",
+          "answer": "The expression x² + 9 is a sum of squares, and there are no real numbers that multiply to 9 and add to 0 (the coefficient of x is 0). Sums of squares cannot be factored into real binomials.",
+          "explanation": "Factoring x² + 9 would require finding two numbers that multiply to 9 and add to 0. The only possible pairs are (3, -3) and (-3, 3), but their product is -9, not 9. Thus, it cannot be factored with real numbers."
+        },
+        {
+          "id": "8",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe the steps you would take to factor the expression 4x² - 25y² completely.",
+          "answer": "The expression 4x² - 25y² is a difference of squares. It can be factored as (2x + 5y)(2x - 5y).",
+          "explanation": "A difference of squares follows the pattern a² - b² = (a + b)(a - b). Here, 4x² is (2x)² and 25y² is (5y)², so the factored form is (2x + 5y)(2x - 5y)."
+        },
+        {
+          "id": "9",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain how you would verify that the trinomial x² + 10x + 25 is a perfect square trinomial and then factor it.",
+          "answer": "To verify, check that the first and third terms are perfect squares (x² and 25) and that the middle term is twice the product of their square roots (2 * x * 5 = 10x). The factored form is (x + 5)².",
+          "explanation": "A perfect square trinomial has the form a² + 2ab + b² = (a + b)². Here, x² + 10x + 25 fits this pattern with a = x and b = 5, so it factors to (x + 5)²."
+        }
+      ],
+      "createdAt": 1744144586612,
+      "totalQuestions": 9
+    },
+    "quiz-1744144902665": {
+      "title": "Grade 10 Algebraic Expressions - Common Factoring Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Algebraic Expressions - Common Factoring",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the greatest common factor (GCF) of the expression 12x³y² - 18x²y⁴?",
+          "options": [
+            "A) 6x²y²",
+            "B) 3x³y⁴",
+            "C) 12x²y²",
+            "D) 18x³y⁴"
+          ],
+          "answer": "A) 6x²y²",
+          "explanation": "The GCF of 12 and 18 is 6. The lowest power of x common to both terms is x², and the lowest power of y common to both terms is y². Thus, the GCF is 6x²y²."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "Which of the following is the factored form of the trinomial x² + 8x + 15?",
+          "options": [
+            "A) (x + 3)(x + 5)",
+            "B) (x + 2)(x + 6)",
+            "C) (x + 1)(x + 15)",
+            "D) (x + 4)(x + 4)"
+          ],
+          "answer": "A) (x + 3)(x + 5)",
+          "explanation": "To factor x² + 8x + 15, find two numbers that multiply to 15 and add to 8. These numbers are 3 and 5, so the factored form is (x + 3)(x + 5)."
+        },
+        {
+          "id": "3",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define what it means to 'factor by grouping' and provide an example expression where this method could be applied.",
+          "answer": "Factoring by grouping involves grouping terms in an expression that have common factors, factoring out the GCF from each group, and then factoring out the common binomial factor. An example expression where this method could be applied is 2x² + 8x + 3x + 12.",
+          "explanation": "In the example 2x² + 8x + 3x + 12, you would group (2x² + 8x) and (3x + 12), factor out 2x from the first group and 3 from the second group, resulting in 2x(x + 4) + 3(x + 4). Then, factor out the common binomial (x + 4) to get (x + 4)(2x + 3)."
+        },
+        {
+          "id": "4",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Factor the expression 6x² - 5x - 6 completely. Show all steps.",
+          "answer": "(3x + 2)(2x - 3)",
+          "explanation": "1. Multiply the coefficient of x² (6) by the constant term (-6) to get -36. 2. Find two numbers that multiply to -36 and add to -5 (these are -9 and 4). 3. Rewrite the middle term: 6x² - 9x + 4x - 6. 4. Factor by grouping: 3x(2x - 3) + 2(2x - 3). 5. Factor out the common binomial: (2x - 3)(3x + 2)."
+        },
+        {
+          "id": "5",
+          "type": "application",
+          "category": "Application",
+          "text": "A rectangular garden has an area represented by the expression x² - 7x + 10. Find the expressions for the length and width of the garden, assuming they are binomials with integer coefficients.",
+          "answer": "Length: (x - 5), Width: (x - 2)",
+          "explanation": "To find the length and width, factor the area expression x² - 7x + 10. Find two numbers that multiply to 10 and add to -7, which are -5 and -2. Thus, the factored form is (x - 5)(x - 2), so the length and width are (x - 5) and (x - 2)."
+        },
+        {
+          "id": "6",
+          "type": "application",
+          "category": "Application",
+          "text": "The area of a square is given by the expression 4x² - 12x + 9. Find the length of one side of the square.",
+          "answer": "(2x - 3)",
+          "explanation": "The expression 4x² - 12x + 9 is a perfect square trinomial. It can be factored as (2x)² - 2(2x)(3) + 3² = (2x - 3)². Thus, the length of one side is (2x - 3)."
+        },
+        {
+          "id": "7",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why the expression x² + 9 cannot be factored using the difference of squares method.",
+          "answer": "The difference of squares method requires the expression to be in the form a² - b², where there is a subtraction (difference) between two perfect squares. The expression x² + 9 is a sum of squares (x² + 3²), not a difference, so it cannot be factored using this method.",
+          "explanation": "The difference of squares formula is (a² - b²) = (a + b)(a - b). Since x² + 9 is a sum, not a difference, it does not fit this form and cannot be factored this way."
+        },
+        {
+          "id": "8",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Describe the steps you would take to factor the expression 5x⁵ + 15x³ - 35x⁴ completely. What is the first step, and why?",
+          "answer": "1. Factor out the GCF, which is 5x³. 2. The expression becomes 5x³(x² + 3 - 7x). 3. Rearrange the terms inside the parentheses: 5x³(x² - 7x + 3).",
+          "explanation": "The first step is to factor out the GCF because it simplifies the expression and makes further factoring easier. The GCF of 5x⁵, 15x³, and -35x⁴ is 5x³, as it is the largest term that divides all coefficients and variables."
+        }
+      ],
+      "createdAt": 1744144902665,
+      "totalQuestions": 8
+    },
+    "quiz-1744145579659": {
+      "title": "Grade 9 Integers - Operations With Integers Quiz",
+      "subject": "Mathematics",
+      "grade": "9",
+      "topic": "Integers - Operations With Integers",
+      "questions": [
+        {
+          "id": "1",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the result of (-10) ÷ (-2) – (+4) x (+6)?",
+          "options": [
+            "A) -19",
+            "B) 5",
+            "C) -29",
+            "D) 19"
+          ],
+          "answer": "C) -29",
+          "explanation": "First, divide (-10) by (-2) to get 5. Then multiply (+4) by (+6) to get 24. Subtract 24 from 5 to get -19."
+        },
+        {
+          "id": "2",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "If Joe climbs -3 steps every second, where is he after 4 seconds compared to his starting position?",
+          "options": [
+            "A) 12 steps above",
+            "B) 12 steps below",
+            "C) 7 steps above",
+            "D) 7 steps below"
+          ],
+          "answer": "B) 12 steps below",
+          "explanation": "Multiply -3 steps/second by 4 seconds to get -12 steps, meaning 12 steps below the starting position."
+        },
+        {
+          "id": "3",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "text": "What is the mean of the daily temperatures (+3°), (-1°), (+2°), (-4°), and (+5°)?",
+          "options": [
+            "A) 1°",
+            "B) 2°",
+            "C) 3°",
+            "D) 4°"
+          ],
+          "answer": "A) 1°",
+          "explanation": "Add all temperatures: 3 + (-1) + 2 + (-4) + 5 = 5. Divide by 5 days to get a mean of 1°."
+        },
+        {
+          "id": "4",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "text": "Define the term 'integer' and give an example of a real-world situation where integers are used.",
+          "answer": "An integer is a whole number that can be positive, negative, or zero. Example: Tracking temperature changes (e.g., -5°C to +3°C).",
+          "explanation": "Integers are used in scenarios involving direction or opposite states, such as temperature, elevation, or financial gains/losses."
+        },
+        {
+          "id": "5",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Solve: (-16) ÷ [(+5) – (+6) + (-7)]. Show all steps.",
+          "answer": "2",
+          "explanation": "First, solve inside the brackets: 5 - 6 = -1, then -1 + (-7) = -8. Now divide -16 by -8 to get 2."
+        },
+        {
+          "id": "6",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Predict whether (-) x (-) x (-) – (-) x (-) x (-) is positive or negative. Justify your answer.",
+          "answer": "Zero (neither positive nor negative)",
+          "explanation": "Both products are negative (since three negatives multiplied together yield a negative). Subtracting identical values results in zero."
+        },
+        {
+          "id": "7",
+          "type": "thinking",
+          "category": "Thinking",
+          "text": "Frederick deposited $30 weekly for 6 weeks but withdrew $50 weekly for 4 weeks. Write an addition-only equation for his net balance change.",
+          "answer": "(30 + 30 + 30 + 30 + 30 + 30) + (-50 + -50 + -50 + -50) = 180 + (-200) = -20",
+          "explanation": "Total deposits: 6 x 30 = +180. Total withdrawals: 4 x (-50) = -200. Net change: -20."
+        },
+        {
+          "id": "8",
+          "type": "application",
+          "category": "Application",
+          "text": "Johnny has $4, repays Gary $3, collects $7 from Karen, and doubles his money at roulette. Write an equation modeling his final amount.",
+          "answer": "Final amount = 2 x (4 - 3 + 7) = 2 x 8 = 16",
+          "explanation": "Initial: $4. After repaying Gary: 4 - 3 = $1. After collecting from Karen: 1 + 7 = $8. Doubled: 8 x 2 = $16."
+        },
+        {
+          "id": "9",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Explain why the product of two negative integers is positive.",
+          "answer": "Multiplying two negatives follows the rule that (-a) x (-b) = ab. This aligns with the idea that opposites cancel out (e.g., reversing a debt is a gain).",
+          "explanation": "Mathematically, it preserves consistency in operations. For example, (-1) x (-1) = 1 ensures distributive property holds."
+        },
+        {
+          "id": "10",
+          "type": "communication",
+          "category": "Communication",
+          "text": "Sami Salo has a +3 rating. If he gets -2 per game, how many games until his total is -9? Show your reasoning.",
+          "answer": "6 games",
+          "explanation": "Let x = games needed. Current: +3. Change per game: -2. Equation: 3 + (-2)x = -9. Solve: -2x = -12 → x = 6."
+        }
+      ],
+      "createdAt": 1744145579659,
+      "totalQuestions": 10
+    },
+    "quiz-1744145969546": {
+      "title": "Grade 9 Integers - Operations With Integers Quiz",
+      "subject": "Mathematics",
+      "grade": "9",
+      "topic": "Integers - Operations With Integers",
+      "questions": [
+        {
+          "id": "1",
+          "text": "What is the result of (-10) ÷ (-2) – (+4) x (+6)?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) -19",
+            "B) 5",
+            "C) -29",
+            "D) 19"
+          ],
+          "answer": "C) -29",
+          "explanation": "First, divide (-10) by (-2) to get 5. Then multiply (+4) by (+6) to get 24. Finally, subtract 24 from 5 to get -19."
+        },
+        {
+          "id": "2",
+          "text": "Joe climbs -3 steps every second for 4 seconds. Where is he compared to his starting position?",
+          "type": "multipleChoice",
+          "category": "Multiple Choice",
+          "options": [
+            "A) 12 steps above",
+            "B) 12 steps below",
+            "C) 7 steps above",
+            "D) 7 steps below"
+          ],
+          "answer": "B) 12 steps below",
+          "explanation": "Multiply -3 steps/second by 4 seconds to get -12 steps, meaning 12 steps below the starting position."
+        },
+        {
+          "id": "3",
+          "text": "Define the term 'mean' in the context of integers.",
+          "type": "knowledge",
+          "category": "Knowledge",
+          "options": [],
+          "answer": "The mean is the average of a set of numbers, calculated by dividing the sum of the numbers by the count of numbers.",
+          "explanation": "For example, to find the mean of +3, -1, +2, -4, and +5, you would sum them (5) and divide by 5 to get +1."
+        },
+        {
+          "id": "4",
+          "text": "Sami Salo has a +/- rating of +3. If he gets a -2 rating for each remaining game, how many games does he need to play to reach a total rating of -9?",
+          "type": "thinking",
+          "category": "Thinking",
+          "options": [],
+          "answer": "6 games",
+          "explanation": "Let x be the number of games. The equation is 3 + (-2)x = -9. Solving for x: -2x = -12 → x = 6."
+        },
+        {
+          "id": "5",
+          "text": "Johnny has $4, repays Gary $3, collects $7 from Karen, and then doubles his money at the roulette table. Write an equation to model his final amount.",
+          "type": "application",
+          "category": "Application",
+          "options": [],
+          "answer": "Final amount = 2 x (4 - 3 + 7)",
+          "explanation": "Start with $4, subtract $3 (repayment), add $7 (collection), then multiply by 2 (doubling). The equation is 2 x (4 - 3 + 7) = 2 x 8 = $16."
+        },
+        {
+          "id": "6",
+          "text": "Explain how you would determine whether (-) x (-) x (-) – (-) x (-) x (-) is positive or negative.",
+          "type": "communication",
+          "category": "Communication",
+          "options": [],
+          "answer": "The expression simplifies to 0. The product of three negative numbers is negative, so (-) x (-) x (-) = -A and (-) x (-) x (-) = -B. Thus, -A - (-B) = -A + B. If A = B, the result is 0.",
+          "explanation": "Since both terms are identical (both are the product of three negatives), their difference is zero, which is neither positive nor negative."
+        }
+      ],
+      "createdAt": 1744145969546,
+      "totalQuestions": 6,
+      "results": {
+        "id": "result-1744146119277",
+        "quizId": "quiz-1744145969546",
+        "answers": {
+          "1": {
+            "isCorrect": false,
+            "feedback": "Incorrect. The correct answer is: C) -29",
+            "score": 0,
+            "userAnswer": "A) -19"
+          },
+          "2": {
+            "isCorrect": true,
+            "feedback": "Correct!",
+            "score": 1,
+            "userAnswer": "B) 12 steps below"
+          },
+          "3": {
+            "isCorrect": true,
+            "feedback": "The student's answer accurately captures the essence of calculating the mean for a set of integers. While the phrasing is less formal than the expected answer, the key steps—adding all the numbers and dividing by the count of numbers—are correctly described. This demonstrates a clear understanding of the concept.",
+            "score": 1,
+            "userAnswer": "add all the numbers and divide by the amount of numbers"
+          },
+          "4": {
+            "isCorrect": false,
+            "feedback": "The student's answer is incorrect. To reach a total rating of -9 from a current rating of +3, Sami Salo needs to lose 12 rating points (since 3 - 12 = -9). If he loses 2 rating points per game, he needs to play 6 games (12 ÷ 2 = 6). The student's answer of 3 games only accounts for a loss of 6 rating points, which would result in a total rating of -3, not -9.",
+            "score": 0,
+            "userAnswer": "3"
+          },
+          "5": {
+            "isCorrect": true,
+            "feedback": "The student's answer is correct. The expression (4-3+7)2 correctly models the sequence of operations: Johnny starts with $4, repays $3, collects $7, and then doubles his money. The placement of the '2' outside the parentheses indicates multiplication, just like the expected answer.",
+            "score": 1,
+            "userAnswer": "(4-3+7)2"
+          },
+          "6": {
+            "isCorrect": false,
+            "feedback": "The student's answer does not address the question directly. While BEDMAS (order of operations) is relevant, the student failed to apply it to simplify the expression and determine its sign. The expected answer involves simplifying the expression to show that it equals 0, which the student did not do.",
+            "score": 0.2,
+            "userAnswer": "BEDMAS, start with the multiplcation and division, then work on the subtraction and addition."
+          }
+        },
+        "overall": {
+          "score": 53,
+          "feedback": "You have a basic understanding, but there are areas for improvement.",
+          "reviewTopics": [
+            "What is the result of (-10) ÷ (-2) – (+4) x (+6)?",
+            "Sami Salo has a +/- rating of +3. If he gets a -2 rating for each remaining game, how many games does he need to play to reach a total rating of -9?",
+            "Explain how you would determine whether (-) x (-) x (-) – (-) x (-) x (-) is positive or negative."
+          ],
+          "strengths": [
+            "Joe climbs -3 steps every second for 4 seconds. Where is he compared to his starting position?",
+            "Define the term 'mean' in the context of integers.",
+            "Johnny has $4, repays Gary $3, collects $7 from Karen, and then doubles his money at the roulette table. Write an equation to model his final amount."
+          ]
+        },
+        "submittedAt": "2025-04-08T21:01:59.277Z"
+      }
     }
   },
   "pastQuizzes": [
@@ -1935,6 +2517,60 @@
       "topic": "Exponential Functions - Exponential Growth And Decay",
       "createdAt": "2025-04-08T19:51:06.320Z",
       "totalQuestions": 7
+    },
+    {
+      "id": "quiz-1744142859999",
+      "title": "Grade 10 Trigonometry - Similar Triangles Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Trigonometry - Similar Triangles",
+      "createdAt": "2025-04-08T20:07:39.999Z",
+      "totalQuestions": 4
+    },
+    {
+      "id": "quiz-1744143889243",
+      "title": "Grade 10 Algebraic Expressions - Common Factoring Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Algebraic Expressions - Common Factoring",
+      "createdAt": "2025-04-08T20:24:49.243Z",
+      "totalQuestions": 5
+    },
+    {
+      "id": "quiz-1744144586612",
+      "title": "Grade 10 Algebraic Expressions - Common Factoring Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Algebraic Expressions - Common Factoring",
+      "createdAt": "2025-04-08T20:36:26.612Z",
+      "totalQuestions": 9
+    },
+    {
+      "id": "quiz-1744144902665",
+      "title": "Grade 10 Algebraic Expressions - Common Factoring Quiz",
+      "subject": "Mathematics",
+      "grade": "10",
+      "topic": "Algebraic Expressions - Common Factoring",
+      "createdAt": "2025-04-08T20:41:42.665Z",
+      "totalQuestions": 8
+    },
+    {
+      "id": "quiz-1744145579659",
+      "title": "Grade 9 Integers - Operations With Integers Quiz",
+      "subject": "Mathematics",
+      "grade": "9",
+      "topic": "Integers - Operations With Integers",
+      "createdAt": "2025-04-08T20:52:59.660Z",
+      "totalQuestions": 10
+    },
+    {
+      "id": "quiz-1744145969546",
+      "title": "Grade 9 Integers - Operations With Integers Quiz",
+      "subject": "Mathematics",
+      "grade": "9",
+      "topic": "Integers - Operations With Integers",
+      "createdAt": "2025-04-08T20:59:29.546Z",
+      "totalQuestions": 6
     }
   ]
 }
