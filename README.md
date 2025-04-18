@@ -1,6 +1,7 @@
 # Study AI App
 
-A Next.js application that helps students study by generating quizzes from their notes and providing AI-powered feedback.
+Application that helps students study by generating quizzes from their notes and providing AI-powered feedback.
+https://youtu.be/9D5G9IZub7w
 
 ## Features
 
